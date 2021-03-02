@@ -1,0 +1,11 @@
+Trial 5
+Stand 1 -> 200
+Forward 200 -> 600
+Stand 600 -> 1000
+Faint 1000 -> 1300
+Stand 1300 -> 1500
+Slip 1500 -> 2100
+Stand 2100 -> 2200
+Left 2200 -> 2600 
+Stand 2600 -> end of data
+All falls occur for roughly 120 ticks
