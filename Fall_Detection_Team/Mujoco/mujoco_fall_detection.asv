@@ -145,7 +145,7 @@ for i = 40:length(roll)
         out = sprintf("%d Forward detected", data_ticks);
             disp(out)
             
-    elseif (diffPitch <= 0 && diffPitch >= -28.97 && diffRoll <= 80 && diffRoll >= 23.14 && diffGyroX >= -130.127 && diffGyroY <= 56.275 && diffGyroZ <= 62.813) %&& abs(gyro_x(i)) <= 13.7 && gyro_y(i) <= -146.7 && gyro_z(i) <= -89.47)
+    elseif (diffPitch >= -28.97 && diffRoll >= 23.14 && diffGyroX >= -130.127 && diffGyroY <= 56.275 && diffGyroZ <= 62.813) %&& abs(gyro_x(i)) <= 13.7 && gyro_y(i) <= -146.7 && gyro_z(i) <= -89.47)
         out = sprintf("%d Slip fall detected", data_ticks);
             disp(out)
     
