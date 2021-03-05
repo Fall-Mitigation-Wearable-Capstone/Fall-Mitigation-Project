@@ -4,7 +4,7 @@ clear all;
 close all;
 clc;
 
-range = 1500:2100;
+range = 1000:1200;
 sim_data = csvread('eulers_trial5.csv');
 x = sim_data(range, :);
 time = 0:1/200:(length(x) - 1)/200;
