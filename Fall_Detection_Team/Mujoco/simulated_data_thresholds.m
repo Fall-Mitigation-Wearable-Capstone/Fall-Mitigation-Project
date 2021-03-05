@@ -4,7 +4,7 @@ clear all;
 close all;
 clc;
 
-range = 1000:1300;
+range = 1500:2100;
 sim_data = csvread('eulers_trial5.csv');
 x = sim_data(range, :);
 time = 0:1/200:(length(x) - 1)/200;
@@ -21,6 +21,13 @@ hold on
 data2 = sim_data(range, 2);
 plot(time, data2)
 data3 = sim_data(range, 3);
+% for i=1:length(data3)
+%     if data3(i) > 90
+%         data3(i) = data3(i) - 360;
+%     else
+%         data3(i) = data3(i);
+%     end
+% end
 plot(time, data3)
 legend("yaw", "pitch", "roll")
 
@@ -34,7 +41,7 @@ data6 = more_data(range, 3);
 plot(time2, data6*180/pi)
 legend("x", "y", "z")
 
-range2 = 1500:2100;
+range2 = 2190:2400;
 % sim_data = csvread('eulers_trial5.csv')
 x = sim_data(range2, :);
 time = 0:1/200:(length(x) - 1)/200;
@@ -51,6 +58,13 @@ hold on
 data2 = sim_data(range2, 2);
 plot(time, data2)
 data3 = sim_data(range2, 3);
+for i=1:length(data3)
+    if data3(i) > 90
+        data3(i) = data3(i) - 360;
+    else
+        data3(i) = data3(i);
+    end
+end
 plot(time, data3)
 legend("yaw", "pitch", "roll")
 

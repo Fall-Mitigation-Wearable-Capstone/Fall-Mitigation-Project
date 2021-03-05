@@ -138,25 +138,36 @@ for i = 40:length(roll)
     diffRoll = roll(i) - circBuff_roll(mod(i, 40) + 1);
     diffPitch = pitch(i) - circBuff_pitch(mod(i, 40) + 1);
     diffGyroX = gyro_x(i) - circBuff_gyrox(mod(i, 40) + 1);
-    diffGyroY = gyro_y(i) - circBuff_gyroy(mod(i, 40) + 1);
+    diffGyroY = gyro_y(i) - circBuff_gyroy(mod(i, 40) + 1); 
     diffGyroZ = gyro_z(i) - circBuff_gyroz(mod(i, 40) + 1);
     
+    if i >= 1500 && i <= 1560
+        out = sprintf("%d %d %d %d", data_ticks, diffGyroX, diffGyroY, diffGyroZ);
+        disp(out)
+    end
+%     
     if (diffPitch >= 61 && abs(diffRoll) <= 1.63 && abs(gyro_x(i)) <= 44.16 && gyro_y(i) >= 221.9 && abs(gyro_z(i)) <= 122.7)
-        out = sprintf("%d Forward detected", data_ticks);
-            disp(out)
+%         out = sprintf("%d Forward detected", data_ticks);
+%         disp(out)
             
-    elseif (diffPitch <= 0 && diffPitch >= -28.97 && diffRoll <= 80 && diffRoll >= 23.14 && diffGyroX >= -130.127 && diffGyroY <= 56.275 && diffGyroZ <= 62.813) %&& abs(gyro_x(i)) <= 13.7 && gyro_y(i) <= -146.7 && gyro_z(i) <= -89.47)
-        out = sprintf("%d Slip fall detected", data_ticks);
-            disp(out)
+    elseif (diffPitch <= 0 && diffPitch >= -28.97 && diffRoll <= 80 && diffRoll >= 23.14 && diffGyroX >= -130.127 && diffGyroX <= 0 && diffGyroY <= 56.275 && diffGyroY >= -150 && diffGyroZ <= 100 && diffGyroZ >= 0) %&& abs(gyro_x(i)) <= 13.7 && gyro_y(i) <= -146.7 && gyro_z(i) <= -89.47)
+%         out = sprintf("%d Slip fall detected", data_ticks);
+%         disp(out)
     
     elseif (diffPitch <= 0 && diffPitch >= -22.316 && diffRoll <= 98.025 && diffRoll >= 0 && diffGyroX <= 146.222 && diffGyroY <= -284.67 && diffGyroZ <= 235.84) % && gyro_x(i) >= 106.5 && gyro_y(i) >= -279.656)% && diffGyroZ <= 31.754)
         out = sprintf("%d Faint fall detected", data_ticks);
-            disp(out)
+        disp(out)
             
+%     elseif (diffPitch >= -20 && diffPitch <= -12.986 && diffRoll >= -3) % && diffGyroX <= 44.948 && diffGyroY <= -7.5601 && diffGyroZ >= -111.4029)
+%         out = sprintf("%d Left fall detected", data_ticks);
+%         disp(out)
     end
     
     circBuff_roll(mod(i, 40) + 1) = roll(i);
     circBuff_pitch(mod(i, 40) + 1) = pitch(i);
+    circBuff_gyrox(mod(i, 40) + 1) = gyro_x(i);
+    circBuff_gyroy(mod(i, 40) + 1) = gyro_y(i); 
+    circBuff_gyroz(mod(i, 40) + 1) = gyro_z(i);
     data_ticks = data_ticks + 1;
 end
 
