@@ -3,9 +3,9 @@ clear all;
 close all;
 clc;
 
-participantNum = 2;
+participantNum = 1;
 
-data = csvread("Participant-Data\Participant " + participantNum + "\Raw\testing" + participantNum + "_sit2up.csv");
+data = csvread("Participant-Data\Participant " + participantNum + "\Raw\testing" + participantNum + "_right.csv");
 % time2 = 0:30/length(data2):(length(data2)-1)*30/length(data2);
 g = data(:,1:3);
 e = data(:,7:9);
@@ -18,15 +18,15 @@ e = data(:,7:9);
 % range = 2820:3222; %straighting out 1
 % range = 2379:2731; %bending over 2
 % range = 2732:3052; %straighting out 2
-range = 2400:3000;
+% range = 2400:3000;
 
 figure(1)
-subplot(2,1,1)
+% subplot(2,1,1)
 plot(e(:,2:3))
 legend("pitch", "roll")
-title("Euler")
-subplot(2,1,2)
-plot(range, e(range,2:3))
+% title("Euler")
+% subplot(2,1,2)
+% plot(range, e(range,2:3))
 
 % figure(2)
 % title("Gyro")
@@ -155,18 +155,20 @@ disp(out1)
 disp(out2)
 
 %% Algorithm
+clc;
 
 %current reporitng frequency at 155hz
 
 %fall flags for debouncing
 foward_flag = 0;
+right_flag = 0;
 
 %buffers for data
 circBuff_roll = zeros(31);
 circBuff_pitch = zeros(31);
 circBuff_gyrox = zeros(31);
-circBuff_gyroy = zeros(31);
-circBuff_gyroz = zeros(31);
+% circBuff_gyroy = zeros(31);
+% circBuff_gyroz = zeros(31);
 
 data_ticks = 1;
 
@@ -174,7 +176,7 @@ data_ticks = 1;
 for i = 1:31
     circBuff_roll(i) = roll(i);
     circBuff_pitch(i) = pitch(i);
-%     circBuff_gyrox(i) = gx(i);
+    circBuff_gyrox(i) = gx(i);
 %     circBuff_gyroy(i) = gy(i);
 %     circBuff_gyroz(i) = gz(i);
     data_ticks = data_ticks + 1;
@@ -183,22 +185,39 @@ end
 for i = 31:length(e)
     diffRoll = roll(i) - circBuff_roll(mod(i, 31) + 1);
     diffPitch = pitch(i) - circBuff_pitch(mod(i, 31) + 1);
-%     diffGyroX = gx(i) - circBuff_gyrox(mod(i, 40) + 1);
-%     diffGyroY = gy(i) - circBuff_gyroy(mod(i, 40) + 1); 
-%     diffGyroZ = gz(i) - circBuff_gyroz(mod(i, 40) + 1);
+    diffGyroX = gx(i) - circBuff_gyrox(mod(i, 31) + 1);
+%     diffGyroY = gy(i) - circBuff_gyroy(mod(i, 31) + 1); 
+%     diffGyroZ = gz(i) - circBuff_gyroz(mod(i, 31) + 1);
 
-%     if(diffRoll >= 2.61 && diffRoll <= 16.6)
-%         x = sprintf("%d forward fall", data_ticks); 
-%         disp(x)
-%     end
+    if(diffRoll >= 4 && diffGyroX >= 48)
+        forward_flag = forward_flag + 1;
+    else
+        forward_flag = 0;
+    end
 
     if(diffPitch >= -38.7 && diffPitch <= -10.3)
-        x = sprintf("%d right fall", data_ticks); 
+        right_flag = right_flag + 1;
+    else
+        right_flag = 0;
+    end
+    
+    if forward_flag >= 5
+        x = sprintf("%d forward fall: %0.2f %0.2f", data_ticks, diffRoll, diffGyroX); 
         disp(x)
+        
+        forward_flag = 0;
+    end
+ 
+    if right_flag >= 5
+        x = sprintf("%d right fall: %0.2f %0.2f %0.2f", data_ticks, diffPitch, diffRoll, diffGyroX); 
+        disp(x)
+        
+        right_flag = 0;
     end
     
     circBuff_roll(mod(i, 40) + 1) = roll(i);
     circBuff_pitch(mod(i, 40) + 1) = pitch(i);
+    circBuff_gyrox(mod(i, 31) + 1) = gx(i);
     data_ticks = data_ticks + 1;
 end
 
