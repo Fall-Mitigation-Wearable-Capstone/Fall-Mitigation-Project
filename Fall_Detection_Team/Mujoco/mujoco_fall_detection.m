@@ -129,6 +129,29 @@ slip_debounce = 0;
 faint_debounce = 0;
 left_debounce = 0;
 
+time = 0:1/200:(length(sim_data) - 1)/200;
+figure(1)
+a = subplot(3, 2, 1);
+plot(time, gyro_x)
+title("Gyro X")
+hold on
+b = subplot(3, 2, 3);
+plot(time, gyro_y)
+title("Gyro Y")
+hold on
+c = subplot(3, 2, 5);
+plot(time, gyro_z)
+title("Gyro Z")
+hold on
+d = subplot(2, 2, 2);
+plot(time, pitch)
+title("Pitch")
+hold on
+e = subplot(2, 2, 4);
+plot(time, roll)
+title("Roll")
+hold on
+
 for i = 1:40
     circBuff_roll(i) = roll(i);
     circBuff_pitch(i) = pitch(i);
@@ -178,18 +201,62 @@ for i = 40:length(roll)
     
     if forward_debounce >= 5
         forward_debounce = 0;
+        currTime = data_ticks/200;
+        axes(a)
+        plot(currTime, gyro_x(i), 'ro')
+        axes(b)
+        plot(currTime, gyro_y(i), 'ro')
+        axes(c)
+        plot(currTime, gyro_z(i), 'ro')
+        axes(d)
+        plot(currTime, pitch(i), 'ro')
+        axes(e)
+        plot(currTime, roll(i), 'ro')
         out = sprintf("%d Forward detected", data_ticks);
         disp(out)
     elseif slip_debounce >= 5
         slip_debounce = 0;
+        currTime = data_ticks/200;
+        axes(a)
+        plot(currTime, gyro_x(i), 'mo')
+        axes(b)
+        plot(currTime, gyro_y(i), 'mo')
+        axes(c)
+        plot(currTime, gyro_z(i), 'mo')
+        axes(d)
+        plot(currTime, pitch(i), 'mo')
+        axes(e)
+        plot(currTime, roll(i), 'mo')
         out = sprintf("%d Slip detected", data_ticks);
         disp(out)
     elseif faint_debounce >= 5
         faint_debounce = 0;
+        currTime = data_ticks/200;
+        axes(a)
+        plot(currTime, gyro_x(i), 'go')
+        axes(b)
+        plot(currTime, gyro_y(i), 'go')
+        axes(c)
+        plot(currTime, gyro_z(i), 'go')
+        axes(d)
+        plot(currTime, pitch(i), 'go')
+        axes(e)
+        plot(currTime, roll(i), 'go')
         out = sprintf("%d Faint detected", data_ticks);
         disp(out)
     elseif left_debounce >= 5
         left_debounce = 0;
+        currTime = data_ticks/200;
+        axes(a)
+        plot(currTime, gyro_x(i), 'co')
+        axes(b)
+        plot(currTime, gyro_y(i), 'co')
+        axes(c)
+        plot(currTime, gyro_z(i), 'co')
+        axes(d)
+        plot(currTime, pitch(i), 'co')
+        axes(e)
+        plot(currTime, roll(i), 'co')
         out = sprintf("%d Left detected", data_ticks);
         disp(out)
     end
