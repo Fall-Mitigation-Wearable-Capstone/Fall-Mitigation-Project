@@ -3,30 +3,23 @@ clear all;
 close all;
 clc;
 
-participantNum = 3;
+participantNum = 4;
+movement = "right";
 
-data = csvread("Participant-Data\Participant " + participantNum + "\Raw\testing" + participantNum + "_collapse.csv");
+data = csvread("Participant-Data\Participant " + participantNum + "\Raw\testing" + participantNum + "_" + movement + ".csv");
 % time2 = 0:30/length(data2):(length(data2)-1)*30/length(data2);
 time =(data(:,1) - data(1,1)) / 1000;
+a = data(:,5:7);
 g = data(:,2:4);
 e = data(:,8:10);
 
-% range = 2397:2517; %forward 1
-% range = 2533:2615; %forward 2
-% range = 2651:2712; %right 2
-% range = 1:length(data); %walking (both)
-% range = 2508:2819; %bending over 1
-% range = 2820:3222; %straighting out 1
-% range = 2379:2731; %bending over 2
-% range = 2732:3052; %straighting out 2
-% range = 2400:3000;
-
 figure(1)
 % subplot(2,1,1)
-plot(time, e(:,2))
-hold on
-plot(time, e(:,3))
+plot(time, e(:,2:3));
 legend("pitch", "roll")
+hold on;
+figure(2)
+plot(e(:,2:3))
 % title("Euler")
 % subplot(2,1,2)
 % plot(range, e(range,2:3))
@@ -44,6 +37,17 @@ gy = g(:,2);
 gz = g(:,3);
 
 %% Finding thresh
+
+out1 = sprintf("%d %s", participantNum, movement);
+disp(out1)
+
+% range = 1:length(e);
+range = 2662:2848;
+
+figure(3)
+plot(time(range), e(range, 2:3))
+% hold on
+% plot(time(range(1)+31), e(range(1)+31, 2:3), 'x')
 
 data_ticks = 1;
 circBuff_roll = zeros(31);
@@ -158,12 +162,19 @@ disp(out1)
 disp(out2)
 
 %% Algorithm
-clc;
+
+figure(2)
+% subplot(2,1,1)
+plot(time, e(:,2:3));
+hold on;
+
+out1 = sprintf("%d %s", participantNum, movement);
+disp(out1);
 
 %current reporitng frequency at 155hz
 
 %fall flags for debouncing
-foward_flag = 0;
+forward_flag = 0;
 right_flag = 0;
 left_flag = 0;
 back_flag = 0;
@@ -176,7 +187,6 @@ circBuff_gyrox = zeros(31);
 % circBuff_gyroz = zeros(31);
 
 data_ticks = 1;
-
 
 for i = 1:31
     circBuff_roll(i) = roll(i);
@@ -194,25 +204,25 @@ for i = 31:length(e)
 %     diffGyroY = gy(i) - circBuff_gyroy(mod(i, 31) + 1); 
 %     diffGyroZ = gz(i) - circBuff_gyroz(mod(i, 31) + 1);
 
-    if(diffRoll >= 4 && diffGyroX >= 48)
+    if(diffRoll <= -7)
         forward_flag = forward_flag + 1;
     else
         forward_flag = 0;
     end
 
-    if(diffPitch <= 38.7 && diffPitch >= 10.3)
+    if(diffPitch <= -10)
         left_flag = left_flag + 1;
     else
         left_flag = 0;
     end
     
-    if(diffPitch >= -38.7 && diffPitch <= -10.3)
+    if(diffPitch >= 10)
         right_flag = right_flag + 1;
     else
         right_flag = 0;
     end
     
-    if(diffRoll <= -4 && diffGyroX <= -48)
+    if(diffRoll >= 7)
         back_flag = back_flag + 1;
     else
         back_flag = 0;
@@ -222,6 +232,9 @@ for i = 31:length(e)
         x = sprintf("%0.2f forward fall: %0.2f %0.2f", time(data_ticks), diffRoll, diffGyroX); 
         disp(x)
         
+        
+        plot(time(data_ticks), roll(data_ticks), 'co')
+        
         forward_flag = 0;
     end
     
@@ -229,6 +242,7 @@ for i = 31:length(e)
         x = sprintf("%0.2f left fall: %0.2f %0.2f %0.2f", time(data_ticks), diffPitch, diffRoll, diffGyroX); 
         disp(x)
         
+        plot(time(data_ticks), pitch(data_ticks), 'ro')
         left_flag = 0;
     end
  
@@ -236,6 +250,7 @@ for i = 31:length(e)
         x = sprintf("%0.2f right fall: %0.2f %0.2f %0.2f", time(data_ticks), diffPitch, diffRoll, diffGyroX); 
         disp(x)
         
+        plot(time(data_ticks), pitch(data_ticks), 'mo')
         right_flag = 0;
     end
     
@@ -243,6 +258,7 @@ for i = 31:length(e)
         x = sprintf("%0.2f back fall: %0.2f %0.2f", time(data_ticks), diffRoll, diffGyroX); 
         disp(x)
         
+        plot(time(data_ticks), roll(data_ticks), 'go')
         back_flag = 0;
     end
     
@@ -252,9 +268,7 @@ for i = 31:length(e)
     data_ticks = data_ticks + 1;
 end
 
-
-
-
+legend("pitch", "roll")
 
 
 
