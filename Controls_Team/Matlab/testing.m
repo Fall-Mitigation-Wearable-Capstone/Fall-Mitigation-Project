@@ -3,7 +3,7 @@ clear all;
 close all;
 clc;
 
-participantNum = 2;
+participantNum = 3;
 
 %%
 clc;
