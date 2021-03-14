@@ -20,6 +20,10 @@ legend("pitch", "roll")
 hold on;
 figure(2)
 plot(e(:,2:3))
+% figure(3)
+% plot(a)
+% legend("x", "y", "z")
+
 % title("Euler")
 % subplot(2,1,2)
 % plot(range, e(range,2:3))
@@ -168,7 +172,7 @@ figure(2)
 plot(time, e(:,2:3));
 hold on;
 
-out1 = sprintf("%d %s", participantNum, movement);
+out1 = sprintf("testing: %d %s", participantNum, movement);
 disp(out1);
 
 %current reporitng frequency at 155hz
@@ -183,7 +187,7 @@ back_flag = 0;
 circBuff_roll = zeros(31);
 circBuff_pitch = zeros(31);
 circBuff_gyrox = zeros(31);
-% circBuff_gyroy = zeros(31);
+circBuff_gyroy = zeros(31);
 % circBuff_gyroz = zeros(31);
 
 data_ticks = 1;
@@ -192,7 +196,7 @@ for i = 1:31
     circBuff_roll(i) = roll(i);
     circBuff_pitch(i) = pitch(i);
     circBuff_gyrox(i) = gx(i);
-%     circBuff_gyroy(i) = gy(i);
+    circBuff_gyroy(i) = gy(i);
 %     circBuff_gyroz(i) = gz(i);
     data_ticks = data_ticks + 1;
 end
@@ -201,70 +205,88 @@ for i = 31:length(e)
     diffRoll = roll(i) - circBuff_roll(mod(i, 31) + 1);
     diffPitch = pitch(i) - circBuff_pitch(mod(i, 31) + 1);
     diffGyroX = gx(i) - circBuff_gyrox(mod(i, 31) + 1);
-%     diffGyroY = gy(i) - circBuff_gyroy(mod(i, 31) + 1); 
+    diffGyroY = gy(i) - circBuff_gyroy(mod(i, 31) + 1); 
 %     diffGyroZ = gz(i) - circBuff_gyroz(mod(i, 31) + 1);
 
-    if(diffRoll <= -7)
-        forward_flag = forward_flag + 1;
-    else
-        forward_flag = 0;
-    end
+%     if(diffRoll <= -6 && diffGyroX < -10 && gx(i) < - 20) % && diffGyroX <= -15 && gx(i) < -30 )
+%         x = sprintf("%d forward fall: %0.2f %0.2f %0.2f", data_ticks, diffRoll, diffGyroX, gx(i)); 
+%         disp(x)
+%         
+%         if(forward_flag < 16)
+%             forward_flag = forward_flag + 1;
+%         end
+%     else
+%         if(forward_flag > 0)
+%             forward_flag = forward_flag - 1;
+%         end
+%     end
 
-    if(diffPitch <= -10)
-        left_flag = left_flag + 1;
-    else
-        left_flag = 0;
-    end
-    
-    if(diffPitch >= 10)
-        right_flag = right_flag + 1;
-    else
-        right_flag = 0;
-    end
-    
     if(diffRoll >= 7)
         back_flag = back_flag + 1;
     else
         back_flag = 0;
     end
     
-    if forward_flag >= 5
-        x = sprintf("%0.2f forward fall: %0.2f %0.2f", time(data_ticks), diffRoll, diffGyroX); 
+    if(diffPitch < -6)
+        x = sprintf("%0.2f left fall: %0.2f %0.2f", time(data_ticks), diffPitch, diffGyroY); 
         disp(x)
         
-        
-        plot(time(data_ticks), roll(data_ticks), 'co')
-        
-        forward_flag = 0;
+        if(left_flag < 16)
+            left_flag = left_flag + 1;
+        end
+    else
+        if(left_flag > 0)
+            left_flag = left_flag - 1;
+        end
     end
     
-    if left_flag >= 5
-        x = sprintf("%0.2f left fall: %0.2f %0.2f %0.2f", time(data_ticks), diffPitch, diffRoll, diffGyroX); 
-        disp(x)
+    if(diffPitch > 6)
+        
+        if(right_flag < 16)
+            right_flag = right_flag + 1;
+        end
+    else
+        if(right_flag > 0)
+            right_flag = right_flag - 1;
+        end
+    end
+    
+%     if forward_flag >= 16
+% %         x = sprintf("%0.2f forward fall: %0.2f %0.2f %0.2f", time(data_ticks), diffRoll, diffGyroX, roll(i)); 
+% %         disp(x)
+% %         
+%         
+%         plot(time(data_ticks), roll(data_ticks), 'co')
+%         
+% %         forward_flag = 0;
+%     end
+    
+    if left_flag >= 16
         
         plot(time(data_ticks), pitch(data_ticks), 'ro')
-        left_flag = 0;
+%         left_flag = 0;
     end
  
-    if right_flag >= 5
-        x = sprintf("%0.2f right fall: %0.2f %0.2f %0.2f", time(data_ticks), diffPitch, diffRoll, diffGyroX); 
+    if right_flag >= 16
+        x = sprintf("%0.2f right fall: %0.2f %0.2f", time(data_ticks), diffPitch, diffGyroY); 
         disp(x)
         
         plot(time(data_ticks), pitch(data_ticks), 'mo')
-        right_flag = 0;
+%         right_flag = 0;
     end
+%     
+%     if back_flag >= 5
+%         x = sprintf("%0.2f back fall: %0.2f %0.2f", time(data_ticks), diffRoll, diffGyroX); 
+%         disp(x)
+%         
+%         plot(time(data_ticks), roll(data_ticks), 'go')
+%         back_flag = 0;
+%     end
     
-    if back_flag >= 5
-        x = sprintf("%0.2f back fall: %0.2f %0.2f", time(data_ticks), diffRoll, diffGyroX); 
-        disp(x)
-        
-        plot(time(data_ticks), roll(data_ticks), 'go')
-        back_flag = 0;
-    end
-    
-    circBuff_roll(mod(i, 40) + 1) = roll(i);
-    circBuff_pitch(mod(i, 40) + 1) = pitch(i);
+    circBuff_roll(mod(i, 31) + 1) = roll(i);
+    circBuff_pitch(mod(i, 31) + 1) = pitch(i);
     circBuff_gyrox(mod(i, 31) + 1) = gx(i);
+    circBuff_gyroy(mod(i, 31) + 1) = gy(i);
     data_ticks = data_ticks + 1;
 end
 
