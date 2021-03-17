@@ -208,8 +208,8 @@ for i = 31:length(e)
     diffGyroY = gy(i) - circBuff_gyroy(mod(i, 31) + 1); 
 %     diffGyroZ = gz(i) - circBuff_gyroz(mod(i, 31) + 1);
 
-%     if(diffRoll <= -6 && diffGyroX < -10 && gx(i) < - 20) % && diffGyroX <= -15 && gx(i) < -30 )
-%         x = sprintf("%d forward fall: %0.2f %0.2f %0.2f", data_ticks, diffRoll, diffGyroX, gx(i)); 
+%     if(diffRoll <= -5 && gx(i) < - 20) % && diffGyroX <= -15 && gx(i) < -30 )
+%         x = sprintf("%d  %0.2f forward fall: %0.2f %0.2f %0.2f", data_ticks, time(data_ticks), diffRoll, diffGyroX, gx(i)); 
 %         disp(x)
 %         
 %         if(forward_flag < 16)
@@ -221,14 +221,22 @@ for i = 31:length(e)
 %         end
 %     end
 
-    if(diffRoll >= 7)
-        back_flag = back_flag + 1;
-    else
-        back_flag = 0;
-    end
+%     if(roll(i) > 70 && diffRoll > 12)
+%         x = sprintf("%0.2f back fall: %0.2f %0.2f %0.2f", time(data_ticks), roll(i), diffRoll, diffGyroX); 
+%         disp(x)
+%         if(back_flag < 16)
+%             back_flag = back_flag + 1;
+%         end
+%     else
+%         if(back_flag > 0)
+%             back_flag = back_flag - 1;
+%         end
+%     end
     
-    if(diffPitch < -6)
-        x = sprintf("%0.2f left fall: %0.2f %0.2f", time(data_ticks), diffPitch, diffGyroY); 
+    % -0.74 7.28 -6.67
+    % -2.54 2.21 -6.7
+    if(diffPitch < -5 && abs(gy(i)) > 40)
+        x = sprintf("%0.2f left fall: %0.2f %0.2f", time(data_ticks), diffPitch, gy(i)); 
         disp(x)
         
         if(left_flag < 16)
@@ -240,48 +248,47 @@ for i = 31:length(e)
         end
     end
     
-    if(diffPitch > 6)
-        
-        if(right_flag < 16)
-            right_flag = right_flag + 1;
-        end
-    else
-        if(right_flag > 0)
-            right_flag = right_flag - 1;
-        end
-    end
+%     if(diffPitch > 6)
+%         x = sprintf("%0.2f right fall: %0.2f %0.2f %0.2f", time(data_ticks), pitch(i), diffPitch, gy(i)); 
+%         disp(x)
+%         if(right_flag < 16)
+%             right_flag = right_flag + 1;
+%         end
+%     else
+%         if(right_flag > 0)
+%             right_flag = right_flag - 1;
+%         end
+%     end
     
 %     if forward_flag >= 16
 % %         x = sprintf("%0.2f forward fall: %0.2f %0.2f %0.2f", time(data_ticks), diffRoll, diffGyroX, roll(i)); 
 % %         disp(x)
 % %         
 %         
-%         plot(time(data_ticks), roll(data_ticks), 'co')
+%         plot(time(data_ticks), roll(data_ticks), 'bx')
 %         
 % %         forward_flag = 0;
 %     end
-    
+%     
     if left_flag >= 16
-        
         plot(time(data_ticks), pitch(data_ticks), 'ro')
 %         left_flag = 0;
     end
  
     if right_flag >= 16
-        x = sprintf("%0.2f right fall: %0.2f %0.2f", time(data_ticks), diffPitch, diffGyroY); 
-        disp(x)
-        
+%         x = sprintf("%0.2f right fall: %0.2f %0.2f %0.2f", time(data_ticks), pitch(i), diffPitch, diffGyroY); 
+%         disp(x)
         plot(time(data_ticks), pitch(data_ticks), 'mo')
 %         right_flag = 0;
     end
-%     
-%     if back_flag >= 5
-%         x = sprintf("%0.2f back fall: %0.2f %0.2f", time(data_ticks), diffRoll, diffGyroX); 
+    
+    if back_flag >= 16
+%         x = sprintf("%0.2f back fall: %0.2f %0.2f %0.2f", time(data_ticks), roll(i), diffRoll, diffGyroX); 
 %         disp(x)
-%         
-%         plot(time(data_ticks), roll(data_ticks), 'go')
-%         back_flag = 0;
-%     end
+        
+        plot(time(data_ticks), roll(data_ticks), 'go')
+        back_flag = 0;
+    end
     
     circBuff_roll(mod(i, 31) + 1) = roll(i);
     circBuff_pitch(mod(i, 31) + 1) = pitch(i);
@@ -290,8 +297,19 @@ for i = 31:length(e)
     data_ticks = data_ticks + 1;
 end
 
-legend("pitch", "roll")
+% x = [0.6 0.51];
+% y = [0.8 0.775];
+% annotation('textarrow', x, y, 'String', 'Start of Fall (17.28s)')
+% 
+% x = [0.6 0.52];
+% y = [0.7 0.67];
+% annotation('textarrow', x, y, 'String', 'First Detected Fall (17.47s)')
+% 
+% title('Participant 1: Forward Fall Trial')
 
+legend("pitch", "roll")
+ylabel("Degrees")
+xlabel("Time (Seconds)")
 
 
 
