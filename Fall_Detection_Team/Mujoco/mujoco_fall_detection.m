@@ -131,24 +131,34 @@ left_debounce = 0;
 
 time = 0:1/200:(length(sim_data) - 1)/200;
 figure(1)
-a = subplot(3, 2, 1);
-plot(time, gyro_x)
-title("Gyro X")
-hold on
-b = subplot(3, 2, 3);
-plot(time, gyro_y)
-title("Gyro Y")
-hold on
-c = subplot(3, 2, 5);
-plot(time, gyro_z)
-title("Gyro Z")
-hold on
-d = subplot(2, 2, 2);
+% a = subplot(3, 2, 1);
+% plot(time, gyro_x)
+% xlabel("Time (sec)")
+% ylabel("Angular velocity (deg/sec)")
+% title("Gyro X")
+% hold on
+% b = subplot(3, 2, 3);
+% plot(time, gyro_y)
+% xlabel("Time (sec)")
+% ylabel("Angular velocity (deg/sec)")
+% title("Gyro Y")
+% hold on
+% c = subplot(3, 2, 5);
+% plot(time, gyro_z)
+% xlabel("Time (sec)")
+% ylabel("Angular velocity (deg/sec)")
+% title("Gyro Z")
+% hold on
+d = subplot(2, 1, 1);
 plot(time, pitch)
+xlabel("Time (sec)")
+ylabel("Angle (deg)")
 title("Pitch")
 hold on
-e = subplot(2, 2, 4);
+e = subplot(2, 1, 2);
 plot(time, roll)
+xlabel("Time (sec)")
+ylabel("Angle (deg)")
 title("Roll")
 hold on
 
@@ -202,61 +212,61 @@ for i = 40:length(roll)
     if forward_debounce >= 5
         forward_debounce = 0;
         currTime = data_ticks/200;
-        axes(a)
-        plot(currTime, gyro_x(i), 'ro')
-        axes(b)
-        plot(currTime, gyro_y(i), 'ro')
-        axes(c)
-        plot(currTime, gyro_z(i), 'ro')
+%         axes(a)
+%         plot(currTime, gyro_x(i), 'ro', 'MarkerFaceColor', 'r')
+%         axes(b)
+%         plot(currTime, gyro_y(i), 'ro', 'MarkerFaceColor', 'r')
+%         axes(c)
+%         plot(currTime, gyro_z(i), 'ro', 'MarkerFaceColor', 'r')
         axes(d)
-        plot(currTime, pitch(i), 'ro')
+        plot(currTime, pitch(i), 'ro', 'MarkerFaceColor', 'r')
         axes(e)
-        plot(currTime, roll(i), 'ro')
+        plot(currTime, roll(i), 'ro', 'MarkerFaceColor', 'r')
         out = sprintf("%d Forward detected", data_ticks);
         disp(out)
     elseif slip_debounce >= 5
         slip_debounce = 0;
         currTime = data_ticks/200;
-        axes(a)
-        plot(currTime, gyro_x(i), 'mo')
-        axes(b)
-        plot(currTime, gyro_y(i), 'mo')
-        axes(c)
-        plot(currTime, gyro_z(i), 'mo')
+%         axes(a)
+%         plot(currTime, gyro_x(i), 'o', 'MarkerEdgeColor', [0.5 0.1 1], 'MarkerFaceColor', [0.5 0.1 1])
+%         axes(b)
+%         plot(currTime, gyro_y(i), 'o', 'MarkerEdgeColor', [0.5 0.1 1], 'MarkerFaceColor', [0.5 0.1 1])
+%         axes(c)
+%         plot(currTime, gyro_z(i), 'o', 'MarkerEdgeColor', [0.5 0.1 1], 'MarkerFaceColor', [0.5 0.1 1])
         axes(d)
-        plot(currTime, pitch(i), 'mo')
+        plot(currTime, pitch(i), 'o', 'MarkerEdgeColor', [0.5 0.1 1], 'MarkerFaceColor', [0.5 0.1 1])
         axes(e)
-        plot(currTime, roll(i), 'mo')
+        plot(currTime, roll(i), 'o', 'MarkerEdgeColor', [0.5 0.1 1], 'MarkerFaceColor', [0.5 0.1 1])
         out = sprintf("%d Slip detected", data_ticks);
         disp(out)
     elseif faint_debounce >= 5
         faint_debounce = 0;
         currTime = data_ticks/200;
-        axes(a)
-        plot(currTime, gyro_x(i), 'go')
-        axes(b)
-        plot(currTime, gyro_y(i), 'go')
-        axes(c)
-        plot(currTime, gyro_z(i), 'go')
+%         axes(a)
+%         plot(currTime, gyro_x(i), 'o', 'MarkerEdgeColor', [0.1 0.8 0.1], 'MarkerFaceColor', [0.1 0.8 0.1])
+%         axes(b)
+%         plot(currTime, gyro_y(i), 'o', 'MarkerEdgeColor', [0.1 0.8 0.1], 'MarkerFaceColor', [0.1 0.8 0.1])
+%         axes(c)
+%         plot(currTime, gyro_z(i), 'o', 'MarkerEdgeColor', [0.1 0.8 0.1], 'MarkerFaceColor', [0.1 0.8 0.1])
         axes(d)
-        plot(currTime, pitch(i), 'go')
+        plot(currTime, pitch(i), 'o', 'MarkerEdgeColor', [0.1 0.8 0.1], 'MarkerFaceColor', [0.1 0.8 0.1])
         axes(e)
-        plot(currTime, roll(i), 'go')
+        plot(currTime, roll(i), 'o', 'MarkerEdgeColor', [0.1 0.8 0.1], 'MarkerFaceColor', [0.1 0.8 0.1])
         out = sprintf("%d Faint detected", data_ticks);
         disp(out)
     elseif left_debounce >= 5
         left_debounce = 0;
         currTime = data_ticks/200;
-        axes(a)
-        plot(currTime, gyro_x(i), 'co')
-        axes(b)
-        plot(currTime, gyro_y(i), 'co')
-        axes(c)
-        plot(currTime, gyro_z(i), 'co')
+%         axes(a)
+%         plot(currTime, gyro_x(i), 'o', 'MarkerEdgeColor', [0.9 0 1], 'MarkerFaceColor', [0.9 0 1])
+%         axes(b)
+%         plot(currTime, gyro_y(i), 'o', 'MarkerEdgeColor', [0.9 0 1], 'MarkerFaceColor', [0.9 0 1])
+%         axes(c)
+%         plot(currTime, gyro_z(i), 'o', 'MarkerEdgeColor', [0.9 0 1], 'MarkerFaceColor', [0.9 0 1])
         axes(d)
-        plot(currTime, pitch(i), 'co')
+        plot(currTime, pitch(i), 'o', 'MarkerEdgeColor', [0.9 0 1], 'MarkerFaceColor', [0.9 0 1])
         axes(e)
-        plot(currTime, roll(i), 'co')
+        plot(currTime, roll(i), 'o', 'MarkerEdgeColor', [0.9 0 1], 'MarkerFaceColor', [0.9 0 1])
         out = sprintf("%d Left detected", data_ticks);
         disp(out)
     end
@@ -269,7 +279,30 @@ for i = 40:length(roll)
     data_ticks = data_ticks + 1;
 end
 
-
-
-
+% Plot 0.2 second position
+% axes(a)
+% plot(240/200, gyro_x(240), 'k*', 'MarkerSize', 8)
+% plot(1040/200, gyro_x(1040), 'k*', 'MarkerSize', 8)
+% plot(1540/200, gyro_x(1540), 'k*', 'MarkerSize', 8)
+% plot(2240/200, gyro_x(2240), 'k*', 'MarkerSize', 8)
+% axes(b)
+% plot(240/200, gyro_y(240), 'k*', 'MarkerSize', 8)
+% plot(1040/200, gyro_y(1040), 'k*', 'MarkerSize', 8)
+% plot(1540/200, gyro_y(1540), 'k*', 'MarkerSize', 8)
+% plot(2240/200, gyro_y(2240), 'k*', 'MarkerSize', 8)
+% axes(c)
+% plot(240/200, gyro_z(240), 'k*', 'MarkerSize', 8)
+% plot(1040/200, gyro_z(1040), 'k*', 'MarkerSize', 8)
+% plot(1540/200, gyro_z(1540), 'k*', 'MarkerSize', 8)
+% plot(2240/200, gyro_z(2240), 'k*', 'MarkerSize', 8)
+axes(d)
+plot(240/200, pitch(240), 'k*', 'MarkerSize', 8)
+plot(1040/200, pitch(1040), 'k*', 'MarkerSize', 8)
+plot(1540/200, pitch(1540), 'k*', 'MarkerSize', 8)
+plot(2240/200, pitch(2240), 'k*', 'MarkerSize', 8)
+axes(e)
+plot(240/200, roll(240), 'k*', 'MarkerSize', 8)
+plot(1040/200, roll(1040), 'k*', 'MarkerSize', 8)
+plot(1540/200, roll(1540), 'k*', 'MarkerSize', 8)
+plot(2240/200, roll(2240), 'k*', 'MarkerSize', 8)
 
