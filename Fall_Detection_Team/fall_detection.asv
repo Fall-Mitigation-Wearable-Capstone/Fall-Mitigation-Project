@@ -4,7 +4,7 @@ close all;
 clc;
 
 participantNum = 4;
-movement = "longRight";
+movement = "longForward2";
 
 data = csvread("Participant-Data\Participant " + participantNum + "\Raw\testing" + participantNum + "_" + movement + ".csv");
 % time2 = 0:30/length(data2):(length(data2)-1)*30/length(data2);
@@ -208,7 +208,6 @@ for i = 31:length(e)
     diffGyroY = gy(i) - circBuff_gyroy(mod(i, 31) + 1); 
 %     diffGyroZ = gz(i) - circBuff_gyroz(mod(i, 31) + 1);
     
-    % && roll(i) <= 68
     if(diffRoll <= -6.5 && gx(i) < -40  && diffGyroX <-10) % && diffGyroX < -8) % && diffPitch <= 1
         x = sprintf("%0.2f forward fall: %0.2f %0.2f %0.2f %0.2f", time(data_ticks), diffRoll, roll(i), gx(i), diffGyroX); 
         %x = sprintf("%d %0.2f forward: %0.2f %0.2f %0.2f", data_ticks, time(data_ticks), a(i, 1), a(i, 2), a(i, 3));
@@ -261,21 +260,21 @@ for i = 31:length(e)
         end
     end
     
-%     if forward_flag >= 16
-%         plot(time(data_ticks), roll(data_ticks), 'bx')
-%     end
-%   
-%     if left_flag >= 16
-%         plot(time(data_ticks), pitch(data_ticks), 'ro')
-%     end
+    if forward_flag >= 16
+        plot(time(data_ticks), roll(data_ticks), 'bx')
+    end
+  
+    if left_flag >= 16
+        plot(time(data_ticks), pitch(data_ticks), 'ro')
+    end
  
     if right_flag >= 16
-        plot(time(data_ticks), pitch(data_ticks), 'go')
+        plot(time(data_ticks), pitch(data_ticks), 'co')
     end
     
-%     if back_flag >= 16
-%         plot(time(data_ticks), roll(data_ticks), 'go')
-%     end
+    if back_flag >= 16
+        plot(time(data_ticks), roll(data_ticks), 'go')
+    end
     
     circBuff_roll(mod(i, 31) + 1) = roll(i);
     circBuff_pitch(mod(i, 31) + 1) = pitch(i);
@@ -297,8 +296,8 @@ end
 legend("pitch", "roll")
 ylabel("Degrees")
 xlabel("Time (Seconds)")
-% title(out1)
-title("Repeated Right Fall Trial")
+title(out1)
+
 
 
 
