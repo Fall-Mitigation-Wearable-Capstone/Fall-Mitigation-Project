@@ -169,7 +169,7 @@ gz = g(:,3);
 
 figure(2)
 % subplot(2,1,1)
-plot(time, e(:,2:3));
+plot(time, e(:,2));
 hold on;
 
 out1 = sprintf("testing: %d %s", participantNum, movement);
@@ -294,7 +294,7 @@ end
 % 
 % title('Participant 1: Forward Fall Trial')
 
-legend("pitch", "roll")
+legend("Pitch Angle", "Right Fall Flag")%"roll")
 ylabel("Degrees")
 xlabel("Time (Seconds)")
 % title(out1)
