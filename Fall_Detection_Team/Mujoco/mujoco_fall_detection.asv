@@ -362,7 +362,7 @@ plot(time(slipTime), slip2, 'o', 'MarkerEdgeColor', [0.5 0.1 1], 'MarkerFaceColo
 plot(time(leftTime), left2, 'o', 'MarkerEdgeColor', [0.9 0 1], 'MarkerFaceColor', [0.9 0 1])
 plot(time([240 1040 1540 2240]), [pitch(240) pitch(1040) pitch(1540) pitch(2240)], 'k*', 'MarkerSize', 8)
 
-legend("Pitch Angle", "Forward Fall", "Faint Fall", "Slip Fall", "Left Fall", "0.2s After Fall");
+legend("Pitch Angle", "Forward Fall", "Faint Fall", "Slip Fall", "Left Fall", "0.2s ");
 
 subplot(2, 1, 2);
 plot(time, roll)
@@ -376,7 +376,7 @@ plot(time(slipTime), slip1, 'o', 'MarkerEdgeColor', [0.5 0.1 1], 'MarkerFaceColo
 plot(time(leftTime), left1, 'o', 'MarkerEdgeColor', [0.9 0 1], 'MarkerFaceColor', [0.9 0 1])
 plot([240 1040 1540 2240]/200, [roll(240) roll(1040) roll(1540) roll(2240)], 'k*', 'MarkerSize', 8)
 
-legend("Roll Angle", "Forward Fall", "Faint Fall", "Slip Fall", "Left Fall", "0.2s After Fall");
+legend("Roll Angle", "Forward Fall", "Faint Fall", "Slip Fall", "Left Fall", "Detected Fall");
 sgtitle('Mujoco Fall Detection')
 
 
