@@ -4,7 +4,7 @@ close all;
 clc;
 
 participantNum = 4;
-movement = "longRight";
+movement = "forward";
 
 data = csvread("Participant-Data\Participant " + participantNum + "\Raw\testing" + participantNum + "_" + movement + ".csv");
 % time2 = 0:30/length(data2):(length(data2)-1)*30/length(data2);
@@ -169,7 +169,7 @@ gz = g(:,3);
 
 figure(2)
 % subplot(2,1,1)
-plot(time, e(:,2));
+plot(time, e(:,2:3));
 hold on;
 
 out1 = sprintf("testing: %d %s", participantNum, movement);
@@ -208,9 +208,9 @@ for i = 31:length(e)
     diffGyroY = gy(i) - circBuff_gyroy(mod(i, 31) + 1); 
 %     diffGyroZ = gz(i) - circBuff_gyroz(mod(i, 31) + 1);
     
-    % && roll(i) <= 68
-    if(diffRoll <= -6.5 && gx(i) < -40  && diffGyroX <-10) % && diffGyroX < -8) % && diffPitch <= 1
-        x = sprintf("%0.2f forward fall: %0.2f %0.2f %0.2f %0.2f", time(data_ticks), diffRoll, roll(i), gx(i), diffGyroX); 
+    % dR = -6.5, gx = -40, dgx = -10
+    if(diffRoll <= -5 && gx(i) <= -50) % diffRoll <= -6 && gx(i) < -90
+        x = sprintf("%0.2f forward fall: %0.2f %0.2f %0.2f", time(data_ticks), diffRoll, gx(i), diffGyroX); 
         %x = sprintf("%d %0.2f forward: %0.2f %0.2f %0.2f", data_ticks, time(data_ticks), a(i, 1), a(i, 2), a(i, 3));
         %x = sprintf("%d %0.2f forward: %0.2f", data_ticks, time(data_ticks), diffGyroX);
         disp(x)
@@ -224,7 +224,9 @@ for i = 31:length(e)
         end
     end
 
-    if(roll(i) > 75 && diffRoll > 8 && gx(i) > 10)
+    % current: 75, 8, 10
+    % 77-95, 8-11, 11-23
+    if(roll(i) > 75 && diffRoll > 8 && gx(i) > 23)
         x = sprintf("%0.2f back fall: %0.2f %0.2f %0.2f", time(data_ticks), roll(i), diffRoll, gx(i)); 
         disp(x)
         if(back_flag < 16)
@@ -261,21 +263,21 @@ for i = 31:length(e)
         end
     end
     
-%     if forward_flag >= 16
-%         plot(time(data_ticks), roll(data_ticks), 'bx')
-%     end
-%   
-%     if left_flag >= 16
-%         plot(time(data_ticks), pitch(data_ticks), 'ro')
-%     end
+    if forward_flag >= 16
+        plot(time(data_ticks), roll(data_ticks), 'bx')
+    end
+  
+    if left_flag >= 16
+        plot(time(data_ticks), pitch(data_ticks), 'ro')
+    end
  
     if right_flag >= 16
-        plot(time(data_ticks), pitch(data_ticks), 'go')
+        plot(time(data_ticks), pitch(data_ticks), 'mo')
     end
     
-%     if back_flag >= 16
-%         plot(time(data_ticks), roll(data_ticks), 'go')
-%     end
+    if back_flag >= 16
+        plot(time(data_ticks), roll(data_ticks), 'go')
+    end
     
     circBuff_roll(mod(i, 31) + 1) = roll(i);
     circBuff_pitch(mod(i, 31) + 1) = pitch(i);
@@ -298,7 +300,7 @@ legend("Pitch Angle", "Right Fall Flag")%"roll")
 ylabel("Degrees")
 xlabel("Time (Seconds)")
 % title(out1)
-title("Repeated Right Fall Trial")
+% title("Repeated Right Fall Trial")
 
 
 
