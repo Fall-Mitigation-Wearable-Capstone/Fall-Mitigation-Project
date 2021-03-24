@@ -209,7 +209,7 @@ for i = 31:length(e)
 %     diffGyroZ = gz(i) - circBuff_gyroz(mod(i, 31) + 1);
     
     % dR = -6.5, gx = -40, dgx = -10
-    if(diffRoll <= -5 && gx(i) <= -50) % diffRoll <= -6 && gx(i) < -90
+    if(diffRoll <= -5 && gx(i) <= -60) % diffRoll <= -6 && gx(i) < -90
         x = sprintf("%0.2f forward fall: %0.2f %0.2f %0.2f", time(data_ticks), diffRoll, gx(i), diffGyroX); 
         %x = sprintf("%d %0.2f forward: %0.2f %0.2f %0.2f", data_ticks, time(data_ticks), a(i, 1), a(i, 2), a(i, 3));
         %x = sprintf("%d %0.2f forward: %0.2f", data_ticks, time(data_ticks), diffGyroX);
