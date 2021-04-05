@@ -7,7 +7,7 @@
 MPU9250_DMP imu;
 Madgwick filter;
 float yaw, pitch, roll;
-Fall fall;
+FallDetection fall;
 int falls;
 
 void setup() 
