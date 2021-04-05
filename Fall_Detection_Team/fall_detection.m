@@ -3,8 +3,8 @@ clear all;
 close all;
 clc;
 
-participantNum = 4;
-movement = "longRight";
+participantNum = 3;
+movement = "longBackwards";
 
 data = csvread("Participant-Data\Participant " + participantNum + "\Raw\testing" + participantNum + "_" + movement + ".csv");
 % time2 = 0:30/length(data2):(length(data2)-1)*30/length(data2);
@@ -197,7 +197,7 @@ for i = 1:31
     circBuff_pitch(i) = pitch(i);
     circBuff_gyrox(i) = gx(i);
     circBuff_gyroy(i) = gy(i);
-%     circBuff_gyroz(i) = gz(i);
+%     circBuff_gyrDEDoz(i) = gz(i);
     data_ticks = data_ticks + 1;
 end
 
@@ -224,9 +224,8 @@ for i = 31:length(e)
         end
     end
 
-    % current: 75, 8, 10
-    % 77-95, 8-11, 11-23
-    if(roll(i) > 75 && diffRoll > 8 && gx(i) > 23)
+    % current: 75, 8, 23
+    if(roll(i) > 60 && diffRoll > 8 && gx(i) > 23)
         x = sprintf("%0.2f back fall: %0.2f %0.2f %0.2f", time(data_ticks), roll(i), diffRoll, gx(i)); 
         disp(x)
         if(back_flag < 16)
