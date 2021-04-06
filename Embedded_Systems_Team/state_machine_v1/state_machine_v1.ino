@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // state_machine_v1.ino
 // This is the state machine which will control the inflatable. All of the hardware interactions occur through this state machine.
 // Author: Archisha Sinha
@@ -10,15 +9,13 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Names of HSM superstates
-=======
->>>>>>> 21b021ebe49b8db3730a4607af462cb4ac4e90a3
 enum Superstate {
   CHECK_USABILITY,
   DETECT_MOVEMENT,
   INFLATE_WEARABLE
 } super;
 
-<<<<<<< HEAD
+
 // Names of HSM substates
 enum Substate {
   START,                // Beginning of superstate 1
@@ -32,7 +29,8 @@ enum Substate {
   CALCULATE_EULERS,
   DETECT_FALLS,         // End of superstate 2
   INFLATE_TO_100,       // Beginning of superstate 3
-=======
+} super;
+
 enum Substate {
   START,
   CHECK_FOR_USER,
@@ -45,12 +43,10 @@ enum Substate {
   CALCULATE_EULERS,
   DETECT_FALLS,
   INFLATE_TO_100,
->>>>>>> 21b021ebe49b8db3730a4607af462cb4ac4e90a3
   FULLY_INFLATED,
   DEFLATE_BY_20,
   INFLATED_80,
   INFLATION_ERROR,
-<<<<<<< HEAD
   DEFLATE_FULLY,
   FULLY_DEFLATED        // End of superstate 3
 } sub;
@@ -66,20 +62,17 @@ int tester;
 Inflation inf(3);
 // This is where all initial varibales are set before the main
 void setup() {
-=======
   DEFLATE_FULLY
 } sub;
 
 void setup() {
   // put your setup code here, to run once:
->>>>>>> 21b021ebe49b8db3730a4607af462cb4ac4e90a3
   Serial.begin(115200);
   super = CHECK_USABILITY;
   sub = START;
   Serial.println("Ready");
 }
 
-<<<<<<< HEAD
 // This is the main
 void loop() {
   delay(1000);
@@ -106,34 +99,9 @@ void loop() {
       Serial.println("inflating");
       inflate_wearable();
       delay(1000);
-=======
-void loop() {
-  // put your main code here, to run repeatedly:
-  delay(1000);
-  switch (super) {
-    case CHECK_USABILITY:
-      Serial.println("checking");
-      checkUsability(1);
-      delay(1000);
-//      super = DETECT_MOVEMENT;
-      break;
-    case DETECT_MOVEMENT:
-      Serial.println("detecting");
-      detectMovement(2);
-      delay(1000);
-//      super = INFLATE_WEARABLE;
-      break;
-    case INFLATE_WEARABLE:
-      Serial.println("inflating");
-      inflateWearable(3);
-      delay(1000);
-//      super = CHECK_USABILITY;
->>>>>>> 21b021ebe49b8db3730a4607af462cb4ac4e90a3
-      break;
   }
 }
 
-<<<<<<< HEAD
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ALL FUNCTIONS DEFINITIONS BELOW... FUNCTIONS IN THIS FILE ARE SPECIFIC TO THE STATE MACHINE AND STATE MACHINE TESTING
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -389,72 +357,4 @@ void wait_for_command(void) {
       error = input;
     }
   }
-=======
-void checkUsability(int x) {
-  switch(sub){
-    case START:
-      Serial.println("checking Start");
-      super = CHECK_USABILITY;
-      sub = CHECK_FOR_USER;
-    break;
-    case CHECK_FOR_USER:
-      Serial.println("checking User");
-      super = DETECT_MOVEMENT;
-      sub = READ_IMU;
-    break;
-    case CHECK_BATTERY_LEVEL:
-    break;
-    case LOW_BATTERY:
-    break;
-    case CHECK_GAS_LEVEL:
-    break;
-    case LOW_GAS:
-    break;
-  }
-//  return DETECT_MOVEMENT;
-}
-
-void detectMovement(int x) {
-  switch(sub){
-    case READ_IMU:
-      Serial.println("detecting Read");
-      super = DETECT_MOVEMENT;
-      sub = CALCULATE_EULERS;
-    break;
-    case IMU_ERROR:
-    break;
-    case CALCULATE_EULERS:
-      Serial.println("detecting Eulers");
-      super = INFLATE_WEARABLE;
-      sub = INFLATE_TO_100;
-    break;
-    case DETECT_FALLS:
-    break;
-  }
-//  return INFLATE_WEARABLE;
-}
-
-void inflateWearable(int x) {
-  switch(sub){
-    case INFLATE_TO_100:
-      Serial.println("inflating 100");
-      super = INFLATE_WEARABLE;
-      sub = FULLY_INFLATED;
-    break;
-    case FULLY_INFLATED:
-      Serial.println("inflating Full");
-      super = CHECK_USABILITY;
-      sub = START;
-    break;
-    case DEFLATE_BY_20:
-    break;
-    case INFLATED_80:
-    break;
-    case INFLATION_ERROR:
-    break;
-    case DEFLATE_FULLY:
-    break;
-  }
-//  return CHECK_USABILITY;
->>>>>>> 21b021ebe49b8db3730a4607af462cb4ac4e90a3
 }
