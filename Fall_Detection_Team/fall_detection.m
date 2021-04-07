@@ -3,8 +3,8 @@ clear all;
 close all;
 clc;
 
-participantNum = 3;
-movement = "longBackwards";
+participantNum = 6;
+movement = "longForward";
 
 data = csvread("Participant-Data\Participant " + participantNum + "\Raw\testing" + participantNum + "_" + movement + ".csv");
 % time2 = 0:30/length(data2):(length(data2)-1)*30/length(data2);
