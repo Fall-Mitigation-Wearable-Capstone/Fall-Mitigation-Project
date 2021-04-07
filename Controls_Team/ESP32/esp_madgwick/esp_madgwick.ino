@@ -110,11 +110,13 @@ void printIMUData(void)
   Serial.print("\t");
   Serial.print(pitch);
   Serial.print("\t");
-  Serial.println(roll);
-
+  Serial.print(roll);
+  Serial.print("\t");
+  
   falls = fall.detectFalls(pitch, roll, gyroX, gyroY);
-  if(falls != 0){
-    Serial.print(falls);
-    Serial.println(" FALL!!!");
-  }
+  Serial.println(falls);
+//  if(falls != 0){
+//    Serial.print(falls);
+//    Serial.println(" FALL!!!");
+//  }
 }
