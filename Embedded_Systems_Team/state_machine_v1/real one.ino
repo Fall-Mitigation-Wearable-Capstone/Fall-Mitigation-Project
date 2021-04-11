@@ -11,6 +11,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Names of HSM superstates
+//DELETE THESE LATER
 enum Superstate {
   CHECK_USABILITY,
   DETECT_MOVEMENT,
@@ -24,9 +25,7 @@ enum Substate {
   CHECK_FOR_USER,
   CHECK_BATTERY_LEVEL,
   LOW_BATTERY,
-  READ_IMU,
   IMU_ERROR,
-  CALCULATE_EULERS,
   DETECT_FALLS,
   INFLATE_TO_100,
   FULLY_INFLATED,
@@ -159,59 +158,13 @@ void check_usability(void) {
 // Superstate 2
 void detect_movement(void) {
   switch (sub) {
-    case READ_IMU:
-      Serial.println("detecting Read");
-
-      // For testing, get user input
-      // Serial.println("Is IMU initialized (Type Y or N): ");
-      // wait_for_command();
-
-      if(checks.checkForUser() == ERROR){           // If user takes of jacket
-        error = '\n';
-        super = CHECK_USABILITY;
-        sub = START;
-      }
-      else if(checks.getBatteryLevel() == 'B'){      // If battery is low
-        error = '\n';
-        super = CHECK_USABILITY;
-        sub = LOW_BATTERY;
-      }
-      else if(detection.getIMUData() == SUCCESS){    // If data read correctly
-        sub = CALCULATE_EULERS;
-      } else{
-        sub = IMU_ERROR;
-      }
-      break;
-
     case IMU_ERROR:
       Serial.println("detecting IMU ERROR");
       Serial.println("STOPPING SYSTEM (Reset ESP to continue testing)");
       break;
 
-    case CALCULATE_EULERS:
-      Serial.println("detecting Eulers");
-      delay(200);
-      // FUNCTION NEEDED HERE
-      // For testing, get user input
-      // Serial.println("Is user/battery ok still (Type U or B): ");
-      // wait_for_command();
-
-      if(checks.checkForUser() == ERROR){           // If user takes of jacket
-        super = CHECK_USABILITY;
-        sub = START;
-      }
-      else if(checks.getBatteryLevel() == ERROR){      // If battery is low
-        super = CHECK_USABILITY;
-        sub = LOW_BATTERY;
-      }
-      else{
-        sub = DETECT_FALLS;
-      }
-      break;
-
     case DETECT_FALLS:
       Serial.println("detecting Falls");
-
       // For testing, get user input
       // Serial.println("Is fall detected (Type Y or N): ");
       // wait_for_command();
@@ -226,11 +179,14 @@ void detect_movement(void) {
         super = CHECK_USABILITY;
         sub = LOW_BATTERY;
       }
-      else if(command == 'Y'){    // If fall is detected
+      else if(detection.getIMUData() == ERROR){
+        sub = IMU_ERROR;
+      }
+      else if(detection.detectFalls() != 0){    // If fall is detected
         super = INFLATE_WEARABLE;
         sub = INFLATE_TO_100;
       } else{
-        sub = READ_IMU;
+        sub = DETECT_FALLS;
       }
       break;
   }

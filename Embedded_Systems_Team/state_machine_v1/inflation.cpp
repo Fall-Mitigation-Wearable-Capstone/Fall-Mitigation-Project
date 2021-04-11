@@ -1,69 +1,72 @@
 #include "Arduino.h"
 #include "inflation.h"
+#include "checking.h"
 
-Inflation::Inflation(int air_in1, int air_in2, int air_in3, int air_in4, int air_in5, int air_in6,
-                    int air_out1, int air_out2, int air_out3, int air_out4, int air_out5, int air_out6,
-                    int pres1, int pres2)
+// All code written with the assumption of 2 inflation pumps and 2 deflation pumps
+// Each pump has 2 switches, 1 to each battery
+
+Inflation::Inflation()
 {
-  pinMode(air_in1, OUTPUT);
-  pump_in1 = air_in1;
-  pinMode(air_in2, OUTPUT);
-  pump_in2 = air_in2;
-  pinMode(air_in3, OUTPUT);
-  pump_in3 = air_in3;
-  pinMode(air_in4, OUTPUT);
-  pump_in4 = air_in4;
-  pinMode(air_in5, OUTPUT);
-  pump_in5 = air_in5;
-  pinMode(air_in6, OUTPUT);
-  pump_in6 = air_in6;
+  pinMode(INFLATION_PUMP1, OUTPUT);
+  pinMode(INFLATION_PUMP2, OUTPUT);
+  pinMode(INFLATION_PUMP3, OUTPUT);
+  pinMode(INFLATION_PUMP4, OUTPUT);
 
-  pinMode(air_release1, OUTPUT);
-  pump_release1 = air_out1;
-  pinMode(air_release2, OUTPUT);
-  pump_release2 = air_out2;
-  pinMode(air_release3, OUTPUT);
-  pump_release3 = air_out3;
-  pinMode(air_release4, OUTPUT);
-  pump_release4 = air_out4;
-  pinMode(air_release5, OUTPUT);
-  pump_release5 = air_out5;
-  pinMode(air_release6, OUTPUT);
-  pump_release6 = air_out6;
+  pinMode(RELEASE_PUMP1, OUTPUT);
+  pinMode(RELEASE_PUMP2, OUTPUT);
+  pinMode(RELEASE_PUMP3, OUTPUT);
+  pinMode(RELEASE_PUMP4, OUTPUT);
 
-  pinMode(pres1, INPUT);
-  pressure1 = pres1;
-  pinMode(pres2, INPUT);
-  pressure2 = pres2;
+  pinMode(PRESSURE1, INPUT);
+  pinMode(PRESSURE2, INPUT);
 }
 
 // Inflates the pockets to their maximum volume
 // The air pumps turn on with a 1 signal and off with a 0 signal
 // Full inflation takes 80ms per slot
-void Inflation::full_inflate()
+void Inflation::fullInflate()
 {
-  digitalWrite(air_in1, HIGH);
-  digitalWrite(air_in2, HIGH);
-  digitalWrite(air_in3, HIGH);
-  digitalWrite(air_in4, HIGH);
-  digitalWrite(air_in5, HIGH);
-  digitalWrite(air_in6, HIGH);
+  digitalWrite(INFLATION_PUMP1, HIGH);
+  digitalWrite(INFLATION_PUMP2, HIGH);
+  digitalWrite(INFLATION_PUMP3, HIGH);
+  digitalWrite(INFLATION_PUMP4, HIGH);
   delay(80);
-  digitalWrite(air_in1, LOW);
-  digitalWrite(air_in2, LOW);
-  digitalWrite(air_in3, LOW);
-  digitalWrite(air_in4, LOW);
-  digitalWrite(air_in5, LOW);
-  digitalWrite(air_in6, LOW);
 }
 
 
-void Inflation::partial_deflate()
+void Inflation::partialDeflate()
 {
-  digitalWrite(air_release1, HIGH);
-  digitalWrite(air_release2, HIGH);
-  digitalWrite(air_release3, HIGH);
-  digitalWrite(air_release4, HIGH);
-  digitalWrite(air_release5, HIGH);
-  digitalWrite(air_release6, HIGH);
+  digitalWrite(RELEASE_PUMP1, HIGH);
+  digitalWrite(RELEASE_PUMP2, HIGH);
+  digitalWrite(RELEASE_PUMP3, HIGH);
+  digitalWrite(RELEASE_PUMP4, HIGH);
+  delay(2000);
+  digitalWrite(RELEASE_PUMP1, LOW);
+  digitalWrite(RELEASE_PUMP2, LOW);
+  digitalWrite(RELEASE_PUMP3, LOW);
+  digitalWrite(RELEASE_PUMP4, LOW);
+}
+
+void Inflation::fullDeflate()
+{
+  digitalWrite(RELEASE_PUMP1, HIGH);
+  digitalWrite(RELEASE_PUMP2, HIGH);
+  digitalWrite(RELEASE_PUMP3, HIGH);
+  digitalWrite(RELEASE_PUMP4, HIGH);
+}
+
+void Inflation::getPressure()
+{
+  pressure1 = digitalRead(PRESSURE1);
+  pressure2 = digitalRead(PRESSURE2);
+}
+
+int Inflation::pressureCheck()
+{
+  getPressure();
+  if(pressure1 < MIN_PRESSURE_FRONT || pressure2 < MIN_PRESSURE_BACK){
+    return ERROR;
+  } else{
+    return SUCCESS;
+  }
 }
