@@ -4,37 +4,37 @@ clear all;
 close all;
 clc;
 
-participantNum = 6;
-movement = "longForward";
+participantNum = 4;
+movement = "liveLeft";
 
 data = csvread("Participant-Data\Participant " + participantNum + "\Raw\testing" + participantNum + "_" + movement + ".csv");
-% time =(data(:,1) - data(1,1)) / 1000;
-
-e = data(:,1:3);
-falls = data(:,4);
+time =(data(:,1) - data(1,1)) / 1000;
+g = data(:,2:4);
+e = data(:,5:7);
+falls = data(:,8);
 
 plot1 = figure(1);
-plot(e(:,2:3));
+plot(time, e(:,2:3));
 hold on;
 
 for i = 1:length(falls)
     % forward
     if falls(i) == 1
-        plot(i, e(i,3), 'ro')
+        plot(time(i), e(i,3), 'ro')
     end
     
     % backwards
     if falls(i) == 2
-        plot(i, e(i,3), 'bo')
+        plot(time(i), e(i,3), 'bo')
     end
     
     % left 
     if falls(i) == 4
-        plot(i, e(i,3), 'mo')
+        plot(time(i), e(i,2), 'mo')
     end
     
     % right
     if falls(i) == 8
-        plot(i, e(i,3), 'go')
+        plot(time(i), e(i,2), 'go')
     end
 end

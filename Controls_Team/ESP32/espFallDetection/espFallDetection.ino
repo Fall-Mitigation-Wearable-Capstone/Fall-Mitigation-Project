@@ -110,12 +110,12 @@ void printIMUData(void)
   SerialBT.print(millis());
   SerialBT.print(",\t");
   
-//  SerialBT.print(gyroX);
-//  SerialBT.print(",\t");
-//  SerialBT.print(gyroY);
-//  SerialBT.print(",\t");
-//  SerialBT.print(gyroZ);
-//  SerialBT.print(",\t");
+  SerialBT.print(gyroX);
+  SerialBT.print(",\t");
+  SerialBT.print(gyroY);
+  SerialBT.print(",\t");
+  SerialBT.print(gyroZ);
+  SerialBT.print(",\t");
 
 //  SerialBT.print(accelX);
 //  SerialBT.print(",\t");
