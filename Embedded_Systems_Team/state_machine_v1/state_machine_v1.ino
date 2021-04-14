@@ -5,10 +5,18 @@
 #include "inflation.h"
 #include "checking.h"
 #include "FallDetection.h"
+#include "BluetoothSerial.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ALL VARIABLES FOR STATE MACHINE DECLARED BELOW
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Set up microcontroller to use bluetooth
+#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
+#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
+#endif
+
+BluetoothSerial SerialBT;
 
 // Names of HSM superstates
 enum Superstate {
@@ -52,9 +60,29 @@ FallDeetection detection();
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
-  super = CHECK_USABILITY;
-  sub = START;
-  Serial.println("Ready");
+
+  // Initialize bluetooth Serial
+  SerialBT.begin("ESP32test"); //Bluetooth device name
+  SerialBT.println("The device started, now you can pair it with bluetooth!");
+
+  // Initialize the IMU
+  // If IMU works, start SM at the beginning
+  // If IMU doesn't work, SM jumps straight to an IMU error
+  if(detection.initIMU() == ERROR){
+    while (1){
+      SerialBT.println("Unable to communicate with MPU-9250");
+      SerialBT.println("Check connections, and try again.");
+      SerialBT.println();
+      delay(5000);
+      super = DETECT_FALLS;
+      sub = IMU_ERROR;
+    }
+  }
+  else{
+    super = CHECK_USABILITY;
+    sub = START;
+    SerialBT.println("Ready");
+  }
 }
 
 // This is the main

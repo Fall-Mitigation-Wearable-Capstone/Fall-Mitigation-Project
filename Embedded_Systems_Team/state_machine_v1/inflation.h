@@ -28,23 +28,9 @@ public:
   void fullInflate();
   void partialDeflate();
   void fullDeflate();
-  void getPressure();
   int pressureCheck();
 private:
-  const int pump_in1;
-  const int pump_in2;
-  const int pump_in3;
-  const int pump_in4;
-  const int pump_in5;
-  const int pump_in6;
-  const int pump_release1;
-  const int pump_release2;
-  const int pump_release3;
-  const int pump_release4;
-  const int pump_release5;
-  const int pump_release6;
-  int pressure1;
-  int pressure2;
+  void getPressure();
 };
 
 #endif

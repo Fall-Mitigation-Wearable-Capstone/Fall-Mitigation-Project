@@ -55,7 +55,7 @@ void Checking::setBatteryLights()
 // Function gets called while the wearable is charging
 // Battery indicator lights get set depending on the interrupt reading
 // Returns SUCCESS if battery is full, else returns ERROR
-int checkBatteryCharging()
+int Checking::checkBatteryCharging()
 {
   //getBatteryLevel will be called in an interrupt so no need to call it here
   getBatteryLevel(); //temporary call here
@@ -76,9 +76,4 @@ int Checking::checkForUser()
   getTouchSensorReading();
   if(rightTouchState && leftTouchState) return SUCCESS;
   return ERROR;
-}
-
-void Checking::batteryInterrupt()
-{
-
 }

@@ -1,7 +1,10 @@
 #ifndef FallDetection_h
 #define FallDetection_h
 
+#include <SparkFunMPU9250-DMP.h>
+#include <MadgwickAHRS.h>
 #include "Arduino.h"
+#include "checking.h"
 
 #define TWO_HUNDRED_MS 31
 #define DEBOUNCE 16
@@ -12,6 +15,9 @@
 
 class FallDetection {
 	private:
+		MPU9250_DMP imu;
+		Madgwick filter;
+
 		//buffers for tracking relevant data
 		float rollBuffer[TWO_HUNDRED_MS];
 		float pitchBuffer[TWO_HUNDRED_MS];
@@ -37,6 +43,7 @@ class FallDetection {
 		void updateFlags(void);
 		int detectFalls(float pitch, float roll, float gyroX, float gyroY);
 		void getIMUData();		// Uses SparkfunMPU9250-DMP library. If data is not ready, return ERROR
+		int initIMU();
 };
 
 #endif
