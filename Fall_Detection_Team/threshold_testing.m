@@ -4,8 +4,8 @@ clear all;
 close all;
 clc;
 
-participantNum = 3;
-movement = "liveLeft";
+participantNum = 4;
+movement = "adlOnly";
 
 data = csvread("Participant-Data\Participant " + participantNum + "\Raw\testing" + participantNum + "_" + movement + ".csv");
 time =(data(:,1) - data(1,1)) / 1000;
@@ -101,7 +101,7 @@ for i = 31:length(e)
 %     end
     
     % dp = -6, gy = -50
-    if(diffPitch < -7)
+    if(diffPitch < -7.5)
         x = sprintf("%0.2f left fall: %0.2f %0.2f %0.2f", time(data_ticks), pitch(i), diffPitch, gy(i)); 
         disp(x)
         
@@ -114,17 +114,18 @@ for i = 31:length(e)
         end
     end
     
-%     if(diffPitch > 6 && gy(i) > 55)
-%         x = sprintf("%0.2f right fall: %0.2f %0.2f %0.2f", time(data_ticks), pitch(i), diffPitch, gy(i)); 
-%         disp(x)
-%         if(right_flag < 16)
-%             right_flag = right_flag + 1;
-%         end
-%     else
-%         if(right_flag > 0)
-%             right_flag = right_flag - 1;
-%         end
-%     end
+    % dp = 6, gy = 50
+    if(diffPitch > 7.5)
+        x = sprintf("%0.2f right fall: %0.2f %0.2f %0.2f", time(data_ticks), pitch(i), diffPitch, gy(i)); 
+        disp(x)
+        if(right_flag < 16)
+            right_flag = right_flag + 1;
+        end
+    else
+        if(right_flag > 0)
+            right_flag = right_flag - 1;
+        end
+    end
     
     if forward_flag >= 16
         plot(time(data_ticks), roll(data_ticks), 'bx')

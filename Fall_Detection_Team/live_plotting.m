@@ -5,7 +5,7 @@ close all;
 clc;
 
 participantNum = 4;
-movement = "liveLeft";
+movement = "adlOnly";
 
 data = csvread("Participant-Data\Participant " + participantNum + "\Raw\testing" + participantNum + "_" + movement + ".csv");
 time =(data(:,1) - data(1,1)) / 1000;

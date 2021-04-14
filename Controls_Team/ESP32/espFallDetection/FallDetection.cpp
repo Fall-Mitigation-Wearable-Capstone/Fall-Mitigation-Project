@@ -75,7 +75,7 @@ void FallDetection::updateFlags(void){
         }
 	}
 	
-	if(diffPitch < -6 && gyroYBuffer[bufferIndex] < -55){
+	if(diffPitch < -7){
         if(leftFlag < 16){
             leftFlag++;
         } 
@@ -85,7 +85,7 @@ void FallDetection::updateFlags(void){
         }
 	}
 	
-	if(diffPitch > 6 && gyroYBuffer[bufferIndex] > 55){
+	if(diffPitch > 7){
         if(rightFlag < 16){
             rightFlag++;
         } 
