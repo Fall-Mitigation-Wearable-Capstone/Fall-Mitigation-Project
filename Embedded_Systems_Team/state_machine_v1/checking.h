@@ -21,20 +21,20 @@
 
 class Checking
 {
-public:
-  void Checking();
-  int getBatteryLevel();
-  int checkForUser();
-  void setBatteryLights();
-  int checkBatteryCharging();
-private:
-  int batteryLevel;
-  int rightTouchState;
-  int leftTouchState;
-  int touchSensorState;
+  public:
+    Checking();
+    int getBatteryLevel();
+    int checkForUser();
+    void setBatteryLights();
+    int checkBatteryCharging();
+  private:
+    int batteryLevel;
+    int rightTouchState;
+    int leftTouchState;
+    int touchSensorState;
 
-  void getTouchSensorReading();
-  void IRAM_ATTR batteryInterrupt();
+    void getTouchSensorReading();
+    void IRAM_ATTR batteryInterrupt();
 };
 
 #endif

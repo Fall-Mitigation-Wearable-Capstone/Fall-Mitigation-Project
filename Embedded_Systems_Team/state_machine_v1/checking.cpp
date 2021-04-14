@@ -21,7 +21,7 @@ Checking::Checking()
 int Checking::getBatteryLevel()
 {
   batteryLevel = analogRead(BATTERY_PIN);
-  if(batteryLevel <= LOW_BATTERY) return ERROR;
+  if(batteryLevel <= BATTERY_LOW) return ERROR;
   return SUCCESS;
 }
 

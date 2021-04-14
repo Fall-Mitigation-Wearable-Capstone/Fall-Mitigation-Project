@@ -34,12 +34,9 @@ enum Substate {
   LOW_BATTERY,
   READ_IMU,
   IMU_ERROR,
-  CALCULATE_EULERS,
   DETECT_FALLS,
   INFLATE_TO_100,
-  FULLY_INFLATED,
-  DEFLATE_BY_20,
-  INFLATED_80,
+  MAINTAIN_FULL_INFLATION,
   INFLATION_ERROR,
   DEFLATE_FULLY       // End of superstate 3
 } sub;
@@ -48,13 +45,14 @@ enum Substate {
 char input; //Variable stores the reading from the serial monitor
 char command; //Variable stores the command given by tester
 char error; //Variable stores input from tester about if "no User" or "low Battery". Defaults to '\n'
+unsigned long startTime; //Variable stores the start time for all timers in the inflation process of the state machine
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // BELOW IS THE MAIN CODE FOR THE STATE MACHINE
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-Inflation inflation();
-Checking checks();
-FallDeetection detection();
+Inflation inflation;
+Checking checks;
+FallDetection detection;
 
 // This is where all initial varibales are set before the main
 void setup() {
@@ -74,7 +72,7 @@ void setup() {
       SerialBT.println("Check connections, and try again.");
       SerialBT.println();
       delay(5000);
-      super = DETECT_FALLS;
+      super = DETECT_MOVEMENT;
       sub = IMU_ERROR;
     }
   }
@@ -147,7 +145,7 @@ void check_usability(void) {
       Serial.println("checking Battery");
 
       if (checks.getBatteryLevel() == SUCCESS) {     // If battery is in usage range
-        super = DETECT_FALLS;
+        super = DETECT_MOVEMENT;
         sub = READ_IMU;
       } else {
         sub = LOW_BATTERY;
@@ -195,36 +193,6 @@ void detect_movement(void) {
       // wait_for_command();
 
       if(checks.checkForUser() == ERROR){           // If user takes of jacket
-        error = '\n';
-        super = CHECK_USABILITY;
-        sub = START;
-      }
-      else if(checks.getBatteryLevel() == 'B'){      // If battery is low
-        error = '\n';
-        super = CHECK_USABILITY;
-        sub = LOW_BATTERY;
-      }
-      else if(detection.getIMUData() == SUCCESS){    // If data read correctly
-        sub = CALCULATE_EULERS;
-      } else{
-        sub = IMU_ERROR;
-      }
-      break;
-
-    case IMU_ERROR:
-      Serial.println("detecting IMU ERROR");
-      Serial.println("STOPPING SYSTEM (Reset ESP to continue testing)");
-      break;
-
-    case CALCULATE_EULERS:
-      Serial.println("detecting Eulers");
-      delay(200);
-      // FUNCTION NEEDED HERE
-      // For testing, get user input
-      // Serial.println("Is user/battery ok still (Type U or B): ");
-      // wait_for_command();
-
-      if(checks.checkForUser() == ERROR){           // If user takes of jacket
         super = CHECK_USABILITY;
         sub = START;
       }
@@ -232,9 +200,17 @@ void detect_movement(void) {
         super = CHECK_USABILITY;
         sub = LOW_BATTERY;
       }
+//      else if(detection.getIMUData() == ERROR){
+//        sub = IMU_ERROR;
+//      }
       else{
         sub = DETECT_FALLS;
       }
+      break;
+
+    case IMU_ERROR:
+      Serial.println("detecting IMU ERROR");
+      Serial.println("STOPPING SYSTEM (Reset ESP to continue testing)");
       break;
 
     case DETECT_FALLS:
@@ -245,20 +221,19 @@ void detect_movement(void) {
       // wait_for_command();
 
       if(checks.checkForUser() == ERROR){           // If user takes of jacket
-        error = '\n';
         super = CHECK_USABILITY;
         sub = START;
+      } else if(checks.getBatteryLevel() == ERROR){      // If battery is low
+          super = CHECK_USABILITY;
+          sub = LOW_BATTERY;
       }
-      else if(checks.getBatteryLevel() == ERROR){      // If battery is low
-        error = '\n';
-        super = CHECK_USABILITY;
-        sub = LOW_BATTERY;
-      }
-      else if(command == 'Y'){    // If fall is detected
-        super = INFLATE_WEARABLE;
-        sub = INFLATE_TO_100;
-      } else{
-        sub = READ_IMU;
+//      } else if(detection.detectFalls() != 0){    // If fall is detected
+//          super = INFLATE_WEARABLE;
+//          sub = INFLATE_TO_100;
+//      } 
+        else{
+          sub = DETECT_FALLS;
+          startTime = millis();
       }
       break;
   }
@@ -271,40 +246,25 @@ void inflate_wearable(void) {
     case INFLATE_TO_100:
       Serial.println("inflating 100");
       inflation.fullInflate();
-      sub = FULLY_INFLATED;
+      
+      if(millis() - startTime >= 80){
+        sub = MAINTAIN_FULL_INFLATION;
+        startTime = millis();
+      } else{
+          sub = INFLATE_TO_100;
+      }
       break;
 
-    case FULLY_INFLATED:
+    case MAINTAIN_FULL_INFLATION:
       Serial.println("inflating Full");
+      inflation.fullInflate();
 
-      // For testing, get user input
-      // Serial.println("Is it fully inflated (Type Y or N): ");
-      // wait_for_command();
-
-      if(inflation.pressureCheck() == SUCCESS){     // If pressure is ok
-        sub = DEFLATE_BY_20;
-      } else{
+      if(inflation.pressureCheck() == ERROR){     // If pressure is ok
         sub = INFLATION_ERROR;
-
-      break;
-
-    case DEFLATE_BY_20:
-      Serial.println("deflating by 20");
-      inflation.partialDeflate();
-      sub = INFLATED_80;
-      break;
-
-    case INFLATED_80:
-      Serial.println("inflating 80");
-
-      // For testing, get user input
-      // Serial.println("Is it partially inflated (Type Y or N): ");
-      // wait_for_command();
-
-      if(inflation.pressureCheck() == SUCCESS){     // If pressure is ok
-        sub = DEFLATE_FULLY;
+      } else if(millis() - startTime >= 1000){
+        sub = DEFLATE_FULLY; 
       } else{
-        sub = INFLATION_ERROR;
+        sub = MAINTAIN_FULL_INFLATION;
       }
       break;
 
@@ -318,7 +278,7 @@ void inflate_wearable(void) {
       inflation.fullDeflate();
 
       // For testing, get user input
-      super = DETECT_FALLS;
+      super = DETECT_MOVEMENT;
       sub = READ_IMU;
       break;
   }

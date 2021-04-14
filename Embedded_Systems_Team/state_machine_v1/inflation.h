@@ -23,14 +23,16 @@
 
 class Inflation
 {
-public:
-  Inflation();
-  void fullInflate();
-  void partialDeflate();
-  void fullDeflate();
-  int pressureCheck();
-private:
-  void getPressure();
+  public:
+    Inflation();
+    void fullInflate();
+    void partialDeflate();
+    void fullDeflate();
+    int pressureCheck();
+  private:
+    void getPressure();
+    int pressure1;
+    int pressure2;
 };
 
 #endif

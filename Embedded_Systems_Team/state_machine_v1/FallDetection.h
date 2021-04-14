@@ -42,7 +42,7 @@ class FallDetection {
 		void updateData(float pitch, float roll, float gyroX, float gyroY);
 		void updateFlags(void);
 		int detectFalls(float pitch, float roll, float gyroX, float gyroY);
-		void getIMUData();		// Uses SparkfunMPU9250-DMP library. If data is not ready, return ERROR
+		int getIMUData();		// Uses SparkfunMPU9250-DMP library. If data is not ready, return ERROR
 		int initIMU();
 };
 
