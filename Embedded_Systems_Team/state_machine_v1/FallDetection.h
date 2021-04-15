@@ -6,6 +6,8 @@
 #include "Arduino.h"
 #include "checking.h"
 
+#define INTERRUPT_PIN 22
+
 #define TWO_HUNDRED_MS 31
 #define DEBOUNCE 16
 #define FORWARD 0b0001
@@ -36,14 +38,31 @@ class FallDetection {
 		//values for change in each euler angle after 0.2s
 		float diffRoll;
 		float diffPitch;
+    
+    // Functions to get the imu data into easier variables and check the data
+//    void extractIMUData(void);
+    void calculateEulers(void);
+    void printIMUData(void);
 
 	public:
+ //values read off of the imu. public so they can be printed
+    float accelX;
+    float accelY;
+    float accelZ;
+    float gyroX;
+    float gyroY;
+    float gyroZ;
+    float yaw;
+    float pitch;
+    float roll;
+    
 		FallDetection(void);		//who am I test occurs here
-		void updateData(float pitch, float roll, float gyroX, float gyroY);
+		void updateData(void);    //Edited this to have no parameters
 		void updateFlags(void);
-		int detectFalls(float pitch, float roll, float gyroX, float gyroY);
-		int getIMUData();		// Uses SparkfunMPU9250-DMP library. If data is not ready, return ERROR
-		int initIMU();
+		int detectFalls(void);      //Edited this function to have no parameters
+		int getIMUData(void);		// Uses SparkfunMPU9250-DMP library. If data is not ready, return ERROR
+		int initIMU(void);
+    void extractIMUData(void);
 };
 
 #endif

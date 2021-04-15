@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 #include "FallDetection.h"
+#include <SparkFunMPU9250-DMP.h>
+#include <MadgwickAHRS.h>
 
 /*
 #define TWO_HUNDRED_MS 31
@@ -29,12 +31,20 @@ FallDetection::FallDetection()
 
 	diffRoll = 0;
 	diffPitch = 0;
+
+  accelX = 0;
+  accelY = 0;
+  accelZ = 0;
+  gyroX = 0;
+  gyroY = 0;
+  gyroZ = 0;
 }
 
 /*
 Update buffers and other relevant data for detecting falls
 */
-void FallDetection::updateData(float pitch, float roll, float gyroX, float gyroY)
+//Edited this to have no parameters
+void FallDetection::updateData()
 {
     //update index and consider roll-over
     bufferIndex++;
@@ -102,9 +112,10 @@ void FallDetection::updateFlags(void)
 /*
 Call helper functions & and check debouncing of flags
 */
-int FallDetection::detectFalls(float pitch, float roll, float gyroX, float gyroY)
+//Edited this to have no parameters
+int FallDetection::detectFalls(void)
 {
-	updateData(pitch, roll, gyroX, gyroY);
+	updateData();
 	updateFlags();
 
 	int out = 0;
@@ -115,8 +126,13 @@ int FallDetection::detectFalls(float pitch, float roll, float gyroX, float gyroY
 	return out;
 }
 
-int FallDetection::initIMU()
+/*
+ * Initializes the IMU with a sampling rate of 200Hz and a "data ready" interrupt
+ * Returns SUCCESS if initialization works, ERROR if the initialization does not work
+ */
+int FallDetection::initIMU(void)
 {
+  pinMode(INTERRUPT_PIN, INPUT_PULLUP);
 	if (imu.begin() != INV_SUCCESS){
 		return ERROR;
 	}
@@ -125,6 +141,50 @@ int FallDetection::initIMU()
 	imu.setAccelFSR(2);
 	imu.setLPF(5);
 	imu.setSampleRate(200);
+
+  // For the interrupt
+  imu.enableInterrupt();  //Interrupt outputs as a "data ready" indicator
+  imu.setIntLevel(INT_ACTIVE_LOW);  //Using INT pin's internal pull-up resistor
+  imu.setIntLatched(INT_LATCHED);   //Interrupt latches until data has been read2
+  
 	filter.begin(200);
 	return SUCCESS;
+}
+
+/*
+ * Reads the IMU data when the hardware interrupt indicates that data is ready
+ * Returns SUCCESS if data is read and ERROR if data is not read
+ */
+int FallDetection::getIMUData(void)
+{
+  if(digitalRead(INTERRUPT_PIN) == LOW){
+    imu.update(UPDATE_ACCEL | UPDATE_GYRO);
+    extractIMUData();
+    calculateEulers();
+    return SUCCESS;
+  } else{
+    return ERROR;
+  }
+}
+
+// Extract newest data and convert it to the correct units
+void FallDetection::extractIMUData(void)
+{
+  // Use the calcAccel, calcGyro, and calcMag functions to
+  // convert the raw sensor readings (signed 16-bit values)
+  // to their respective units.
+  accelX = imu.calcAccel(imu.ax);
+  accelY = imu.calcAccel(imu.ay);
+  accelZ = imu.calcAccel(imu.az);
+  gyroX = imu.calcGyro(imu.gx);
+  gyroY = imu.calcGyro(imu.gy);
+  gyroZ = imu.calcGyro(imu.gz);
+}
+
+void FallDetection::calculateEulers(void)
+{
+  filter.updateIMU(gyroX, gyroY, gyroZ, accelX, accelY, accelZ);
+  roll = filter.getRoll();
+  pitch = filter.getPitch();
+  yaw = filter.getYaw();
 }

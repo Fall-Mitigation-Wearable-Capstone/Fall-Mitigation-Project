@@ -41,11 +41,13 @@ enum Substate {
   DEFLATE_FULLY       // End of superstate 3
 } sub;
 
+#define IMU_ERROR_THRESHOLD 10
 
 char input; //Variable stores the reading from the serial monitor
 char command; //Variable stores the command given by tester
 char error; //Variable stores input from tester about if "no User" or "low Battery". Defaults to '\n'
 unsigned long startTime; //Variable stores the start time for all timers in the inflation process of the state machine
+int imuErrorCount;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // BELOW IS THE MAIN CODE FOR THE STATE MACHINE
@@ -79,6 +81,7 @@ void setup() {
   else{
     super = CHECK_USABILITY;
     sub = START;
+    imuErrorCount = 0;
     SerialBT.println("Ready");
   }
 }
@@ -200,10 +203,22 @@ void detect_movement(void) {
         super = CHECK_USABILITY;
         sub = LOW_BATTERY;
       }
-//      else if(detection.getIMUData() == ERROR){
-//        sub = IMU_ERROR;
-//      }
+      else if(detection.getIMUData() == ERROR){
+        imuErrorCount = imuErrorCount + 1;
+
+        /*
+         * IMU_ERROR_THRESHOLD reasoning: 
+         * The IMU is sampled at 200Hz which is every 5ms. Therefore, the interrupt should be ready with data every 5ms
+         * Based on literature, a fall algorthim needs to be sampled at least at 100Hz for any amount of accuracy (every 10ms)
+         * If the interrupt is not ready for 10 calls, 5ms apart, data has not been ready for 50ms
+         * This is more time than the minimum frequency, with 50ms intervals resulting in a frequency of 20Hz which is too slow to ensure accurate fall detection
+         */
+        if(imuErrorCount >= IMU_ERROR_THRESHOLD){
+          sub = IMU_ERROR;  
+        }
+      }
       else{
+        imuErrorCount = 0;
         sub = DETECT_FALLS;
       }
       break;
@@ -226,12 +241,10 @@ void detect_movement(void) {
       } else if(checks.getBatteryLevel() == ERROR){      // If battery is low
           super = CHECK_USABILITY;
           sub = LOW_BATTERY;
-      }
-//      } else if(detection.detectFalls() != 0){    // If fall is detected
-//          super = INFLATE_WEARABLE;
-//          sub = INFLATE_TO_100;
-//      } 
-        else{
+      } else if(detection.detectFalls() != 0){    // If fall is detected
+          super = INFLATE_WEARABLE;
+          sub = INFLATE_TO_100;
+      } else{
           sub = DETECT_FALLS;
           startTime = millis();
       }
@@ -285,21 +298,52 @@ void inflate_wearable(void) {
 }
 
 
-//Function only used for testing
-//Will make system wait for user input to proceed
-//Used for testing SM without hardware
-void wait_for_command(void) {
-  while (Serial.available() < 1) {
-    delay(100);
-  }
-  while (Serial.available() > 0) {
-    input = Serial.read();
-    if (input != '\n' && input != 'U' && input != 'B') {
-      command = input;
-    } else if (input == 'U') {
-      error = input;
-    } else if (input == 'B'){
-      error = input;
-    }
-  }
+void printIMUData(void)
+{
+    //Print time
+  SerialBT.print(millis());
+  SerialBT.print(",\t");
+
+  //Print raw data
+  SerialBT.print(detection.gyroX);
+  SerialBT.print(",\t");
+  SerialBT.print(detection.gyroY);
+  SerialBT.print(",\t");
+  SerialBT.print(detection.gyroZ);
+  SerialBT.print(",\t");
+//  SerialBT.print(accelX);
+//  SerialBT.print(",\t");
+//  SerialBT.print(accelY);
+//  SerialBT.print(",\t");
+//  SerialBT.print(accelZ);
+//  SerialBT.print(",\t");
+
+  //Print Eulers
+  SerialBT.print(detection.yaw);
+  SerialBT.print(",\t");
+  SerialBT.print(detection.pitch);
+  SerialBT.print(",\t");
+  SerialBT.print(detection.roll);
+  SerialBT.print(",\t");
 }
+
+
+
+////Function only used for testing
+////Will make system wait for user input to proceed
+////Used for testing SM without hardware
+//void wait_for_command(void) {
+//  while (Serial.available() < 1) {
+//    delay(100);
+//  }
+//  while (Serial.available() > 0) {
+//    input = Serial.read();
+//    if (input != '\n' && input != 'U' && input != 'B') {
+//      command = input;
+//    } else if (input == 'U') {
+//      error = input;
+//    } else if (input == 'B'){
+//      error = input;
+//    }
+//  }
+//}
