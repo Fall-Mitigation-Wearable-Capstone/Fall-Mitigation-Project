@@ -7,11 +7,13 @@
 Checking::Checking()
 {
   pinMode(BATTERY_PIN, INPUT);
-  pinMode(TOUCH_LEFT_PIN, INPUT);
-  pinMode(TOUCH_RIGHT_PIN, INPUT);
+  pinMode(TOUCH_LEFT_PIN, INPUT_PULLUP);
+  pinMode(TOUCH_RIGHT_PIN, INPUT_PULLUP);
   pinMode(LOW_BATTERY_LED, OUTPUT);
   pinMode(MID_BATTERY_LED, OUTPUT);
   pinMode(HIGH_BATTERY_LED, OUTPUT);
+
+  attachInterrupt(digitalPinToInterrupt(TOUCH_LEFT_PIN), )
 }
 
 // Get the battery level by reading the AD pin

@@ -68,8 +68,8 @@ void setup() {
   // Initialize the IMU
   // If IMU works, start SM at the beginning
   // If IMU doesn't work, SM jumps straight to an IMU error
-  if(detection.initIMU() == ERROR){
-    while (1){
+  if (detection.initIMU() == ERROR) {
+    while (1) {
       SerialBT.println("Unable to communicate with MPU-9250");
       SerialBT.println("Check connections, and try again.");
       SerialBT.println();
@@ -77,8 +77,7 @@ void setup() {
       super = DETECT_MOVEMENT;
       sub = IMU_ERROR;
     }
-  }
-  else{
+  } else {
     super = CHECK_USABILITY;
     sub = START;
     imuErrorCount = 0;
@@ -132,16 +131,6 @@ void check_usability(void) {
       } else {
         sub = CHECK_FOR_USER;
       }
-
-      // For testing, get user input
-      // Serial.println("Is user ready (Type Y or N): ");
-      // wait_for_command();
-      //
-      // if (command == 'Y') {       // If touch sensor detects user
-      //   sub = CHECK_BATTERY_LEVEL;
-      // } else {
-      //   sub = CHECK_FOR_USER;
-      // }
       break;
 
     case CHECK_BATTERY_LEVEL:
@@ -154,27 +143,11 @@ void check_usability(void) {
         sub = LOW_BATTERY;
       }
       checks.setBatteryLights();
-
-      // For testing, get user input
-      // Serial.println("Is battery ready (Type Y or N): ");
-      // wait_for_command();
-      //
-      // if (command == 'Y') {     // If battery is in usage range
-      //   super = DETECT_FALLS;
-      //   sub = READ_IMU;
-      // } else {
-      //   sub = LOW_BATTERY;
-      // }
       break;
 
     case LOW_BATTERY:
       Serial.println("low battery (User takes off jacket)");
 
-      // // For testing, get user input
-      // Serial.println("Is battery charged (Type Y or N): ");
-      // wait_for_command();
-
-      // Charge the battery here
       if (checks.checkBatteryCharging() == SUCCESS) {      // If battery is fully charged
         sub = START;
       } else {
@@ -191,33 +164,26 @@ void detect_movement(void) {
     case READ_IMU:
       Serial.println("detecting Read");
 
-      // For testing, get user input
-      // Serial.println("Is IMU initialized (Type Y or N): ");
-      // wait_for_command();
-
-      if(checks.checkForUser() == ERROR){           // If user takes of jacket
+      if (checks.checkForUser() == ERROR) {         // If user takes of jacket
         super = CHECK_USABILITY;
         sub = START;
-      }
-      else if(checks.getBatteryLevel() == ERROR){      // If battery is low
+      } else if (checks.getBatteryLevel() == ERROR) {    // If battery is low
         super = CHECK_USABILITY;
         sub = LOW_BATTERY;
-      }
-      else if(detection.getIMUData() == ERROR){
+      } else if (detection.getIMUData() == ERROR) {
         imuErrorCount = imuErrorCount + 1;
 
         /*
-         * IMU_ERROR_THRESHOLD reasoning: 
-         * The IMU is sampled at 200Hz which is every 5ms. Therefore, the interrupt should be ready with data every 5ms
-         * Based on literature, a fall algorthim needs to be sampled at least at 100Hz for any amount of accuracy (every 10ms)
-         * If the interrupt is not ready for 10 calls, 5ms apart, data has not been ready for 50ms
-         * This is more time than the minimum frequency, with 50ms intervals resulting in a frequency of 20Hz which is too slow to ensure accurate fall detection
-         */
-        if(imuErrorCount >= IMU_ERROR_THRESHOLD){
-          sub = IMU_ERROR;  
+           IMU_ERROR_THRESHOLD reasoning:
+           The IMU is sampled at 200Hz which is every 5ms. Therefore, the interrupt should be ready with data every 5ms
+           Based on literature, a fall algorthim needs to be sampled at least at 100Hz for any amount of accuracy (every 10ms)
+           If the interrupt is not ready for 10 calls, 5ms apart, data has not been ready for 50ms
+           This is more time than the minimum frequency, with 50ms intervals resulting in a frequency of 20Hz which is too slow to ensure accurate fall detection
+        */
+        if (imuErrorCount >= IMU_ERROR_THRESHOLD) {
+          sub = IMU_ERROR;
         }
-      }
-      else{
+      } else {
         imuErrorCount = 0;
         sub = DETECT_FALLS;
       }
@@ -231,22 +197,18 @@ void detect_movement(void) {
     case DETECT_FALLS:
       Serial.println("detecting Falls");
 
-      // For testing, get user input
-      // Serial.println("Is fall detected (Type Y or N): ");
-      // wait_for_command();
-
-      if(checks.checkForUser() == ERROR){           // If user takes of jacket
+      if (checks.checkForUser() == ERROR) {         // If user takes of jacket
         super = CHECK_USABILITY;
         sub = START;
-      } else if(checks.getBatteryLevel() == ERROR){      // If battery is low
-          super = CHECK_USABILITY;
-          sub = LOW_BATTERY;
-      } else if(detection.detectFalls() != 0){    // If fall is detected
-          super = INFLATE_WEARABLE;
-          sub = INFLATE_TO_100;
-      } else{
-          sub = DETECT_FALLS;
-          startTime = millis();
+      } else if (checks.getBatteryLevel() == ERROR) {    // If battery is low
+        super = CHECK_USABILITY;
+        sub = LOW_BATTERY;
+      } else if (detection.detectFalls() != 0) {  // If fall is detected
+        super = INFLATE_WEARABLE;
+        sub = INFLATE_TO_100;
+      } else {
+        sub = DETECT_FALLS;
+        startTime = millis();
       }
       break;
   }
@@ -259,12 +221,12 @@ void inflate_wearable(void) {
     case INFLATE_TO_100:
       Serial.println("inflating 100");
       inflation.fullInflate();
-      
-      if(millis() - startTime >= 80){
+
+      if (millis() - startTime >= 80) {
         sub = MAINTAIN_FULL_INFLATION;
         startTime = millis();
-      } else{
-          sub = INFLATE_TO_100;
+      } else {
+        sub = INFLATE_TO_100;
       }
       break;
 
@@ -272,11 +234,11 @@ void inflate_wearable(void) {
       Serial.println("inflating Full");
       inflation.fullInflate();
 
-      if(inflation.pressureCheck() == ERROR){     // If pressure is ok
+      if (inflation.pressureCheck() == ERROR) {   // If pressure is ok
         sub = INFLATION_ERROR;
-      } else if(millis() - startTime >= 1000){
-        sub = DEFLATE_FULLY; 
-      } else{
+      } else if (millis() - startTime >= 1000) {
+        sub = DEFLATE_FULLY;
+      } else {
         sub = MAINTAIN_FULL_INFLATION;
       }
       break;
@@ -300,7 +262,7 @@ void inflate_wearable(void) {
 
 void printIMUData(void)
 {
-    //Print time
+  //Print time
   SerialBT.print(millis());
   SerialBT.print(",\t");
 
@@ -311,12 +273,12 @@ void printIMUData(void)
   SerialBT.print(",\t");
   SerialBT.print(detection.gyroZ);
   SerialBT.print(",\t");
-//  SerialBT.print(accelX);
-//  SerialBT.print(",\t");
-//  SerialBT.print(accelY);
-//  SerialBT.print(",\t");
-//  SerialBT.print(accelZ);
-//  SerialBT.print(",\t");
+  //  SerialBT.print(accelX);
+  //  SerialBT.print(",\t");
+  //  SerialBT.print(accelY);
+  //  SerialBT.print(",\t");
+  //  SerialBT.print(accelZ);
+  //  SerialBT.print(",\t");
 
   //Print Eulers
   SerialBT.print(detection.yaw);
