@@ -43,31 +43,31 @@
  
 /* 
 Function: checkingInit
-Param: nothing
-Return: nothing
+Param: none
+Return: none
 Brief: Initializes the battery and touch sensor pins
 */
-void checkingInit(void);
+void checking_Init(void);
 
 /* 
 Function: getBatteryLevel
-Param: nothing
+Param: none
 Return: SUCCESS if battery is usable, ERROR if battery is too low
 Brief: Reads the battery level
 */
-int getBatteryLevel(void);
+int checking_getBatteryLevel(void);
 
 /*
  Function: setBatteryLevel
- Param: nothing
- Return: nothing
+ Param: none
+ Return: none
  Brief: Set LED lights to indicate the battery level
 */
-void setBatteryLevel(void);
+void checking_setBatteryLevel(void);
 
 /*
  Function: checkBatteryCharging
- Param: nothing
+ Param: none
  Return: SUCCESS if battery is full, ERROR if not full
  Brief: Reads the level of the battery while it is charging
  */
@@ -75,16 +75,18 @@ int checkBatteryCharging(void);
 
 /*
  Function: getTouchSensorReading
- Param: nothing
- Return: nothing
+ Param: none
+ Return: none
  Brief: Read status of touch sensors
  */
 void getTouchSensorReading(void);
 
 /*
  Function: checkForUser
- Param: nothing
+ Param: none
  Return: SUCCESS if both touch sensors have a high signal, ERROR if either are low
  Brief: Checks if the touch sensors signal that a user is wearing a wearable
  */
 int checkForUser(void);
+
+#endif

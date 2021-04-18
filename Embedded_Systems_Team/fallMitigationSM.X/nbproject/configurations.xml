@@ -7,6 +7,9 @@
       <itemPath>checking.h</itemPath>
       <itemPath>inflation.h</itemPath>
       <itemPath>fallDetection.h</itemPath>
+      <itemPath>I2C.h</itemPath>
+      <itemPath>BOARD.h</itemPath>
+      <itemPath>serial.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -19,6 +22,9 @@
       <itemPath>checking.c</itemPath>
       <itemPath>inflation.c</itemPath>
       <itemPath>fallDetection.c</itemPath>
+      <itemPath>BOARD.c</itemPath>
+      <itemPath>serial.c</itemPath>
+      <itemPath>I2C.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

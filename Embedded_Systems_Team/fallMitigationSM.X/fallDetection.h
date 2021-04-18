@@ -1,179 +1,91 @@
 /* ************************************************************************** */
-/** Descriptive File Name
-
-  @Company
-    Company Name
-
-  @File Name
-    filename.h
-
-  @Summary
-    Brief description of the file.
-
-  @Description
-    Describe the purpose of this file.
+/** Fall Injury Mitigation Wearable Team
+ * UCSC ECE Senior Capstone 2020-21
+ 
+ * File name: fallDetection.h
+ 
+ * File description: This is the header file for the fall detection algorithm.
+ * These functions read the IMU and check if the incoming data signals whether a 
+ * fall or activity of daily life (ADL) has occurred. 
+ 
+ * Author: Archisha Sinha and David Prager
  */
 /* ************************************************************************** */
 
-#ifndef _EXAMPLE_FILE_NAME_H    /* Guard against multiple inclusion */
-#define _EXAMPLE_FILE_NAME_H
+#ifndef FALL_DETECTION_H    
+#define FALL_DETECTION_H
 
 
-/* ************************************************************************** */
 /* ************************************************************************** */
 /* Section: Included Files                                                    */
 /* ************************************************************************** */
+
+   
+/* ************************************************************************** */
+/* Section: Constants                                                         */
+/* ************************************************************************** */
+#define BATTERY_PIN
+#define TOUCH_LEFT_PIN
+#define TOUCH_RIGHT_PIN
+
+#define LOW_BATTERY_LED
+#define MID_BATTERY_LED
+#define HIGH_BATTERY_LED
+
+#define BATTERY_LOW
+#define BATTERY_MEDIUM
+#define BATTERY_HIGH
+#define BATTERY_FULL
+
+/* ************************************************************************** */
+/* Section: Variables
 /* ************************************************************************** */
 
-/* This section lists the other files that are included in this file.
+ 
+/* 
+Function: checkingInit
+Param: none
+Return: none
+Brief: Initializes the battery and touch sensor pins
+*/
+void checkingInit(void);
+
+/* 
+Function: getBatteryLevel
+Param: none
+Return: SUCCESS if battery is usable, ERROR if battery is too low
+Brief: Reads the battery level
+*/
+int getBatteryLevel(void);
+
+/*
+ Function: setBatteryLevel
+ Param: none
+ Return: none
+ Brief: Set LED lights to indicate the battery level
+*/
+void setBatteryLevel(void);
+
+/*
+ Function: checkBatteryCharging
+ Param: none
+ Return: SUCCESS if battery is full, ERROR if not full
+ Brief: Reads the level of the battery while it is charging
  */
+int checkBatteryCharging(void);
 
-/* TODO:  Include other files here if needed. */
-
-
-/* Provide C++ Compatibility */
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
-    /* ************************************************************************** */
-    /* ************************************************************************** */
-    /* Section: Constants                                                         */
-    /* ************************************************************************** */
-    /* ************************************************************************** */
-
-    /*  A brief description of a section can be given directly below the section
-        banner.
-     */
-
-
-    /* ************************************************************************** */
-    /** Descriptive Constant Name
-
-      @Summary
-        Brief one-line summary of the constant.
-    
-      @Description
-        Full description, explaining the purpose and usage of the constant.
-        <p>
-        Additional description in consecutive paragraphs separated by HTML 
-        paragraph breaks, as necessary.
-        <p>
-        Type "JavaDoc" in the "How Do I?" IDE toolbar for more information on tags.
-    
-      @Remarks
-        Any additional remarks
-     */
-#define EXAMPLE_CONSTANT 0
-
-
-    // *****************************************************************************
-    // *****************************************************************************
-    // Section: Data Types
-    // *****************************************************************************
-    // *****************************************************************************
-
-    /*  A brief description of a section can be given directly below the section
-        banner.
-     */
-
-
-    // *****************************************************************************
-
-    /** Descriptive Data Type Name
-
-      @Summary
-        Brief one-line summary of the data type.
-    
-      @Description
-        Full description, explaining the purpose and usage of the data type.
-        <p>
-        Additional description in consecutive paragraphs separated by HTML 
-        paragraph breaks, as necessary.
-        <p>
-        Type "JavaDoc" in the "How Do I?" IDE toolbar for more information on tags.
-
-      @Remarks
-        Any additional remarks
-        <p>
-        Describe enumeration elements and structure and union members above each 
-        element or member.
-     */
-    typedef struct _example_struct_t {
-        /* Describe structure member. */
-        int some_number;
-
-        /* Describe structure member. */
-        bool some_flag;
-
-    } example_struct_t;
-
-
-    // *****************************************************************************
-    // *****************************************************************************
-    // Section: Interface Functions
-    // *****************************************************************************
-    // *****************************************************************************
-
-    /*  A brief description of a section can be given directly below the section
-        banner.
-     */
-
-    // *****************************************************************************
-    /**
-      @Function
-        int ExampleFunctionName ( int param1, int param2 ) 
-
-      @Summary
-        Brief one-line description of the function.
-
-      @Description
-        Full description, explaining the purpose and usage of the function.
-        <p>
-        Additional description in consecutive paragraphs separated by HTML 
-        paragraph breaks, as necessary.
-        <p>
-        Type "JavaDoc" in the "How Do I?" IDE toolbar for more information on tags.
-
-      @Precondition
-        List and describe any required preconditions. If there are no preconditions,
-        enter "None."
-
-      @Parameters
-        @param param1 Describe the first parameter to the function.
-    
-        @param param2 Describe the second parameter to the function.
-
-      @Returns
-        List (if feasible) and describe the return values of the function.
-        <ul>
-          <li>1   Indicates an error occurred
-          <li>0   Indicates an error did not occur
-        </ul>
-
-      @Remarks
-        Describe any special behavior not described above.
-        <p>
-        Any additional remarks.
-
-      @Example
-        @code
-        if(ExampleFunctionName(1, 2) == 0)
-        {
-            return 3;
-        }
-     */
-    int ExampleFunction(int param1, int param2);
-
-
-    /* Provide C++ Compatibility */
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* _EXAMPLE_FILE_NAME_H */
-
-/* *****************************************************************************
- End of File
+/*
+ Function: getTouchSensorReading
+ Param: none
+ Return: none
+ Brief: Read status of touch sensors
  */
+void getTouchSensorReading(void);
+
+/*
+ Function: checkForUser
+ Param: none
+ Return: SUCCESS if both touch sensors have a high signal, ERROR if either are low
+ Brief: Checks if the touch sensors signal that a user is wearing a wearable
+ */
+int checkForUser(void);
