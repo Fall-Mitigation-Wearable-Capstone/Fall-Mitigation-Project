@@ -13,7 +13,7 @@
 
 
 /* ************************************************************************** */
-/* Section: Included Files                                                    */
+/* Included Files                                                             */
 /* ************************************************************************** */
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,12 +23,12 @@
 #include "I2C.h"
 
 /* ************************************************************************** */
-/* Section: Constants                                                         */
+/* Constants                                                                  */
 /* ************************************************************************** */
 #define MPU_ADDRESS 0x68
 
 /* ************************************************************************** */
-/* Section: Variables
+/* Variables                                                                  */
 /* ************************************************************************** */
 
 /* 
@@ -186,7 +186,7 @@ int I2C_readInteger(unsigned char deviceAddress){
     
     I2C1CONbits.RCEN = 1;                       //Set I2C to receive mode
     while(I2C1STATbits.RBF != 1);
-    data = I2C1RCV;                             //Read data from buffer. Data is big Endian and is added to bottom 8 bits of data value
+    data |= I2C1RCV;                             //Read data from buffer. Data is big Endian and is added to bottom 8 bits of data value
     
     // Unsure if changes actually needed here
     I2C1CONbits.ACKDT = 0;                      //ACK is sent

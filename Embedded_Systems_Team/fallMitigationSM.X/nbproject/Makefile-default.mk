@@ -57,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=projectSM_main.c checking.c inflation.c fallDetection.c BOARD.c serial.c I2C.c
+SOURCEFILES_QUOTED_IF_SPACED=projectSM_main.c checking.c inflation.c fallDetection.c BOARD.c serial.c I2C.c MPU9250.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/projectSM_main.o ${OBJECTDIR}/checking.o ${OBJECTDIR}/inflation.o ${OBJECTDIR}/fallDetection.o ${OBJECTDIR}/BOARD.o ${OBJECTDIR}/serial.o ${OBJECTDIR}/I2C.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/projectSM_main.o.d ${OBJECTDIR}/checking.o.d ${OBJECTDIR}/inflation.o.d ${OBJECTDIR}/fallDetection.o.d ${OBJECTDIR}/BOARD.o.d ${OBJECTDIR}/serial.o.d ${OBJECTDIR}/I2C.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/projectSM_main.o ${OBJECTDIR}/checking.o ${OBJECTDIR}/inflation.o ${OBJECTDIR}/fallDetection.o ${OBJECTDIR}/BOARD.o ${OBJECTDIR}/serial.o ${OBJECTDIR}/I2C.o ${OBJECTDIR}/MPU9250.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/projectSM_main.o.d ${OBJECTDIR}/checking.o.d ${OBJECTDIR}/inflation.o.d ${OBJECTDIR}/fallDetection.o.d ${OBJECTDIR}/BOARD.o.d ${OBJECTDIR}/serial.o.d ${OBJECTDIR}/I2C.o.d ${OBJECTDIR}/MPU9250.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/projectSM_main.o ${OBJECTDIR}/checking.o ${OBJECTDIR}/inflation.o ${OBJECTDIR}/fallDetection.o ${OBJECTDIR}/BOARD.o ${OBJECTDIR}/serial.o ${OBJECTDIR}/I2C.o
+OBJECTFILES=${OBJECTDIR}/projectSM_main.o ${OBJECTDIR}/checking.o ${OBJECTDIR}/inflation.o ${OBJECTDIR}/fallDetection.o ${OBJECTDIR}/BOARD.o ${OBJECTDIR}/serial.o ${OBJECTDIR}/I2C.o ${OBJECTDIR}/MPU9250.o
 
 # Source Files
-SOURCEFILES=projectSM_main.c checking.c inflation.c fallDetection.c BOARD.c serial.c I2C.c
+SOURCEFILES=projectSM_main.c checking.c inflation.c fallDetection.c BOARD.c serial.c I2C.c MPU9250.c
 
 
 
@@ -149,6 +149,12 @@ ${OBJECTDIR}/I2C.o: I2C.c  .generated_files/8f8a7fee0a5ba04a37510e0d17803f262cd8
 	@${RM} ${OBJECTDIR}/I2C.o 
 	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG   -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/I2C.o.d" -o ${OBJECTDIR}/I2C.o I2C.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
+${OBJECTDIR}/MPU9250.o: MPU9250.c  .generated_files/b6fe790491a5d6def98b1ea4cee93989b96407fa.flag .generated_files/9c38dd73fa47c8727ca672a3ac38932765b77050.flag
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/MPU9250.o.d 
+	@${RM} ${OBJECTDIR}/MPU9250.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG   -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/MPU9250.o.d" -o ${OBJECTDIR}/MPU9250.o MPU9250.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
 else
 ${OBJECTDIR}/projectSM_main.o: projectSM_main.c  .generated_files/c302ce9f30ec8b5bda9f8d7e71cac26415fd2d27.flag .generated_files/9c38dd73fa47c8727ca672a3ac38932765b77050.flag
 	@${MKDIR} "${OBJECTDIR}" 
@@ -191,6 +197,12 @@ ${OBJECTDIR}/I2C.o: I2C.c  .generated_files/aaf323519e8f974aa6379efeb2068565e172
 	@${RM} ${OBJECTDIR}/I2C.o.d 
 	@${RM} ${OBJECTDIR}/I2C.o 
 	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/I2C.o.d" -o ${OBJECTDIR}/I2C.o I2C.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/MPU9250.o: MPU9250.c  .generated_files/75a0d8269b0eed5df0e0ec6192dec44bded39474.flag .generated_files/9c38dd73fa47c8727ca672a3ac38932765b77050.flag
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/MPU9250.o.d 
+	@${RM} ${OBJECTDIR}/MPU9250.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/MPU9250.o.d" -o ${OBJECTDIR}/MPU9250.o MPU9250.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
 endif
 
