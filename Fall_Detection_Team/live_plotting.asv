@@ -53,5 +53,5 @@ end
 
 xlabel('Time (Seconds)');
 ylabel('Angle (Degrees)');
-title('Live Data from 5 Repeated Right Falls');
+title('
 legend('Pitch', 'Roll', 'Detected Right Falls');

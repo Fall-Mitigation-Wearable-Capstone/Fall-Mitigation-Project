@@ -4,10 +4,10 @@ clear all;
 close all;
 clc;
 
-participantNum = 4;
-movement = "liveBackwards";
+participantNum = 3;
+movement = "liveLeft";
 
-data = csvread("Participant-Data\Participant " + participantNum + "\Live\testing" + participantNum + "_" + movement + ".csv");
+data = csvread("Participant-Data\Participant " + participantNum + "\Raw\testing" + participantNum + "_" + movement + ".csv");
 time =(data(:,1) - data(1,1)) / 1000;
 g = data(:,2:4);
 e = data(:,5:7);
@@ -72,36 +72,35 @@ for i = 31:length(e)
 %     diffGyroZ = gz(i) - circBuff_gyroz(mod(i, 31) + 1);
     
     % dR = -6.5, gx = -40, dgx = -10
-%     if(diffRoll <= -5 && gx(i) <= -60) % diffRoll <= -6 && gx(i) < -90
-%         x = sprintf("%0.2f forward fall: %0.2f %0.2f %0.2f", time(data_ticks), diffRoll, gx(i), diffGyroX); 
-%         %x = sprintf("%d %0.2f forward: %0.2f %0.2f %0.2f", data_ticks, time(data_ticks), a(i, 1), a(i, 2), a(i, 3));
-%         %x = sprintf("%d %0.2f forward: %0.2f", data_ticks, time(data_ticks), diffGyroX);
-%         disp(x)
-%         
-%         if(forward_flag < 16)
-%             forward_flag = forward_flag + 1;
-%         end
-%     else
-%         if(forward_flag > 0)
-%             forward_flag = forward_flag - 1;
-%         end
-%     end
+    if(diffRoll <= -5 && gx(i) <= -60) % diffRoll <= -6 && gx(i) < -90
+        x = sprintf("%0.2f forward fall: %0.2f %0.2f %0.2f", time(data_ticks), diffRoll, gx(i), diffGyroX); 
+        %x = sprintf("%d %0.2f forward: %0.2f %0.2f %0.2f", data_ticks, time(data_ticks), a(i, 1), a(i, 2), a(i, 3));
+        %x = sprintf("%d %0.2f forward: %0.2f", data_ticks, time(data_ticks), diffGyroX);
+        disp(x)
+        
+        if(forward_flag < 16)
+            forward_flag = forward_flag + 1;
+        end
+    else
+        if(forward_flag > 0)
+            forward_flag = forward_flag - 1;
+        end
+    end
 
-%     % current: 75, 8, 23
-%     if(roll(i) > 60 && diffRoll > 8 && gx(i) > 23)
-%         x = sprintf("%0.2f back fall: %0.2f %0.2f %0.2f", time(data_ticks), roll(i), diffRoll, gx(i)); 
-%         disp(x)
-%         if(back_flag < 16)
-%             back_flag = back_flag + 1;
-%         end
-%     else
-%         if(back_flag > 0)
-%             back_flag = back_flag - 1;
-%         end
-%     end
+    % current: 75, 8, 23
+    if(roll(i) > 60 && diffRoll > 8 && gx(i) > 23)
+        x = sprintf("%0.2f back fall: %0.2f %0.2f %0.2f", time(data_ticks), roll(i), diffRoll, gx(i)); 
+        disp(x)
+        if(back_flag < 16)
+            back_flag = back_flag + 1;
+        end
+    else
+        if(back_flag > 0)
+            back_flag = back_flag - 1;
+        end
+    end
     
-    % dp = -6, gy = -50
-    if(diffPitch < -6)
+    if(diffPitch < -6 && gy(i) < -50)
         x = sprintf("%0.2f left fall: %0.2f %0.2f %0.2f", time(data_ticks), pitch(i), diffPitch, gy(i)); 
         disp(x)
         
@@ -114,8 +113,7 @@ for i = 31:length(e)
         end
     end
     
-    % dp = 6, gy = 50
-    if(diffPitch > 6)
+    if(diffPitch > 6 && gy(i) > 55)
         x = sprintf("%0.2f right fall: %0.2f %0.2f %0.2f", time(data_ticks), pitch(i), diffPitch, gy(i)); 
         disp(x)
         if(right_flag < 16)

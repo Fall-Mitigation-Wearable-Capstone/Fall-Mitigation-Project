@@ -75,7 +75,7 @@ void FallDetection::updateFlags(void){
         }
 	}
 	
-	if(diffPitch < -7){
+	if(diffPitch < -6){
         if(leftFlag < 16){
             leftFlag++;
         } 
@@ -85,7 +85,7 @@ void FallDetection::updateFlags(void){
         }
 	}
 	
-	if(diffPitch > 7){
+	if(diffPitch > 6){
         if(rightFlag < 16){
             rightFlag++;
         } 

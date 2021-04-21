@@ -67,6 +67,9 @@ void setup()
   // This value can range between: 1-100Hz
   //imu.setCompassSampleRate(10); // Set mag rate to 10Hz
   filter.begin(200);
+
+//  pinMode(35, OUTPUT);
+//  digitalWrite(35, LOW);
 }
 
 void loop() 
@@ -139,4 +142,10 @@ void printIMUData(void)
   falls = fall.detectFalls(pitch, roll, gyroX, gyroY);
   SerialBT.print(falls);
   SerialBT.println(",");
+  
+//  if(falls != 0){
+//    digitalWrite(35, HIGH);
+//    delay(2000);
+//  }
+  
 }
