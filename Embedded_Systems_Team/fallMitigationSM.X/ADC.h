@@ -18,4 +18,4 @@ brief: reads the most recently stored value in the selected pins buffer
 **/
 short ADC_CurrentReading(short pin);
 
-#endif ADC_H
+#endif

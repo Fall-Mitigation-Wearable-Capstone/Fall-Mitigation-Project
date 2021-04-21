@@ -183,3 +183,55 @@ void MPU9250_readIMU(void) {
     MPU9250_readAccelY();
     MPU9250_readAccelZ();
 }
+
+
+/* ************************************************************************** */
+/* Section: Test main                                                         */
+/* ************************************************************************** */
+//#define TEST_IMU_MAIN
+#ifdef TEST_IMT_MAIN
+
+#include "FRT.h"
+#include <math.h>
+
+int main(void)
+{
+    BOARD_Init();
+    FRT_Init();
+
+    printf("Testing MPU9250 Library\r\n");
+    if (MPU9250_Init() == ERROR) {
+        printf("Error with sensor\r\n");
+        while (1);
+    }
+//    int q;
+//    for (q = 0; q < 100; q++) asm("nop");
+
+    while (1) {
+        MPU9250_readIMU();
+        printf("%.2f/t %.2f/t %.2f/t %.2f/t %.2f/t %.2f/t", gyroX, gyroY, gyroZ, accelX, accelY, accelZ);
+    }
+    return 1;
+}
+
+#endif
+
+/* ************************************************************************** */
+/* Section: Hello world                                                       */
+/* ************************************************************************** */
+#define HELLO
+#ifdef HELLO
+
+#include "serial.h"
+
+int main(void){
+    BOARD_Init();
+    TRISEbits.TRISE0 = 0;
+    LATEbits.LATE0 = 1;
+    while(1){
+        printf("Hello MR. PRAGER\r\n");
+    }
+    return(1);
+}
+
+#endif

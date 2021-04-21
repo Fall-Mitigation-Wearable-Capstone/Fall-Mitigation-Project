@@ -26,4 +26,4 @@ float getRoll(Madgwick *filter);
 float getPitch(Madgwick *filter); 
 float getYaw(Madgwick *filter);
 
-#endif MADGWICK_H
+#endif

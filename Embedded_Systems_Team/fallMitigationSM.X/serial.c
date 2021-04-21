@@ -6,9 +6,9 @@
  */
 
 #include <xc.h>
-#include <serial.h>
+#include "serial.h"
 #include <sys/attribs.h>
-#include <BOARD.h>
+#include "BOARD.h"
 #include <stdint.h>
 //#include <stdlib.h>
 

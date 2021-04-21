@@ -70,7 +70,7 @@ short ADC_CurrentReading(short pin){
 }
 
 void __ISR(_ADC_VECTOR) ADCIntHandler(void){
-	IFS1bits.AD1F = 0; //clear isr flag
+	IFS1bits.AD1IF = 0; //clear isr flag
 	
 	bufferIndex++; //increment buffer index
 	bufferIndex = bufferIndex % BUFFERLENGTH; //address rollover

@@ -52,7 +52,7 @@ unsigned int FRT_GetMilliSeconds(void){
 }
 
 void __ISR(_TIMER_5_VECTOR, ipl3auto) Timer5IntHandler(void){
-	IPC5bits.T5IF = 0; //interrupt flag set low
+	IFS0bits.T5IF = 0; //interrupt flag set low
 	
 	milli++; //increment millisecond count
 	micro += 1000; //increment microsecond count
