@@ -188,16 +188,14 @@ void MPU9250_readIMU(void) {
 /* ************************************************************************** */
 /* Section: Test main                                                         */
 /* ************************************************************************** */
-//#define TEST_IMU_MAIN
-#ifdef TEST_IMT_MAIN
+#define TEST_IMU_MAIN
+#ifdef TEST_IMU_MAIN
 
-#include "FRT.h"
 #include <math.h>
 
 int main(void)
 {
     BOARD_Init();
-    FRT_Init();
 
     printf("Testing MPU9250 Library\r\n");
     if (MPU9250_Init() == ERROR) {
@@ -209,7 +207,7 @@ int main(void)
 
     while (1) {
         MPU9250_readIMU();
-        printf("%.2f/t %.2f/t %.2f/t %.2f/t %.2f/t %.2f/t", gyroX, gyroY, gyroZ, accelX, accelY, accelZ);
+        printf("%f, %f, %f, %f, %f, %f,\n", gyroX, gyroY, gyroZ, accelX, accelY, accelZ);
     }
     return 1;
 }
@@ -219,15 +217,15 @@ int main(void)
 /* ************************************************************************** */
 /* Section: Hello world                                                       */
 /* ************************************************************************** */
-#define HELLO
+//#define HELLO
 #ifdef HELLO
 
 #include "serial.h"
 
 int main(void){
     BOARD_Init();
-    TRISEbits.TRISE0 = 0;
-    LATEbits.LATE0 = 1;
+    TRISE = 0;
+    LATE = 0xFF;
     while(1){
         printf("Hello MR. PRAGER\r\n");
     }

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <project>                                  
-  <executable name="dist/default/production/fallMitigationSM.X.production.elf">                 
+  <executable name="dist/default/debug/fallMitigationSM.X.debug.elf">                 
     <memory name="program">                 
       <units>bytes</units>                 
       <length>531968</length>                 
-      <used>22308</used>                     
-      <free>509660</free>                     
+      <used>12412</used>                     
+      <free>519556</free>                     
     </memory>                              
     <memory name="data">              
       <units>bytes</units>                 
       <length>32768</length>                 
-      <used>1512</used>                     
-      <free>31256</free>                     
+      <used>1988</used>                     
+      <free>30780</free>                     
     </memory>                              
   </executable>                            
 </project>                                 

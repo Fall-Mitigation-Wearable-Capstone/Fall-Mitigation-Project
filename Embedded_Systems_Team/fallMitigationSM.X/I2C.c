@@ -146,7 +146,7 @@ unsigned char I2C_write(unsigned char deviceAddress, char data){
  * Brief: Reads 2 sequential registers to create a 16 bit value of data
  */
 int I2C_readInteger(unsigned char deviceAddress){
-    int data = ERROR;                           //Initialized to ERROR in case no data is read
+    short data = ERROR;                           //Initialized to ERROR in case no data is read
     I2C1CONbits.SEN = 1;                        //Initiate START condition on SDA & SCL pins, automatically set to Idle 
     while(I2C1CONbits.SEN == 1);                //Wait for START to be sent
     
@@ -189,11 +189,11 @@ int I2C_readInteger(unsigned char deviceAddress){
     data |= I2C1RCV;                             //Read data from buffer. Data is big Endian and is added to bottom 8 bits of data value
     
     // Unsure if changes actually needed here
-    I2C1CONbits.ACKDT = 0;                      //ACK is sent
+    I2C1CONbits.ACKDT = 1;                      //ACK is sent
     I2C1CONbits.ACKEN = 1;                      //Transmit ACKDT data
     while(I2C1CONbits.ACKEN == 1);              //Wait for NACK to be sent
     
-    I2C1CONbits.ACKDT = 1;                      //NACK is sent
+    I2C1CONbits.ACKDT = 0;                      //NACK is sent
     I2C1CONbits.ACKEN = 1;                      //Transmit ACKDT data
     while(I2C1CONbits.ACKEN == 1);              //Wait for NACK to be sent
     
