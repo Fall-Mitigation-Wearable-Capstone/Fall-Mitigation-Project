@@ -1,6 +1,31 @@
+/* ************************************************************************** */
+/** Fall Injury Mitigation Wearable Team
+ * UCSC ECE Senior Capstone 2020-21
+ 
+ * File name: FRT.c
+ 
+ * File description: This is the c file for free running timer peripheral. These
+ * functions allow the program to keep track of time which aids in data logging
+ * and ensuring correctly timed intervals.
+ 
+ * Author: David Prager
+ */
+/* ************************************************************************** */
 #ifndef FRT_H
 #define FRT_H
 
+/* ************************************************************************** */
+/* Section: Included Files                                                    */
+/* ************************************************************************** */
+
+/* ************************************************************************** */
+/* Section: Library Variables                                                 */
+/* ************************************************************************** */
+
+
+/* ************************************************************************** */
+/* Section: Library Functions                                                 */
+/* ************************************************************************** */
 
 /**
 Function: FRT_Init

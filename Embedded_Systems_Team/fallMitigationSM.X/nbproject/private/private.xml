@@ -3,12 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Fall-Mitigation-Project/Embedded_Systems_Team/fallMitigationSM.X/MPU9250.c</file>
             <file>file:/C:/Fall-Mitigation-Project/Embedded_Systems_Team/fallMitigationSM.X/I2C.c</file>
+            <file>file:/C:/Fall-Mitigation-Project/Embedded_Systems_Team/fallMitigationSM.X/MPU9250.c</file>
             <file>file:/C:/Fall-Mitigation-Project/Embedded_Systems_Team/fallMitigationSM.X/checking.h</file>
-            <file>file:/C:/Fall-Mitigation-Project/Embedded_Systems_Team/fallMitigationSM.X/I2C.h</file>
-            <file>file:/C:/Fall-Mitigation-Project/Embedded_Systems_Team/fallMitigationSM.X/MPU9250.h</file>
-            <file>file:/C:/Fall-Mitigation-Project/Embedded_Systems_Team/fallMitigationSM.X/projectSM_main.c</file>
+            <file>file:/C:/Fall-Mitigation-Project/Embedded_Systems_Team/fallMitigationSM.X/BOARD.c</file>
+            <file>file:/C:/Fall-Mitigation-Project/Embedded_Systems_Team/fallMitigationSM.X/checking.c</file>
         </group>
     </open-files>
 </project-private>

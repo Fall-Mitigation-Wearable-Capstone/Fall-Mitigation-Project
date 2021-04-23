@@ -29,6 +29,9 @@ volatile float accelX;
 volatile float accelY;
 volatile float accelZ;
 
+/* ************************************************************************** */
+/* Section: Library Functions                                                 */
+/* ************************************************************************** */
 /* 
  * Function: MPU9250_Init
  * Param: none

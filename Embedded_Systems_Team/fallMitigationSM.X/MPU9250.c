@@ -42,23 +42,17 @@ static enum {
     ACCEL_CONFIG = 28, //Configures accelerometer full scale select
     ACCEL_CONFIG_2 = 29, //Configures accelerometer data rate
     ACCEL_XOUT_H = 59, //High byte of accelerometer x-axis data
-    ACCEL_XOUT_L = 60, //Low byte of accelerometer x-axis data
     ACCEL_YOUT_H = 61, //High byte of accelerometer y-axis data
-    ACCEL_YOUT_L = 62, //Low byte of accelerometer y-axis data
     ACCEL_ZOUT_H = 63, //High byte of accelerometer z-axis data   
-    ACCEL_ZOUT_L = 64, //Low byte of accelerometer z-axis data
     GYRO_XOUT_H = 67, //High byte of gyroscope x-axis data
-    GYRO_XOUT_L = 68, //Low byte of gyroscope x-axis data
     GYRO_YOUT_H = 69, //High byte of gyroscope y-axis data
-    GYRO_YOUT_L = 70, //Low byte of gyroscope y-axis data
     GYRO_ZOUT_H = 71, //High byte of gyroscope z-axis data
-    GYRO_ZOUT_L = 72, //Low byte of gyroscope z-axis data
     PWR_MGMT_1 = 107, //Turns on/off IMU from sleep mode
     WHO_AM_I = 117, //Register address used to verify identity of device
 } MPU_REGISTER_ADDRESSES;
 
 /* ************************************************************************** */
-/* Section: Library Variables                                                 */
+/* Section: Library Functions                                                 */
 /* ************************************************************************** */
 
 /* 
@@ -188,14 +182,16 @@ void MPU9250_readIMU(void) {
 /* ************************************************************************** */
 /* Section: Test main                                                         */
 /* ************************************************************************** */
-#define TEST_IMU_MAIN
+//#define TEST_IMU_MAIN
 #ifdef TEST_IMU_MAIN
 
+#include "FRT.h"
 #include <math.h>
 
 int main(void)
 {
     BOARD_Init();
+    FRT_Init();
 
     printf("Testing MPU9250 Library\r\n");
     if (MPU9250_Init() == ERROR) {
@@ -207,7 +203,7 @@ int main(void)
 
     while (1) {
         MPU9250_readIMU();
-        printf("%f, %f, %f, %f, %f, %f,\n", gyroX, gyroY, gyroZ, accelX, accelY, accelZ);
+        printf("%d %f, %f, %f, %f, %f, %f,\n", FRT_GetMilliSeconds(), gyroX, gyroY, gyroZ, accelX, accelY, accelZ);
     }
     return 1;
 }

@@ -1,15 +1,38 @@
+/* ************************************************************************** */
+/** Fall Injury Mitigation Wearable Team
+ * UCSC ECE Senior Capstone 2020-21
+ 
+ * File name: ADC.c
+ 
+ * File description: This is the c file for ADC peripheral. These functions allow
+ * data to be collected off of the AD pins on the uc32.
+ 
+ * Author: David Prager and Archisha Sinha
+ */
+/* ************************************************************************** */
+
+/* ************************************************************************** */
+/* Section: Included Files                                                    */
+/* ************************************************************************** */
 #include <xc.h>
 #include "BOARD.h"
 #include "ADC.h"
 #include <sys/attribs.h>
 
+/* ************************************************************************** */
+/* Private Variables and Functions                                            */
+/* ************************************************************************** */
 #define CHANNELS 3 //number of ADC ports used (0-2)
 #define BUFFERLENGTH 32 //Max length of each channel's buffer
 
-void __ISR(_ADC_VECTOR) ADCIntHandler(void); //ADC isr
-
 static short data[CHANNELS][BUFFERLENGTH]; //buffers to hold pin readings
 static int bufferIndex; //index all channel readings
+
+void __ISR(_ADC_VECTOR) ADCIntHandler(void); //ADC isr
+
+/* ************************************************************************** */
+/* Section: Library Functions                                                 */
+/* ************************************************************************** */
 
 /**
 Function: ADC_Init(void);
@@ -79,3 +102,33 @@ void __ISR(_ADC_VECTOR) ADCIntHandler(void){
 	data[1][bufferIndex] = ADC1BUF1; //update buffer A1
 	data[2][bufferIndex] = ADC1BUF2; //update buffer A2
 }
+
+
+/* ************************************************************************** */
+/* Section: Test main                                                         */
+/* If the AD works, turning the potentiometer on the IO shield will cause     */
+/* changing readings. If the FRT works, the output will happen every 10 ms.   */
+/* ************************************************************************** */
+#define TEST_ADC_AND_FRT_MAIN
+#ifdef TEST_ADC_AND_FRT_MAIN
+
+#include "FRT.h"
+
+int main(void){
+    BOARD_Init();
+    ADC_Init();
+    FRT_Init();
+    
+    unsigned int prev = FRT_GetMilliSeconds();
+    
+    printf("Testing ADC and FRT Library\r\n");
+    while(1){
+        if(FRT_GetMilliSeconds() - prev >= 10){
+            prev = FRT_GetMilliSeconds();
+            printf("Time: %d  Data: %d\r\n", FRT_GetMilliSeconds(), ADC_CurrentReading(0));
+        }
+    }
+    return 1;
+}
+
+#endif
