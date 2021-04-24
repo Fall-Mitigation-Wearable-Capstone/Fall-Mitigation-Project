@@ -57,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=BOARD.c serial.c I2C.c MPU9250.c ADC.c FRT.c
+SOURCEFILES_QUOTED_IF_SPACED=checking.c BOARD.c serial.c I2C.c MPU9250.c ADC.c FRT.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/BOARD.o ${OBJECTDIR}/serial.o ${OBJECTDIR}/I2C.o ${OBJECTDIR}/MPU9250.o ${OBJECTDIR}/ADC.o ${OBJECTDIR}/FRT.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/BOARD.o.d ${OBJECTDIR}/serial.o.d ${OBJECTDIR}/I2C.o.d ${OBJECTDIR}/MPU9250.o.d ${OBJECTDIR}/ADC.o.d ${OBJECTDIR}/FRT.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/checking.o ${OBJECTDIR}/BOARD.o ${OBJECTDIR}/serial.o ${OBJECTDIR}/I2C.o ${OBJECTDIR}/MPU9250.o ${OBJECTDIR}/ADC.o ${OBJECTDIR}/FRT.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/checking.o.d ${OBJECTDIR}/BOARD.o.d ${OBJECTDIR}/serial.o.d ${OBJECTDIR}/I2C.o.d ${OBJECTDIR}/MPU9250.o.d ${OBJECTDIR}/ADC.o.d ${OBJECTDIR}/FRT.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/BOARD.o ${OBJECTDIR}/serial.o ${OBJECTDIR}/I2C.o ${OBJECTDIR}/MPU9250.o ${OBJECTDIR}/ADC.o ${OBJECTDIR}/FRT.o
+OBJECTFILES=${OBJECTDIR}/checking.o ${OBJECTDIR}/BOARD.o ${OBJECTDIR}/serial.o ${OBJECTDIR}/I2C.o ${OBJECTDIR}/MPU9250.o ${OBJECTDIR}/ADC.o ${OBJECTDIR}/FRT.o
 
 # Source Files
-SOURCEFILES=BOARD.c serial.c I2C.c MPU9250.c ADC.c FRT.c
+SOURCEFILES=checking.c BOARD.c serial.c I2C.c MPU9250.c ADC.c FRT.c
 
 
 
@@ -107,6 +107,12 @@ endif
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: compile
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
+${OBJECTDIR}/checking.o: checking.c  .generated_files/939eefd419cc912d69bb0541e70eebadc30dcc0c.flag .generated_files/9c38dd73fa47c8727ca672a3ac38932765b77050.flag
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/checking.o.d 
+	@${RM} ${OBJECTDIR}/checking.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -Wall -MP -MMD -MF "${OBJECTDIR}/checking.o.d" -o ${OBJECTDIR}/checking.o checking.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
 ${OBJECTDIR}/BOARD.o: BOARD.c  .generated_files/69c6d3ede65fb89a3b3bed2a299ee48231360f02.flag .generated_files/9c38dd73fa47c8727ca672a3ac38932765b77050.flag
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/BOARD.o.d 
@@ -144,6 +150,12 @@ ${OBJECTDIR}/FRT.o: FRT.c  .generated_files/880b2c5eb086754d5ea1ea4c42d81ccdde98
 	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -Wall -MP -MMD -MF "${OBJECTDIR}/FRT.o.d" -o ${OBJECTDIR}/FRT.o FRT.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
 else
+${OBJECTDIR}/checking.o: checking.c  .generated_files/b5800ad1235b3850ee4143c5f968dc54c934f6ee.flag .generated_files/9c38dd73fa47c8727ca672a3ac38932765b77050.flag
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/checking.o.d 
+	@${RM} ${OBJECTDIR}/checking.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -Wall -MP -MMD -MF "${OBJECTDIR}/checking.o.d" -o ${OBJECTDIR}/checking.o checking.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
 ${OBJECTDIR}/BOARD.o: BOARD.c  .generated_files/dccc2846dfc7bf0cf888eeb0e5b9f75f5153ab46.flag .generated_files/9c38dd73fa47c8727ca672a3ac38932765b77050.flag
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/BOARD.o.d 

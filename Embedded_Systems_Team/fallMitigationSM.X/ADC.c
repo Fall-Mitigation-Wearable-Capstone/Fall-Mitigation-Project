@@ -22,7 +22,7 @@
 /* ************************************************************************** */
 /* Private Variables and Functions                                            */
 /* ************************************************************************** */
-#define CHANNELS 3 //number of ADC ports used (0-2)
+#define CHANNELS 4 //number of ADC ports used (0-3)
 #define BUFFERLENGTH 32 //Max length of each channel's buffer
 
 static short data[CHANNELS][BUFFERLENGTH]; //buffers to hold pin readings
@@ -101,6 +101,7 @@ void __ISR(_ADC_VECTOR) ADCIntHandler(void){
 	data[0][bufferIndex] = ADC1BUF0; //update buffer A0
 	data[1][bufferIndex] = ADC1BUF1; //update buffer A1
 	data[2][bufferIndex] = ADC1BUF2; //update buffer A2
+    data[3][bufferIndex] = ADC1BUF3; //update buffer A2
 }
 
 
@@ -109,7 +110,7 @@ void __ISR(_ADC_VECTOR) ADCIntHandler(void){
 /* If the AD works, turning the potentiometer on the IO shield will cause     */
 /* changing readings. If the FRT works, the output will happen every 10 ms.   */
 /* ************************************************************************** */
-#define TEST_ADC_AND_FRT_MAIN
+//#define TEST_ADC_AND_FRT_MAIN
 #ifdef TEST_ADC_AND_FRT_MAIN
 
 #include "FRT.h"
