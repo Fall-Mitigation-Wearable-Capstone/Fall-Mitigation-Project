@@ -31,15 +31,22 @@
 #define BACKWARDS 0b0010 //Backwards fall flag value
 #define LEFT 0b0100  //Left fall flag value
 #define RIGHT 0b1000 //Right fall flag value
+#define FORWARD_THRESHOLD_DIFFROLL -5 //Differential roll threshold for forward fall
+#define FORWARD_THRESHOLD_GYROX -60 //GyroX buffer threshold for forward fall 
+#define BACKWARDS_THRESHOLD_ROLL 60 //Roll buffer threshold for backwards fall
+#define BACKWARDS_THRESHOLD_DIFFROLL 8 //Differential roll theshold for backwards fall
+#define BACKWARDS_THRESHOLD_GYROX 23 //GyroX buffer threshold for backwards fall
+#define LEFT_THRESHOLD_DIFFPITCH -6 //Differential pitch threshold for left fall
+#define RIGHT_THRESHOLD_DIFFPITCH 6 //Differential pitch threshold for right fall
 
 //Buffers hold the previous 31 data points to be used to check if a fall can be detected
-static volatile float rollBuffer[TWO_HUNDRED_MS];  //Previous 32 roll angles
-static volatile float pitchBuffer[TWO_HUNDRED_MS]; //Previous 32 pitch angles
+static volatile float rollBuffer[TWO_HUNDRED_MS]; //Previous 31 roll angles
+static volatile float pitchBuffer[TWO_HUNDRED_MS]; //Previous 31 pitch angles
 static volatile float gyroXBuffer[TWO_HUNDRED_MS]; //Previous 31 gyroX values
 static volatile float gyroYBuffer[TWO_HUNDRED_MS]; //Previous 31 gyroY values
 
 //buffer indexing
-static int bufferIndex;
+static int bufferIndex = TWO_HUNDRED_MS - 1; //On first update, will be set to 0
 
 //flags for tracking debouncing
 static int forwardFlag;
@@ -50,6 +57,7 @@ static int rightFlag;
 //values for change in each euler angle after 0.2s 
 static float diffRoll;
 static float diffPitch;
+
 /* ************************************************************************** */
 /* Section: Library Functions                                                 */
 /* ************************************************************************** */
@@ -58,26 +66,27 @@ static float diffPitch;
 Function: fallDetection_Init
 Param: none
 Return: none
-Brief: Initializes the battery and touch sensor pins
+Brief: Initializes IMU interrupt 
  */
 void fallDetection_Init(void) {
     //Initialize TMR3 interrupt for reading IMU at 200Hz
+    //wiggle wiggle
 }
 
 /* 
 Function: fallDetection_updateData
-Param: none
-Return: SUCCESS if battery is usable, ERROR if battery is too low
-Brief: Reads the battery level
+Param: The most recently updated euler angles and gyroscope rates
+Return: none
+Brief: Updates the data buffers and recalculates euler angle slopes
  */
 void fallDetection_updateData(float pitch, float roll, float gyroX, float gyroY) {
     //update index and consider roll-over
     bufferIndex++;
-    if (bufferIndex == TWO_HUNDRED_MS){
+    if (bufferIndex == TWO_HUNDRED_MS) {
         bufferIndex = 0;
     }
 
-    //update the individual buffers
+    //update the individual data buffers
     rollBuffer[bufferIndex] = roll;
     pitchBuffer[bufferIndex] = pitch;
     gyroXBuffer[bufferIndex] = gyroX;
@@ -93,45 +102,56 @@ void fallDetection_updateData(float pitch, float roll, float gyroX, float gyroY)
  Function: fallDetection_updateFlags
  Param: none
  Return: none
- Brief: Set LED lights to indicate the battery level
+ Brief: Updates fall flag count if new data falls within a fall type's threshold
  */
 void fallDetection_updateFlags(void) {
-    //forward detection flag
-    if (diffRoll <= -5 && gyroXBuffer[bufferIndex] <= -60) {
-        if (forwardFlag < 16) {
+    //Check current data with forward fall thresholds
+    if (diffRoll <= FORWARD_THRESHOLD_DIFFROLL && gyroXBuffer[bufferIndex] <= FORWARD_THRESHOLD_GYROX) {
+        //increment forward counter in response to detected forward fall
+        if (forwardFlag < DEBOUNCE) {
             forwardFlag++;
         }
     } else {
+        //decrement forward counter in response to no detected forward fall
         if (forwardFlag > 0) {
             forwardFlag--;
         }
     }
 
-    if (rollBuffer[bufferIndex] > 60 && diffRoll > 8 && gyroXBuffer[bufferIndex] > 23) {
-        if (backFlag < 16) {
+    //Check current data with backwards fall thresholds
+    if (rollBuffer[bufferIndex] > BACKWARDS_THRESHOLD_ROLL && diffRoll > BACKWARDS_THRESHOLD_DIFFROLL && gyroXBuffer[bufferIndex] > BACKWARDS_THRESHOLD_GYROX) {
+        //increment backwards counter in response to detected backwards fall
+        if (backFlag < DEBOUNCE) {
             backFlag++;
         }
     } else {
+        //decrement backwards counter in response to no detected backwards fall
         if (backFlag > 0) {
             backFlag--;
         }
     }
 
-    if (diffPitch < -6) {
-        if (leftFlag < 16) {
+    //Check current data with left fall thresholds
+    if (diffPitch < LEFT_THRESHOLD_DIFFPITCH) {
+        //increment left counter in response to detected left fall
+        if (leftFlag < DEBOUNCE) {
             leftFlag++;
         }
     } else {
+        //decrement left counter in response to no detected left fall
         if (leftFlag > 0) {
             leftFlag--;
         }
     }
 
-    if (diffPitch > 6) {
-        if (rightFlag < 16) {
+    //Check current data with right fall thresholds
+    if (diffPitch > RIGHT_THRESHOLD_DIFFPITCH) {
+        //increment right counter in response to detected right fall
+        if (rightFlag < DEBOUNCE) {
             rightFlag++;
         }
     } else {
+        //decrement right counter in response to no detected right fall
         if (rightFlag > 0) {
             rightFlag--;
         }
@@ -140,18 +160,21 @@ void fallDetection_updateFlags(void) {
 
 /*
  Function: fallDetection_detectFalls
- Param: none
- Return: SUCCESS if battery is full, ERROR if not full
- Brief: Reads the level of the battery while it is charging
+ Param: The most recently updated euler angles and gyroscope rates
+ Return: A bit-masked integer that indicates which falls may have occurred 
+ Brief: Updates data and flags to see if any falls have occurred
  */
 int fallDetection_detectFalls(float pitch, float roll, float gyroX, float gyroY) {
+    //Update data buffers with new readings
     fallDetection_updateData(pitch, roll, gyroX, gyroY);
+    //Update flags based on new data readings
     fallDetection_updateFlags();
 
+    //return value to be bit-masked if falls are detected
     int out = 0;
-    if (forwardFlag >= 16) out |= FORWARD;
-    if (backFlag >= 16) out |= BACKWARDS;
-    if (leftFlag >= 16) out |= LEFT;
-    if (rightFlag >= 16) out |= RIGHT;
-    return out;
+    if (forwardFlag >= DEBOUNCE) out |= FORWARD; //forward count exceeds debounce => forward fall occurred
+    if (backFlag >= DEBOUNCE) out |= BACKWARDS; //backwards count exceeds debounce => backwards fall occurred
+    if (leftFlag >= DEBOUNCE) out |= LEFT; //left count exceeds debounce => left fall occurred
+    if (rightFlag >= DEBOUNCE) out |= RIGHT; //right count exceeds debounce => right fall occurred
+    return out; 
 }
