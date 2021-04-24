@@ -17,7 +17,6 @@
 /* ************************************************************************** */
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include "BOARD.h"
 #include "MADGWICK.h"
 #include "MPU9250.h"
@@ -26,17 +25,18 @@
 /* ************************************************************************** */
 /* Private Constants and Variables                                            */
 /* ************************************************************************** */
-#define TWO_HUNDRED_MS 31
-#define DEBOUNCE 16 
-#define FORWARD 0b0001
-#define BACKWARDS 0b0010
-#define LEFT 0b0100
-#define RIGHT 0b1000
+#define TWO_HUNDRED_MS 31  //number of data points in 200ms
+#define DEBOUNCE 16 //number of data points for debouncing
+#define FORWARD 0b0001  //Forward fall flag value
+#define BACKWARDS 0b0010 //Backwards fall flag value
+#define LEFT 0b0100  //Left fall flag value
+#define RIGHT 0b1000 //Right fall flag value
 
-static volatile float rollBuffer[TWO_HUNDRED_MS];
-static volatile float pitchBuffer[TWO_HUNDRED_MS];
-static volatile float gyroXBuffer[TWO_HUNDRED_MS];
-static volatile float gyroYBuffer[TWO_HUNDRED_MS];
+//Buffers hold the previous 31 data points to be used to check if a fall can be detected
+static volatile float rollBuffer[TWO_HUNDRED_MS];  //Previous 32 roll angles
+static volatile float pitchBuffer[TWO_HUNDRED_MS]; //Previous 32 pitch angles
+static volatile float gyroXBuffer[TWO_HUNDRED_MS]; //Previous 31 gyroX values
+static volatile float gyroYBuffer[TWO_HUNDRED_MS]; //Previous 31 gyroY values
 
 //buffer indexing
 static int bufferIndex;
@@ -61,21 +61,7 @@ Return: none
 Brief: Initializes the battery and touch sensor pins
  */
 void fallDetection_Init(void) {
-    static float clearData[TWO_HUNDRED_MS];
-    memcpy(rollBuffer, clearData, TWO_HUNDRED_MS);
-    memcpy(pitchBuffer, clearData, TWO_HUNDRED_MS);
-    memcpy(gyroXBuffer, clearData, TWO_HUNDRED_MS);
-    memcpy(gyroYBuffer, clearData, TWO_HUNDRED_MS);
-
-    bufferIndex = 0;
-
-    forwardFlag = 0;
-    backFlag = 0;
-    leftFlag = 0;
-    rightFlag = 0;
-
-    diffRoll = 0;
-    diffPitch = 0;
+    //Initialize TMR3 interrupt for reading IMU at 200Hz
 }
 
 /* 
@@ -87,7 +73,9 @@ Brief: Reads the battery level
 void fallDetection_updateData(float pitch, float roll, float gyroX, float gyroY) {
     //update index and consider roll-over
     bufferIndex++;
-    if (bufferIndex == TWO_HUNDRED_MS) bufferIndex = 0;
+    if (bufferIndex == TWO_HUNDRED_MS){
+        bufferIndex = 0;
+    }
 
     //update the individual buffers
     rollBuffer[bufferIndex] = roll;
