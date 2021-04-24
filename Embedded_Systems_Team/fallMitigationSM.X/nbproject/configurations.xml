@@ -847,7 +847,7 @@
         <C32Global>
         </C32Global>
       </item>
-      <item path="fallDetection.c" ex="true" overriding="false">
+      <item path="fallDetection.c" ex="false" overriding="false">
         <C32>
         </C32>
         <C32-AR>

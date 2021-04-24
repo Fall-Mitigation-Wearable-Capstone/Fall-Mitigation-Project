@@ -1,149 +1,169 @@
 /* ************************************************************************** */
-/** Descriptive File Name
-
-  @Company
-    Company Name
-
-  @File Name
-    filename.c
-
-  @Summary
-    Brief description of the file.
-
-  @Description
-    Describe the purpose of this file.
+/** Fall Injury Mitigation Wearable Team
+ * UCSC ECE Senior Capstone 2020-21
+ 
+ * File name: fallDetection.c
+ 
+ * File description: This is the c file for the fall detection algorithm.
+ * These functions read the IMU and check if the incoming data signals whether a 
+ * fall or activity of daily life (ADL) has occurred. 
+ 
+ * Author: Archisha Sinha and David Prager
  */
 /* ************************************************************************** */
 
-/* ************************************************************************** */
 /* ************************************************************************** */
 /* Section: Included Files                                                    */
 /* ************************************************************************** */
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "BOARD.h"
+#include "MADGWICK.h"
+#include "MPU9250.h"
+#include "fallDetection.h"
+
+/* ************************************************************************** */
+/* Private Constants and Variables                                            */
+/* ************************************************************************** */
+#define TWO_HUNDRED_MS 31
+#define DEBOUNCE 16 
+#define FORWARD 0b0001
+#define BACKWARDS 0b0010
+#define LEFT 0b0100
+#define RIGHT 0b1000
+
+static volatile float rollBuffer[TWO_HUNDRED_MS];
+static volatile float pitchBuffer[TWO_HUNDRED_MS];
+static volatile float gyroXBuffer[TWO_HUNDRED_MS];
+static volatile float gyroYBuffer[TWO_HUNDRED_MS];
+
+//buffer indexing
+static int bufferIndex;
+
+//flags for tracking debouncing
+static int forwardFlag;
+static int backFlag;
+static int leftFlag;
+static int rightFlag;
+
+//values for change in each euler angle after 0.2s 
+static float diffRoll;
+static float diffPitch;
+/* ************************************************************************** */
+/* Section: Library Functions                                                 */
 /* ************************************************************************** */
 
-/* This section lists the other files that are included in this file.
+/* 
+Function: fallDetection_Init
+Param: none
+Return: none
+Brief: Initializes the battery and touch sensor pins
  */
+void fallDetection_Init(void) {
+    static float clearData[TWO_HUNDRED_MS];
+    memcpy(rollBuffer, clearData, TWO_HUNDRED_MS);
+    memcpy(pitchBuffer, clearData, TWO_HUNDRED_MS);
+    memcpy(gyroXBuffer, clearData, TWO_HUNDRED_MS);
+    memcpy(gyroYBuffer, clearData, TWO_HUNDRED_MS);
 
-/* TODO:  Include other files here if needed. */
+    bufferIndex = 0;
 
+    forwardFlag = 0;
+    backFlag = 0;
+    leftFlag = 0;
+    rightFlag = 0;
 
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* Section: File Scope or Global Data                                         */
-/* ************************************************************************** */
-/* ************************************************************************** */
+    diffRoll = 0;
+    diffPitch = 0;
+}
 
-/*  A brief description of a section can be given directly below the section
-    banner.
+/* 
+Function: fallDetection_updateData
+Param: none
+Return: SUCCESS if battery is usable, ERROR if battery is too low
+Brief: Reads the battery level
  */
+void fallDetection_updateData(float pitch, float roll, float gyroX, float gyroY) {
+    //update index and consider roll-over
+    bufferIndex++;
+    if (bufferIndex == TWO_HUNDRED_MS) bufferIndex = 0;
 
-/* ************************************************************************** */
-/** Descriptive Data Item Name
+    //update the individual buffers
+    rollBuffer[bufferIndex] = roll;
+    pitchBuffer[bufferIndex] = pitch;
+    gyroXBuffer[bufferIndex] = gyroX;
+    gyroYBuffer[bufferIndex] = gyroY;
 
-  @Summary
-    Brief one-line summary of the data item.
-    
-  @Description
-    Full description, explaining the purpose and usage of data item.
-    <p>
-    Additional description in consecutive paragraphs separated by HTML 
-    paragraph breaks, as necessary.
-    <p>
-    Type "JavaDoc" in the "How Do I?" IDE toolbar for more information on tags.
-    
-  @Remarks
-    Any additional remarks
+    //update differential euler values
+    int tempIndex = (bufferIndex % TWO_HUNDRED_MS) + 1;
+    diffRoll = roll - rollBuffer[tempIndex];
+    diffPitch = pitch - pitchBuffer[tempIndex];
+}
+
+/*
+ Function: fallDetection_updateFlags
+ Param: none
+ Return: none
+ Brief: Set LED lights to indicate the battery level
  */
-int global_data;
-
-
-/* ************************************************************************** */
-/* ************************************************************************** */
-// Section: Local Functions                                                   */
-/* ************************************************************************** */
-/* ************************************************************************** */
-
-/*  A brief description of a section can be given directly below the section
-    banner.
- */
-
-/* ************************************************************************** */
-
-/** 
-  @Function
-    int ExampleLocalFunctionName ( int param1, int param2 ) 
-
-  @Summary
-    Brief one-line description of the function.
-
-  @Description
-    Full description, explaining the purpose and usage of the function.
-    <p>
-    Additional description in consecutive paragraphs separated by HTML 
-    paragraph breaks, as necessary.
-    <p>
-    Type "JavaDoc" in the "How Do I?" IDE toolbar for more information on tags.
-
-  @Precondition
-    List and describe any required preconditions. If there are no preconditions,
-    enter "None."
-
-  @Parameters
-    @param param1 Describe the first parameter to the function.
-    
-    @param param2 Describe the second parameter to the function.
-
-  @Returns
-    List (if feasible) and describe the return values of the function.
-    <ul>
-      <li>1   Indicates an error occurred
-      <li>0   Indicates an error did not occur
-    </ul>
-
-  @Remarks
-    Describe any special behavior not described above.
-    <p>
-    Any additional remarks.
-
-  @Example
-    @code
-    if(ExampleFunctionName(1, 2) == 0)
-    {
-        return 3;
+void fallDetection_updateFlags(void) {
+    //forward detection flag
+    if (diffRoll <= -5 && gyroXBuffer[bufferIndex] <= -60) {
+        if (forwardFlag < 16) {
+            forwardFlag++;
+        }
+    } else {
+        if (forwardFlag > 0) {
+            forwardFlag--;
+        }
     }
- */
-static int ExampleLocalFunction(int param1, int param2) {
-    return 0;
+
+    if (rollBuffer[bufferIndex] > 60 && diffRoll > 8 && gyroXBuffer[bufferIndex] > 23) {
+        if (backFlag < 16) {
+            backFlag++;
+        }
+    } else {
+        if (backFlag > 0) {
+            backFlag--;
+        }
+    }
+
+    if (diffPitch < -6) {
+        if (leftFlag < 16) {
+            leftFlag++;
+        }
+    } else {
+        if (leftFlag > 0) {
+            leftFlag--;
+        }
+    }
+
+    if (diffPitch > 6) {
+        if (rightFlag < 16) {
+            rightFlag++;
+        }
+    } else {
+        if (rightFlag > 0) {
+            rightFlag--;
+        }
+    }
 }
 
-
-/* ************************************************************************** */
-/* ************************************************************************** */
-// Section: Interface Functions                                               */
-/* ************************************************************************** */
-/* ************************************************************************** */
-
-/*  A brief description of a section can be given directly below the section
-    banner.
+/*
+ Function: fallDetection_detectFalls
+ Param: none
+ Return: SUCCESS if battery is full, ERROR if not full
+ Brief: Reads the level of the battery while it is charging
  */
+int fallDetection_detectFalls(float pitch, float roll, float gyroX, float gyroY) {
+    fallDetection_updateData(pitch, roll, gyroX, gyroY);
+    fallDetection_updateFlags();
 
-// *****************************************************************************
-
-/** 
-  @Function
-    int ExampleInterfaceFunctionName ( int param1, int param2 ) 
-
-  @Summary
-    Brief one-line description of the function.
-
-  @Remarks
-    Refer to the example_file.h interface header for function usage details.
- */
-int ExampleInterfaceFunction(int param1, int param2) {
-    return 0;
+    int out = 0;
+    if (forwardFlag >= 16) out |= FORWARD;
+    if (backFlag >= 16) out |= BACKWARDS;
+    if (leftFlag >= 16) out |= LEFT;
+    if (rightFlag >= 16) out |= RIGHT;
+    return out;
 }
-
-
-/* *****************************************************************************
- End of File
- */
