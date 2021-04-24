@@ -146,7 +146,7 @@ unsigned char I2C_write(unsigned char deviceAddress, char data){
  * Brief: Reads 2 sequential registers to create a 16 bit value of data
  */
 int I2C_readInteger(unsigned char deviceAddress){
-    short data = ERROR;                           //Initialized to ERROR in case no data is read
+    short data = IMU_ERROR;                           //Initialized to ERROR in case no data is read
     I2C1CONbits.SEN = 1;                        //Initiate START condition on SDA & SCL pins, automatically set to Idle 
     while(I2C1CONbits.SEN == 1);                //Wait for START to be sent
     

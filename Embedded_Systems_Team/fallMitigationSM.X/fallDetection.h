@@ -8,7 +8,7 @@
  * These functions read the IMU and check if the incoming data signals whether a 
  * fall or activity of daily life (ADL) has occurred. 
  
- * Author: Archisha Sinha and David Prager
+ * Author: David Prager and Archisha Sinha
  */
 /* ************************************************************************** */
 
