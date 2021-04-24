@@ -152,7 +152,7 @@ void __ISR(_TIMER_2_VECTOR) Timer2IntHandler(void) {
 /* ************************************************************************** */
 /* Section: Test main                                                         */
 /* ************************************************************************** */
-#define TEST_CHECKING_MAIN
+//#define TEST_CHECKING_MAIN
 #ifdef TEST_CHECKING_MAIN
 
 #include "FRT.h"

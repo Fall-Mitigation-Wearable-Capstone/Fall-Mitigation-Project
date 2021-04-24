@@ -268,7 +268,7 @@
         <C32Global>
         </C32Global>
       </item>
-      <item path="MADGWICK.c" ex="true" overriding="false">
+      <item path="MADGWICK.c" ex="false" overriding="false">
         <C32>
         </C32>
         <C32-AR>

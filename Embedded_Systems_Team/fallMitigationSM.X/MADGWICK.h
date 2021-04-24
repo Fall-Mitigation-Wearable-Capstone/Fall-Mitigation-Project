@@ -1,8 +1,22 @@
+/* ************************************************************************** */
+/** Fall Injury Mitigation Wearable Team
+ * UCSC ECE Senior Capstone 2020-21
+ 
+ * File name: MADGWICK.h
+ 
+ * File description: This is the header file for the Madgwick filter. This 
+ * filter is used to convert raw IMU data to Euler angles.
+ 
+ * Author: David Prager
+ */
+/* ************************************************************************** */
+
 #ifndef MADGWICK_H
 #define MADGWICK_H
 
-#include <math.h>
-
+/* ************************************************************************** */
+/* Section: Library Variables                                                 */
+/* ************************************************************************** */
 typedef struct Madgwick {
 	float beta; // algorithm gain
     float q0;
@@ -16,14 +30,24 @@ typedef struct Madgwick {
     char anglesComputed;
 } Madgwick;
 
+/* ************************************************************************** */
+/* Section: Library Functions                                                 */
+/* ************************************************************************** */
+
+/* 
+ * Function: MPU9250_Init
+ * Param: none
+ * Return: SUCCESS or ERROR
+ * Brief: Initializes the IMU
+*/
 static float invSqrt(float x);
-void computeAngles(Madgwick *filter);
+void computeAngles(void);
 
-struct Madgwick* begin(float sampleFrequency);
-void update(float gx, float gy, float gz, float ax, float ay, float az, Madgwick *filter);
+void begin(float sampleFrequency);
+void update(float gx, float gy, float gz, float ax, float ay, float az);
 
-float getRoll(Madgwick *filter); 
-float getPitch(Madgwick *filter); 
-float getYaw(Madgwick *filter);
+float getRoll(void); 
+float getPitch(void); 
+float getYaw(void);
 
 #endif
