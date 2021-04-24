@@ -16,34 +16,19 @@
 #define FALL_DETECTION_H
 
 
-/* ************************************************************************** */
-/* Section: Included Files                                                    */
-/* ************************************************************************** */
-
-   
-/* ************************************************************************** */
-/* Section: Constants                                                         */
-/* ************************************************************************** */
-
-
-/* ************************************************************************** */
-/* Section: Variables
-/* ************************************************************************** */
-
- 
 /* 
 Function: fallDetection_Init
 Param: none
 Return: none
-Brief: Initializes the battery and touch sensor pins
+Brief: Initializes sensor buffers and other variables used by the library 
 */
 void fallDetection_Init(void);
 
 /* 
 Function: fallDetection_updateData
-Param: none
-Return: SUCCESS if battery is usable, ERROR if battery is too low
-Brief: Reads the battery level
+Param: The most recently updated euler angles and gyroscope rates
+Return: none
+Brief: Updates the data buffers and recalculates euler angle slopes
 */
 void fallDetection_updateData(float pitch, float roll, float gyroX, float gyroY);
 
@@ -51,14 +36,14 @@ void fallDetection_updateData(float pitch, float roll, float gyroX, float gyroY)
  Function: fallDetection_updateFlags
  Param: none
  Return: none
- Brief: Set LED lights to indicate the battery level
+ Brief: Updates fall flag count if new data falls within a fall type's threshold
 */
 void fallDetection_updateFlags(void);
 
 /*
  Function: fallDetection_detectFalls
- Param: none
- Return: SUCCESS if battery is full, ERROR if not full
- Brief: Reads the level of the battery while it is charging
+ Param: The most recently updated euler angles and gyroscope rates
+ Return: A bit-masked integer that indicates which falls may have occurred 
+ Brief: Updates data and flags to see if any falls have occurred
  */
 int fallDetection_detectFalls(float pitch, float roll, float gyroX, float gyroY);
