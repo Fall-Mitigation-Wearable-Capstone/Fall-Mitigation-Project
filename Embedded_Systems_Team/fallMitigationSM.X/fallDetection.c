@@ -176,5 +176,72 @@ int fallDetection_detectFalls(float pitch, float roll, float gyroX, float gyroY)
     if (backFlag >= DEBOUNCE) out |= BACKWARDS; //backwards count exceeds debounce => backwards fall occurred
     if (leftFlag >= DEBOUNCE) out |= LEFT; //left count exceeds debounce => left fall occurred
     if (rightFlag >= DEBOUNCE) out |= RIGHT; //right count exceeds debounce => right fall occurred
-    return out; 
+    return out;
 }
+
+/* ************************************************************************** */
+/* Section: Test main                                                         */
+/* ************************************************************************** */
+//#define TEST_FALL_DETECTION_MAIN
+#ifdef TEST_FALL_DETECTION_MAIN
+#include "BOARD.h"
+#include "FRT.h"
+#include <xc.h>
+#include <sys/attribs.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+enum fallSubstates {
+    READ_IMU, //Beginning of super state 2
+    IMU_ERROR,
+    DETECT_FALLS //End of super state 1
+} states;
+enum fallSubstates states = READ_IMU;
+
+static unsigned int prevDataReadTime; //Used to keep track of data reading times to detect errors
+
+int main(void) {
+    BOARD_Init();
+    FRT_Init();
+    MPU9250_Init();
+
+    printf("Testing fall detection as state machine\r\n");
+    switch (states) {
+        case READ_IMU:
+            printf("detecting Read\r\n");
+            //Checks if data was read properly
+            if (dataReadStatus == ERROR) {
+                /*If data has not been read for 20ms, reading frequency has dropped
+                 * below 100Hz which is too slow for accurate fall detection. */
+                printf("Error occurred with read\r\n");
+                if (FRT_GetMilliSeconds() - prevDataReadTime >= 80) {
+                    states = IMU_ERROR; //Failed read
+                }
+            } else {
+                printf("read occurred successfully");
+                prevDataReadTime = FRT_GetMilliSeconds(); //Update time of good data read 
+                states = DETECT_FALLS; //Data ready
+            }
+            break;
+
+        case IMU_ERROR:
+            printf("detecting IMU ERROR\r\n");
+            printf("STOPPING SYSTEM (Reset ESP to continue testing)\r\n");
+            break;
+
+        case DETECT_FALLS:
+            printf("detecting Falls\r\n");
+            update(gyroX, gyroY, gyroZ, accelX, accelY, accelZ); //Convert raw IMU data to Euler angles
+
+            //Use the fall detection algorithm to detect falls versus ADLs
+            if (fallDetection_detectFalls(filter.pitch, filter.roll, gyroX, gyroY) != 0) {
+                printf("Fall detected\r\n");
+                printf("Try to inflate now\r\n");
+            } else {
+                printf("ADL detected\r\n");
+                states = DETECT_FALLS; //ADL detected
+            }
+            break;
+    }
+}
+#endif

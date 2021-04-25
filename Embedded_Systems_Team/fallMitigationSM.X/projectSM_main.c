@@ -23,7 +23,10 @@
 #include "fallDetection.h"
 #include "inflation.h"
 #include "ADC.h"
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/attribs.h>
+#include <xc.h>
 /* ************************************************************************** */
 /* Function Prototypes                                                        */
 /* ************************************************************************** */
@@ -143,7 +146,7 @@ void checkUsability(void) {
         case LOW_BATTERY:
             printf("low battery (User takes off jacket)\r\n");
             //Charge the battery
-            if (checking_checkBatteryCharging == SUCCESS) {
+            if (batteryLevel < BATTERY_LOW) {
                 sub = START; //Battery charged
             } else {
                 sub = LOW_BATTERY; //Battery charging
@@ -187,13 +190,13 @@ void detectMovement(void) {
             update(gyroX, gyroY, gyroZ, accelX, accelY, accelZ); //Convert raw IMU data to Euler angles
 
             //Use the fall detection algorithm to detect falls versus ADLs
-            if (checks.checkForUser() == ERROR) { //Is user still wearing jacket?
+            if (checking_checkForUser() == ERROR) { //Is user still wearing jacket?
                 super = CHECK_USABILITY; //No user
                 sub = START;
-            } else if (checks.getBatteryLevel() == ERROR) { //Is battery usable?
+            } else if (batteryLevel < BATTERY_LOW) { //Is battery usable?
                 super = CHECK_USABILITY; //Low battery
                 sub = LOW_BATTERY;
-            } else if (fallDetection_detectFalls(gyroX, gyroY, gyroZ, accelX, accelY, accelZ) != 0) {
+            } else if (fallDetection_detectFalls(filter.pitch, filter.roll, gyroX, gyroY) != 0) {
                 inflationStartTime = FRT_GetMilliSeconds();
                 super = INFLATE_WEARABLE; //Fall detected
                 sub = INFLATE_TO_100;

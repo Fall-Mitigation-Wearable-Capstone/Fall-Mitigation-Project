@@ -32,8 +32,6 @@
 #define AY_OFFSET -0.0242f
 #define AZ_OFFSET 1.1391f
 
-Madgwick filter;
-
 float calibrateGx(float gx); 
 float calibrateGy(float gy); 
 float calibrateGz(float gz);
@@ -51,7 +49,7 @@ float calibrateAz(float Az);
  * Return: SUCCESS or ERROR
  * Brief: Initializes the IMU
 */
-float invSqrt(float x){
+static float invSqrt(float x){
 	float halfx = 0.5f * x;
 	float y = x;
 	long i = *(long*)&y;
