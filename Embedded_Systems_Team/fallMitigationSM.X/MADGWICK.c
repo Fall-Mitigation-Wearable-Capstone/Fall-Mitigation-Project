@@ -221,7 +221,7 @@ float calibrateAz(float az){
 /* ************************************************************************** */
 /* Section: Test main                                                         */
 /* ************************************************************************** */
-#define TEST_MADGWICK_MAIN
+//#define TEST_MADGWICK_MAIN
 #ifdef TEST_MADGWICK_MAIN
 
 #include <math.h>

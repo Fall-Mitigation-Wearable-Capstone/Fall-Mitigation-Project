@@ -68,9 +68,9 @@ enum Substate sub = START;
 
 static unsigned int prevDataReadTime; //Used to keep track of data reading times to detect errors
 static unsigned int inflationStartTime; //Time at which inflation begins
+
 /* ************************************************************************** */
 /* Section: Main Loop                                                         */
-
 /* ************************************************************************** */
 int main(void) {
     //This state machine switches between the superstates
