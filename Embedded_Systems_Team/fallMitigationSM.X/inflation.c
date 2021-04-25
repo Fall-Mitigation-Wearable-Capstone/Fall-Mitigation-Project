@@ -1,145 +1,88 @@
 /* ************************************************************************** */
-/** Descriptive File Name
-
-  @Company
-    Company Name
-
-  @File Name
-    filename.c
-
-  @Summary
-    Brief description of the file.
-
-  @Description
-    Describe the purpose of this file.
+/** Fall Injury Mitigation Wearable Team
+ * UCSC ECE Senior Capstone 2020-21
+ 
+ * File name: inflation.c
+ 
+ * File description: This is the c file for the inflation control functions.
+ * These functions control the inflatable portion of the wearable. 
+ 
+ * Author: Archisha Sinha
  */
 /* ************************************************************************** */
 
-/* ************************************************************************** */
 /* ************************************************************************** */
 /* Section: Included Files                                                    */
 /* ************************************************************************** */
+#include "inflation.h"
+#include "ADC.h"
+#include "BOARD.h"
+/* ************************************************************************** */
+/* Private Variables and Functions                                            */
 /* ************************************************************************** */
 
-/* This section lists the other files that are included in this file.
+/* ************************************************************************** */
+/* Section: Library Functions                                                 */
+/* ************************************************************************** */
+
+/* 
+Function: inflation_Init
+Param: none
+Return: none
+Brief: Initializes the inflation/deflation pump pins and the pressure sensor AD pins
  */
+void inflation_Init(void) {
+    //Set inflation and deflation control pins as output
+    TRISDbits.TRISD6 = 0; //Inflation pin
+    TRISDbits.TRISD7 = 0; //Deflation pin
 
-/* TODO:  Include other files here if needed. */
-
-
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* Section: File Scope or Global Data                                         */
-/* ************************************************************************** */
-/* ************************************************************************** */
-
-/*  A brief description of a section can be given directly below the section
-    banner.
- */
-
-/* ************************************************************************** */
-/** Descriptive Data Item Name
-
-  @Summary
-    Brief one-line summary of the data item.
+    //Make sure inflation and deflation are turned off
+    INFLATION_CONTROL_PIN = 0;
+    DEFLATION_CONTROL_PIN = 0;
     
-  @Description
-    Full description, explaining the purpose and usage of data item.
-    <p>
-    Additional description in consecutive paragraphs separated by HTML 
-    paragraph breaks, as necessary.
-    <p>
-    Type "JavaDoc" in the "How Do I?" IDE toolbar for more information on tags.
-    
-  @Remarks
-    Any additional remarks
+    //Set pins for pressure sensors as analog inputs
+    AD1PCFGbits.PCFG4 = 0; //Configure pin for AD1 as analog input
+    TRISBbits.TRISB4 = 1;
+    AD1PCFGbits.PCFG8 = 0; //Configure pin for AD2 as analog input
+    TRISBbits.TRISB8 = 1;
+}
+
+/* 
+Function: inflation_inflate
+Param: none
+Return: none
+Brief: Sends signal to turn on the inflation pumps
  */
-int global_data;
+void inflation_inflate(void){
+    INFLATION_CONTROL_PIN = 1;
+    DEFLATION_CONTROL_PIN = 0;
+}
 
-
-/* ************************************************************************** */
-/* ************************************************************************** */
-// Section: Local Functions                                                   */
-/* ************************************************************************** */
-/* ************************************************************************** */
-
-/*  A brief description of a section can be given directly below the section
-    banner.
+/* 
+Function: inflation_deflate
+Param: none
+Return: none
+Brief: Sends signal to turn on the deflation pumps
  */
+void inflation_deflate(void){
+    INFLATION_CONTROL_PIN = 0;
+    DEFLATION_CONTROL_PIN = 1;
+}
 
-/* ************************************************************************** */
-
-/** 
-  @Function
-    int ExampleLocalFunctionName ( int param1, int param2 ) 
-
-  @Summary
-    Brief one-line description of the function.
-
-  @Description
-    Full description, explaining the purpose and usage of the function.
-    <p>
-    Additional description in consecutive paragraphs separated by HTML 
-    paragraph breaks, as necessary.
-    <p>
-    Type "JavaDoc" in the "How Do I?" IDE toolbar for more information on tags.
-
-  @Precondition
-    List and describe any required preconditions. If there are no preconditions,
-    enter "None."
-
-  @Parameters
-    @param param1 Describe the first parameter to the function.
+/* 
+Function: inflation_pressureCheck
+Param: none
+Return: SUCCESS if pressure is ok, ERROR if pressure is too low
+Brief: Reads the pressure of the front and back and checks if they are too low
+ */
+int inflation_pressureCheck(void){
+    //Read front and back pressure sensors
+    frontPressure = ADC_CurrentReading(FRONT_PRESSURE_PIN);
+    backPressure = ADC_CurrentReading(BACK_PRESSURE_PIN);
     
-    @param param2 Describe the second parameter to the function.
-
-  @Returns
-    List (if feasible) and describe the return values of the function.
-    <ul>
-      <li>1   Indicates an error occurred
-      <li>0   Indicates an error did not occur
-    </ul>
-
-  @Remarks
-    Describe any special behavior not described above.
-    <p>
-    Any additional remarks.
-
-  @Example
-    @code
-    if(ExampleFunctionName(1, 2) == 0)
-    {
-        return 3;
+    //If the pressure on the front of the back is lower than the min requirement, an error has occurred
+    if(frontPressure < MIN_PRESSURE_FRONT || backPressure < MIN_PRESSURE_BACK){
+        return ERROR;
     }
- */
-
-
-
-/* ************************************************************************** */
-/* ************************************************************************** */
-// Section: Interface Functions                                               */
-/* ************************************************************************** */
-/* ************************************************************************** */
-
-/*  A brief description of a section can be given directly below the section
-    banner.
- */
-
-// *****************************************************************************
-
-/** 
-  @Function
-    int ExampleInterfaceFunctionName ( int param1, int param2 ) 
-
-  @Summary
-    Brief one-line description of the function.
-
-  @Remarks
-    Refer to the example_file.h interface header for function usage details.
- */
-
-
-
-/* *****************************************************************************
- End of File
- */
+    return SUCCESS;
+}

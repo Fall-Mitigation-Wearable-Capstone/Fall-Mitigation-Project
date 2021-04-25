@@ -25,7 +25,7 @@
 /* ************************************************************************** */
 /* Section: Constants                                                         */
 /* ************************************************************************** */
-#define BATTERY_PIN 0       //Set this to 0 if testing with potentiometer
+#define BATTERY_PIN 3       //Set this to 0 if testing with potentiometer
 #define TOUCH_RIGHT_PIN PORTDbits.RD1
 #define TOUCH_LEFT_PIN PORTDbits.RD2
 
