@@ -86,3 +86,14 @@ int inflation_pressureCheck(void){
     }
     return SUCCESS;
 }
+
+/* 
+Function: inflation_deflate
+Param: none
+Return: none
+Brief: Sends signal to turn off all pumps
+ */
+void inflation_resetPumps(void){
+    INFLATION_CONTROL_PIN = 0;
+    DEFLATION_CONTROL_PIN = 0;
+}

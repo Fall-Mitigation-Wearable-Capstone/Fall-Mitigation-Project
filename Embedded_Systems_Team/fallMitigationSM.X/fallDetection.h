@@ -47,3 +47,4 @@ void fallDetection_updateFlags(void);
  Brief: Updates data and flags to see if any falls have occurred
  */
 int fallDetection_detectFalls(float pitch, float roll, float gyroX, float gyroY);
+#endif

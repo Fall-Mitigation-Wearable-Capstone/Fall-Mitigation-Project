@@ -45,6 +45,7 @@
 #define ACCEL_READ_ERROR (float)IMU_ERROR/ACCEL_SSF //Value of all accel variables if a data read error occured
 
 //Enum holds addresses for all needed MPU9250 registers
+
 static enum {
     SMPLRT_DIV = 26, //Sets sampling rate
     GYRO_CONFIG = 27, //Configures gyroscope full scale select
@@ -58,7 +59,7 @@ static enum {
     GYRO_ZOUT_H = 71, //High byte of gyroscope z-axis data
     PWR_MGMT_1 = 107, //Turns on/off IMU from sleep mode
     WHO_AM_I = 117, //Register address used to verify identity of device
-} MPU_REGISTER_ADDRESSES;
+};
 
 //TMR3 isr to read IMU data at 200Hz
 void __ISR(_TIMER_3_VECTOR) Timer3IntHandler(void);
@@ -104,12 +105,12 @@ int MPU9250_Init(void) {
     T3CON = 0x0; //Stop the timer and clear the register
     T3CONbits.TCKPS = 0b010; //Select desired timer input clock prescale to 1:4
     TMR3 = 0x0; //Clear the timer register
-    PR3 = PB_CLOCK_FREQUENCY/(TIMER3_FREQ * PRESCALAR3); //Load period register to rollover at 200Hz
+    PR3 = PB_CLOCK_FREQUENCY / (TIMER3_FREQ * PRESCALAR3); //Load period register to rollover at 200Hz
     IFS0bits.T3IF = 0; //TMR3 flag low
     IPC3bits.T3IP = 7; //TMR3 priority set to highest in the system
     IPC3bits.T3IS = 1; //TMR3 sub priority high in the priority level
     IEC0bits.T3IE = 1; //TMR3 enabled
-    T3CONbits.ON = 1;  //Turn on TMR3
+    T3CONbits.ON = 1; //Turn on TMR3
     //IMU initialized properly
     return SUCCESS;
 }
@@ -206,32 +207,33 @@ int MPU9250_readIMU(void) {
     MPU9250_readAccelX();
     MPU9250_readAccelY();
     MPU9250_readAccelZ();
-    
+
     //Check if data has been read. Return ERROR if not, SUCCESS if yes
     //Gyro variables will equal GYRO_READ_ERROR if read error occurred
     //Accel variables will equal ACCEL_READ_ERROR if read error occurred
-    if(gyroX == GYRO_READ_ERROR){
+    if (gyroX == GYRO_READ_ERROR) {
         return ERROR;
-    } else if(gyroY == GYRO_READ_ERROR){
+    } else if (gyroY == GYRO_READ_ERROR) {
         return ERROR;
-    } else if(gyroZ == GYRO_READ_ERROR){
+    } else if (gyroZ == GYRO_READ_ERROR) {
         return ERROR;
-    } else if(accelX == ACCEL_READ_ERROR){
+    } else if (accelX == ACCEL_READ_ERROR) {
         return ERROR;
-    } else if(accelY == ACCEL_READ_ERROR){
+    } else if (accelY == ACCEL_READ_ERROR) {
         return ERROR;
-    } else if(accelZ == ACCEL_READ_ERROR){
+    } else if (accelZ == ACCEL_READ_ERROR) {
         return ERROR;
-    } else{
+    } else {
         return SUCCESS;
     }
 }
 
 //TMR3 isr will read the MPU9250 at 200Hz
-void __ISR(_TIMER_3_VECTOR) Timer3IntHandler(void){
+
+void __ISR(_TIMER_3_VECTOR) Timer3IntHandler(void) {
     if (IFS0bits.T3IF == 1) {
         IFS0bits.T3IF = 0; //Clear interrupt flag
-        
+
         //Read and store IMU data. Store data read success status in global variable
         //Variable will be used in SM to determine if data read error occurred for too long
         dataReadStatus = MPU9250_readIMU();

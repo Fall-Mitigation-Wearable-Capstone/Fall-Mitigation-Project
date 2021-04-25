@@ -5,7 +5,7 @@
  * File name: MADGWICK.c
  
  * File description: This is the c file for the Madgwick filter. This filter is 
- * used to convert raw IMU data to Euler angles.
+ * used to convert raw IMU data to Euler angles. This is the control system.
  
  * Author: David Prager
  */

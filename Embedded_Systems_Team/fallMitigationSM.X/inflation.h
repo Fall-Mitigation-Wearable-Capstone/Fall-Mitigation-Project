@@ -18,7 +18,8 @@
 /* ************************************************************************** */
 /* Section: Included Files                                                    */
 /* ************************************************************************** */
-
+#include <xc.h>
+#include <sys/attribs.h>   
 /* ************************************************************************** */
 /* Constants                                                                  */
 /* ************************************************************************** */
@@ -71,4 +72,12 @@ Return: SUCCESS if pressure is ok, ERROR if pressure is too low
 Brief: Reads the pressure of the front and back and checks if they are too low
  */
 int inflation_pressureCheck(void);
+
+/* 
+Function: inflation_deflate
+Param: none
+Return: none
+Brief: Sends signal to turn off all pumps
+ */
+void inflation_resetPumps(void);
 #endif
