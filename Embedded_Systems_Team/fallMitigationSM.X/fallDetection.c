@@ -182,7 +182,7 @@ int fallDetection_detectFalls(float pitch, float roll, float gyroX, float gyroY)
 /* ************************************************************************** */
 /* Section: Test main                                                         */
 /* ************************************************************************** */
-//#define TEST_FALL_DETECTION_MAIN
+#define TEST_FALL_DETECTION_MAIN
 #ifdef TEST_FALL_DETECTION_MAIN
 #include "BOARD.h"
 #include "FRT.h"
@@ -204,44 +204,51 @@ int main(void) {
     BOARD_Init();
     FRT_Init();
     MPU9250_Init();
-
+    begin(100.f);
     printf("Testing fall detection as state machine\r\n");
-    switch (states) {
-        case READ_IMU:
-            printf("detecting Read\r\n");
-            //Checks if data was read properly
-            if (dataReadStatus == ERROR) {
-                /*If data has not been read for 20ms, reading frequency has dropped
-                 * below 100Hz which is too slow for accurate fall detection. */
-                printf("Error occurred with read\r\n");
-                if (FRT_GetMilliSeconds() - prevDataReadTime >= 80) {
-                    states = IMU_ERROR; //Failed read
+    while (1) {
+        switch (states) {
+            case READ_IMU:
+                printf("detecting Read\r\n");
+                //Checks if data was read properly
+                if (dataReadStatus == ERROR) {
+                    /*If data has not been read for 20ms, reading frequency has dropped
+                     * below 100Hz which is too slow for accurate fall detection. */
+                    printf("Error occurred with read\r\n");
+                    if (FRT_GetMilliSeconds() - prevDataReadTime >= 80) {
+                        states = IMU_ERROR; //Failed read
+                    }
+                } else {
+                    printf("read occurred successfully\r\n");
+                    prevDataReadTime = FRT_GetMilliSeconds(); //Update time of good data read 
+                    states = DETECT_FALLS; //Data ready
                 }
-            } else {
-                printf("read occurred successfully");
-                prevDataReadTime = FRT_GetMilliSeconds(); //Update time of good data read 
-                states = DETECT_FALLS; //Data ready
-            }
-            break;
+                break;
 
-        case IMU_ERROR:
-            printf("detecting IMU ERROR\r\n");
-            printf("STOPPING SYSTEM (Reset ESP to continue testing)\r\n");
-            break;
+            case IMU_ERROR:
+                printf("detecting IMU ERROR\r\n");
+                printf("STOPPING SYSTEM (Reset ESP to continue testing)\r\n");
+                break;
 
-        case DETECT_FALLS:
-            printf("detecting Falls\r\n");
-            update(gyroX, gyroY, gyroZ, accelX, accelY, accelZ); //Convert raw IMU data to Euler angles
-
-            //Use the fall detection algorithm to detect falls versus ADLs
-            if (fallDetection_detectFalls(filter.pitch, filter.roll, gyroX, gyroY) != 0) {
-                printf("Fall detected\r\n");
-                printf("Try to inflate now\r\n");
-            } else {
-                printf("ADL detected\r\n");
-                states = DETECT_FALLS; //ADL detected
-            }
-            break;
+            case DETECT_FALLS:
+                printf("detecting Falls\r\n");
+                update(gyroX, gyroY, gyroZ, accelX, accelY, accelZ); //Convert raw IMU data to Euler angles
+                float pitch = getPitch();
+                float roll = getRoll();
+                printf("%.2f %.2f %.2f %.2f\r\n", pitch, roll, gyroX, gyroY);
+                //Use the fall detection algorithm to detect falls versus ADLs
+                if (fallDetection_detectFalls(pitch, roll, gyroX, gyroY) != 0) {
+                    printf("Fall detected\r\n");
+                    printf("Try to inflate now\r\n");
+                    break;
+                } else {
+                    printf("ADL detected\r\n");
+                    states = READ_IMU; //ADL detected
+                }
+                break;
+        }
+        int t = 0;
+        for (t = 0; t <8000; t++) asm("nop");
     }
 }
 #endif

@@ -39,6 +39,7 @@ float calibrateAx(float Ax);
 float calibrateAy(float Ay); 
 float calibrateAz(float Az);
 
+Madgwick filter;
 /* ************************************************************************** */
 /* Section: Library Functions                                                 */
 /* ************************************************************************** */

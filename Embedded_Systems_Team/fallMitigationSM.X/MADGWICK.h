@@ -29,7 +29,7 @@ typedef struct Madgwick {
     float yaw;
     char anglesComputed;
 } Madgwick;
-Madgwick filter;
+
 /* ************************************************************************** */
 /* Section: Library Functions                                                 */
 /* ************************************************************************** */

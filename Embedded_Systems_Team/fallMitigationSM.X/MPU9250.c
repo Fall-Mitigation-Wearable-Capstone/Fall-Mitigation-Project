@@ -207,7 +207,6 @@ int MPU9250_readIMU(void) {
     MPU9250_readAccelX();
     MPU9250_readAccelY();
     MPU9250_readAccelZ();
-
     //Check if data has been read. Return ERROR if not, SUCCESS if yes
     //Gyro variables will equal GYRO_READ_ERROR if read error occurred
     //Accel variables will equal ACCEL_READ_ERROR if read error occurred
@@ -259,10 +258,18 @@ int main(void) {
     }
     //    int q;
     //    for (q = 0; q < 100; q++) asm("nop");
-
+    int t = FRT_GetMilliSeconds();
     while (1) {
-        MPU9250_readIMU();
-        printf("%d %f, %f, %f, %f, %f, %f,\n", FRT_GetMilliSeconds(), gyroX, gyroY, gyroZ, accelX, accelY, accelZ);
+        if (FRT_GetMilliSeconds() - t >= 100) {
+            t = FRT_GetMilliSeconds();
+            printf("ERROR\r\n");
+            if (dataReadStatus == ERROR) {
+                printf("\r\nERROR\r\n");
+                printf("%d %f, %f, %f, %f, %f, %f,\n", FRT_GetMilliSeconds(), gyroX, gyroY, gyroZ, accelX, accelY, accelZ);
+            } else {
+                printf("%d %f, %f, %f, %f, %f, %f,\n", FRT_GetMilliSeconds(), gyroX, gyroY, gyroZ, accelX, accelY, accelZ);
+            }
+        }
     }
     return 1;
 }
