@@ -3,15 +3,15 @@
   <executable name="dist/default/debug/fallMitigationSM.X.debug.elf">                 
     <memory name="program">                 
       <units>bytes</units>                 
-      <length>138752</length>                 
-      <used>39916</used>                     
-      <free>98836</free>                     
+      <length>531968</length>                 
+      <used>40404</used>                     
+      <free>491564</free>                     
     </memory>                              
     <memory name="data">              
       <units>bytes</units>                 
-      <length>16896</length>                 
-      <used>3644</used>                     
-      <free>13252</free>                     
+      <length>33280</length>                 
+      <used>3652</used>                     
+      <free>29628</free>                     
     </memory>                              
   </executable>                            
 </project>                                 

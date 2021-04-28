@@ -21,6 +21,8 @@
 #include "MADGWICK.h"
 #include "MPU9250.h"
 #include "fallDetection.h"
+#include "sys/attribs.h"
+#include <xc.h>
 
 /* ************************************************************************** */
 /* Private Constants and Variables                                            */
@@ -217,21 +219,23 @@ int main(void) {
     BOARD_Init();
     FRT_Init();
     begin(200.f);
+    
+    TRISE = 0;
+    LATE = 0;
+    
+    printf("Testing fall detection as state machine\r\n");
     if (MPU9250_Init() == ERROR) {
         printf("Error with sensor\r\n");
         while (1);
     }
 
-    TRISE = 0;
-    LATE = 0;
-    int time = FRT_GetMilliSeconds(), t;
-    printf("Testing fall detection as state machine\r\n");
+    int time = FRT_GetMilliSeconds(), t, fall;
     while (1) {
-        if (FRT_GetMilliSeconds() - time >= 5) {
+        if (FRT_GetMilliSeconds() - time >= 10) {
             time = FRT_GetMilliSeconds();
             switch (states) {
                 case READ_IMU:
-                    printf("detecting Read\r\n");
+                    //printf("detecting Read\r\n");
                     //Checks if data was read properly
                     if (dataReadStatus == ERROR) {
                         /*If data has not been read for 20ms, reading frequency has dropped
@@ -241,7 +245,7 @@ int main(void) {
                             states = IMU_ERROR; //Failed read
                         }
                     } else {
-                        printf("read occurred successfully\r\n");
+                        //printf("read occurred successfully\r\n");
                         prevDataReadTime = FRT_GetMilliSeconds(); //Update time of good data read 
                         states = DETECT_FALLS; //Data ready
                     }
@@ -259,9 +263,15 @@ int main(void) {
                     //                    float roll = getRoll();
                     printf("%.2f %.2f %.2f %.2f\r\n", getPitch(), getRoll(), gyroX, gyroY);
                     //Use the fall detection algorithm to detect falls versus ADLs
-                    if (fallDetection_detectFalls(getPitch(), getRoll(), gyroX, gyroY) != 0) {
+                    if (fall = fallDetection_detectFalls(getPitch(), getRoll(), gyroX, gyroY) != 0) {
                         //                    printf("Fall detected\r\n");
                         //                    printf("Try to inflate now\r\n");
+                        if(fall & FORWARD) printf("F");
+                        if(fall & BACKWARDS) printf("B");
+                        if(fall & LEFT) printf("L");
+                        if(fall & RIGHT) printf("R");
+                        printf("\r\n");
+                        
                         states = DONE;
                         t = FRT_GetMilliSeconds();
                         LATE = 0xFF;
@@ -272,10 +282,9 @@ int main(void) {
                     }
                     break;
                 case DONE:
-                    //                printf("Fall has been detected\r\n");
-                    printf("Fall has been detected:   ");
+                    //printf("Fall has been detected:   ");
                     printf("%.2f %.2f %.2f %.2f\r\n", getPitch(), getRoll(), gyroX, gyroY);
-                    if (FRT_GetMilliSeconds() - t > 3000) {
+                    if (FRT_GetMilliSeconds() - t > 1000) {
                         LATE = 0;
                         states = READ_IMU;
                     }
@@ -286,3 +295,41 @@ int main(void) {
 }
 #endif
 
+//#define TEST_IMU_MAIN
+#ifdef TEST_IMU_MAIN
+
+#include "FRT.h"
+#include <math.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+int main(void) {
+    BOARD_Init();
+    FRT_Init();
+    TRISE = 0;
+    LATE = 0xFF;
+    printf("Testing MPU9250 Library\r\n");
+    if (MPU9250_Init() == ERROR) {
+        printf("Error with sensor\r\n");
+        while (1);
+    }
+    //    int q;
+    //    for (q = 0; q < 100; q++) asm("nop");
+    int t = FRT_GetMilliSeconds();
+    while (1) {
+        if (FRT_GetMilliSeconds() - t >= 100) {
+            t = FRT_GetMilliSeconds();
+            //            printf("ERROR\r\n");
+            if (dataReadStatus == ERROR) {
+                printf("\r\nERROR\r\n");
+                printf("%d %f, %f, %f, %f, %f, %f,\n", FRT_GetMilliSeconds(), gyroX, gyroY, gyroZ, accelX, accelY, accelZ);
+            } else {
+
+                printf("%d %f, %f, %f, %f, %f, %f,\n", FRT_GetMilliSeconds(), gyroX, gyroY, gyroZ, accelX, accelY, accelZ);
+            }
+        }
+    }
+    return 1;
+}
+
+#endif

@@ -90,7 +90,7 @@ unsigned char I2C_read(unsigned char deviceAddress) {
     
     I2C1CONbits.RCEN = 1;                       //Set I2C to receive mode
     int d = 0;
-    for(d = 0; d < 100000; d++) asm("nop");
+    for(d = 0; d < 100; d++) asm("nop");
     while(I2C1STATbits.RBF != 1);
     dataRead = I2C1RCV;                         //Read data from buffer
     

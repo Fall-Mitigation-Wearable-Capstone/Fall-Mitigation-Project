@@ -231,7 +231,7 @@ float calibrateAz(float az){
 int main(void) {
     BOARD_Init();
     FRT_Init();
-    begin(100.f);
+    begin(200.f);
 
     printf("Testing Madgwick Library\r\n");
     if (MPU9250_Init() == ERROR) {
@@ -243,10 +243,10 @@ int main(void) {
     while (1) {
         if (FRT_GetMilliSeconds() - t > 10) {
             t = FRT_GetMilliSeconds();
-            MPU9250_readIMU();
+//            MPU9250_readIMU();
             //printf("%f, %f, %f, %f, %f, %f,\n", gyroX, gyroY, gyroZ, accelX, accelY, accelZ);
 
-            update(gyroX, gyroY, gyroZ, accelX, accelY, accelZ);
+//            update(gyroX, gyroY, gyroZ, accelX, accelY, accelZ);
             printf("%f, %f, %f,\n", getYaw(), getPitch(), getRoll());
         }
     }
