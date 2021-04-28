@@ -51,6 +51,8 @@ static enum {
     GYRO_CONFIG = 27, //Configures gyroscope full scale select
     ACCEL_CONFIG = 28, //Configures accelerometer full scale select
     ACCEL_CONFIG_2 = 29, //Configures accelerometer data rate
+    INT_EN = 57, //Enables hardware interrupt on the MPU9250
+    INT_STAT = 58, //Status of hardware interrupt on the MPU9250
     ACCEL_XOUT_H = 59, //High byte of accelerometer x-axis data
     ACCEL_YOUT_H = 61, //High byte of accelerometer y-axis data
     ACCEL_ZOUT_H = 63, //High byte of accelerometer z-axis data   
@@ -100,6 +102,9 @@ int MPU9250_Init(void) {
 
     //Set accelerometer full scale select to 2g
     I2C_write(ACCEL_CONFIG, 0x00);
+
+    //Enable raw sensor data ready interrupt
+    I2C_write(INT_EN, 0x01);
 
     //Set up TMR3 interrupt to read the IMU at 200Hz
     T3CON = 0x0; //Stop the timer and clear the register
@@ -193,6 +198,14 @@ void MPU9250_readAccelZ(void) {
     accelZ = (float) temp_accelZ / ACCEL_SSF;
 }
 
+int MPU9250_isDataReady(void) {
+    if (I2C_readInteger(INT_STAT) == 0) {
+        printf("error\r\n");
+        return ERROR;
+    }
+    return SUCCESS;
+}
+
 /* 
  * Function: MPU9250_readIMU
  * Param: none
@@ -207,20 +220,21 @@ int MPU9250_readIMU(void) {
     MPU9250_readAccelX();
     MPU9250_readAccelY();
     MPU9250_readAccelZ();
+    
     //Check if data has been read. Return ERROR if not, SUCCESS if yes
     //Gyro variables will equal GYRO_READ_ERROR if read error occurred
     //Accel variables will equal ACCEL_READ_ERROR if read error occurred
-    if (gyroX == GYRO_READ_ERROR) {
+    if (gyroX == IMU_ERROR) {
         return ERROR;
-    } else if (gyroY == GYRO_READ_ERROR) {
+    } else if (gyroY == IMU_ERROR) {
         return ERROR;
-    } else if (gyroZ == GYRO_READ_ERROR) {
+    } else if (gyroZ == IMU_ERROR) {
         return ERROR;
-    } else if (accelX == ACCEL_READ_ERROR) {
+    } else if (accelX == IMU_ERROR) {
         return ERROR;
-    } else if (accelY == ACCEL_READ_ERROR) {
+    } else if (accelY == IMU_ERROR) {
         return ERROR;
-    } else if (accelZ == ACCEL_READ_ERROR) {
+    } else if (accelZ == IMU_ERROR) {
         return ERROR;
     } else {
         return SUCCESS;
@@ -235,13 +249,17 @@ void __ISR(_TIMER_3_VECTOR) Timer3IntHandler(void) {
 
         //Read and store IMU data. Store data read success status in global variable
         //Variable will be used in SM to determine if data read error occurred for too long
-        dataReadStatus = MPU9250_readIMU();
+        if (MPU9250_readIMU()) {
+            dataReadStatus = SUCCESS;
+        } else {
+            dataReadStatus = ERROR;
+        }
     }
 }
 /* ************************************************************************** */
 /* Section: Test main                                                         */
 /* ************************************************************************** */
-//#define TEST_IMU_MAIN
+#define TEST_IMU_MAIN
 #ifdef TEST_IMU_MAIN
 
 #include "FRT.h"
@@ -250,7 +268,8 @@ void __ISR(_TIMER_3_VECTOR) Timer3IntHandler(void) {
 int main(void) {
     BOARD_Init();
     FRT_Init();
-
+    TRISE = 0;
+    LATE = 0xFF;
     printf("Testing MPU9250 Library\r\n");
     if (MPU9250_Init() == ERROR) {
         printf("Error with sensor\r\n");
@@ -262,7 +281,7 @@ int main(void) {
     while (1) {
         if (FRT_GetMilliSeconds() - t >= 100) {
             t = FRT_GetMilliSeconds();
-            printf("ERROR\r\n");
+            //            printf("ERROR\r\n");
             if (dataReadStatus == ERROR) {
                 printf("\r\nERROR\r\n");
                 printf("%d %f, %f, %f, %f, %f, %f,\n", FRT_GetMilliSeconds(), gyroX, gyroY, gyroZ, accelX, accelY, accelZ);

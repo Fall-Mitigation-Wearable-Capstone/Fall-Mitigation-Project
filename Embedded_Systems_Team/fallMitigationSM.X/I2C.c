@@ -89,6 +89,7 @@ unsigned char I2C_read(unsigned char deviceAddress) {
     };
     
     I2C1CONbits.RCEN = 1;                       //Set I2C to receive mode
+//    int d = 0;
     while(I2C1STATbits.RBF != 1);
     dataRead = I2C1RCV;                         //Read data from buffer
     
@@ -178,7 +179,16 @@ int I2C_readInteger(unsigned char deviceAddress){
     };
     
     I2C1CONbits.RCEN = 1;                       //Set I2C to receive mode
-    while(I2C1STATbits.RBF != 1);
+    int d = 0;
+    while(I2C1STATbits.RBF != 1){
+        printf("h");
+        d++;
+        if(d > 500000000){
+            printf("t\r\n");
+            return ERROR;
+        }
+    }
+    d = 0;
     data = I2C1RCV << 8;                        //Read data from buffer. Data is big Endian. Shift to add bottom 8 bits in next read
 
     I2C1CONbits.ACKEN = 1;                      //Transmit ACKDT data

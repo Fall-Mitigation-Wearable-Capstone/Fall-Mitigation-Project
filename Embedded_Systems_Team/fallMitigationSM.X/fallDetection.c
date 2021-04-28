@@ -182,7 +182,7 @@ int fallDetection_detectFalls(float pitch, float roll, float gyroX, float gyroY)
 /* ************************************************************************** */
 /* Section: Test main                                                         */
 /* ************************************************************************** */
-#define TEST_FALL_DETECTION_MAIN
+//#define TEST_FALL_DETECTION_MAIN
 #ifdef TEST_FALL_DETECTION_MAIN
 #include "BOARD.h"
 #include "FRT.h"
@@ -194,7 +194,8 @@ int fallDetection_detectFalls(float pitch, float roll, float gyroX, float gyroY)
 enum fallSubstates {
     READ_IMU, //Beginning of super state 2
     IMU_ERROR,
-    DETECT_FALLS //End of super state 1
+    DETECT_FALLS, //End of super state 1
+    DONE
 } states;
 enum fallSubstates states = READ_IMU;
 
@@ -240,11 +241,15 @@ int main(void) {
                 if (fallDetection_detectFalls(pitch, roll, gyroX, gyroY) != 0) {
                     printf("Fall detected\r\n");
                     printf("Try to inflate now\r\n");
+                    states = DONE;
                     break;
                 } else {
                     printf("ADL detected\r\n");
                     states = READ_IMU; //ADL detected
                 }
+                break;
+            case DONE:
+                printf("Fall has been detected\r\n");
                 break;
         }
         int t = 0;

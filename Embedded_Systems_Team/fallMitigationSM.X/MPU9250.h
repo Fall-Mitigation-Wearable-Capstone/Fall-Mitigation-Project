@@ -96,4 +96,6 @@ void MPU9250_readAccelZ(void);
  * Brief: Get all orientation data from the IMU
 */
 int MPU9250_readIMU(void);
+
+int MPU9250_isDataReady(void);
 #endif 
