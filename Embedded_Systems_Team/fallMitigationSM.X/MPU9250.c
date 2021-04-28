@@ -198,9 +198,16 @@ void MPU9250_readAccelZ(void) {
     accelZ = (float) temp_accelZ / ACCEL_SSF;
 }
 
+/* 
+ * Function: MPU9250_isDataReady
+ * Param: none
+ * Return: SUCCESS or ERROR depending on if data registers are full
+ * Brief: Check if the data registers are full and ready to read. The IMU should
+ * mostly be ready to print. This is used to check if any errors have occurred 
+ * with the hardware during use.
+ */
 int MPU9250_isDataReady(void) {
     if (I2C_readInteger(INT_STAT) == 0) {
-        printf("error\r\n");
         return ERROR;
     }
     return SUCCESS;
@@ -220,25 +227,14 @@ int MPU9250_readIMU(void) {
     MPU9250_readAccelX();
     MPU9250_readAccelY();
     MPU9250_readAccelZ();
-    
+
     //Check if data has been read. Return ERROR if not, SUCCESS if yes
-    //Gyro variables will equal GYRO_READ_ERROR if read error occurred
-    //Accel variables will equal ACCEL_READ_ERROR if read error occurred
-    if (gyroX == IMU_ERROR) {
+    //Data is initialized to IMU_ERROR. If no data is read, variables should still equal IMU_ERROR
+    if ((gyroX == IMU_ERROR) || (gyroY == IMU_ERROR) || (gyroZ == IMU_ERROR) ||
+            (accelX == IMU_ERROR) || (accelY == IMU_ERROR) || (accelZ == IMU_ERROR)) {
         return ERROR;
-    } else if (gyroY == IMU_ERROR) {
-        return ERROR;
-    } else if (gyroZ == IMU_ERROR) {
-        return ERROR;
-    } else if (accelX == IMU_ERROR) {
-        return ERROR;
-    } else if (accelY == IMU_ERROR) {
-        return ERROR;
-    } else if (accelZ == IMU_ERROR) {
-        return ERROR;
-    } else {
-        return SUCCESS;
     }
+    return SUCCESS;
 }
 
 //TMR3 isr will read the MPU9250 at 200Hz
@@ -246,12 +242,15 @@ int MPU9250_readIMU(void) {
 void __ISR(_TIMER_3_VECTOR) Timer3IntHandler(void) {
     if (IFS0bits.T3IF == 1) {
         IFS0bits.T3IF = 0; //Clear interrupt flag
-
-        //Read and store IMU data. Store data read success status in global variable
-        //Variable will be used in SM to determine if data read error occurred for too long
-        if (MPU9250_readIMU()) {
-            dataReadStatus = SUCCESS;
-        } else {
+        
+        //If data registers are full, try to read data
+        if (MPU9250_isDataReady()) {
+            if(MPU9250_readIMU()){  //If data is read successfully, set read status to SUCCESS
+                dataReadStatus = SUCCESS;
+            } else{ //Else set read status to indicate an error occurred
+                dataReadStatus = ERROR;
+            }
+        } else {    //If data registers are not full on time, indicate an error occurred
             dataReadStatus = ERROR;
         }
     }
@@ -259,7 +258,7 @@ void __ISR(_TIMER_3_VECTOR) Timer3IntHandler(void) {
 /* ************************************************************************** */
 /* Section: Test main                                                         */
 /* ************************************************************************** */
-#define TEST_IMU_MAIN
+//#define TEST_IMU_MAIN
 #ifdef TEST_IMU_MAIN
 
 #include "FRT.h"
@@ -286,6 +285,7 @@ int main(void) {
                 printf("\r\nERROR\r\n");
                 printf("%d %f, %f, %f, %f, %f, %f,\n", FRT_GetMilliSeconds(), gyroX, gyroY, gyroZ, accelX, accelY, accelZ);
             } else {
+
                 printf("%d %f, %f, %f, %f, %f, %f,\n", FRT_GetMilliSeconds(), gyroX, gyroY, gyroZ, accelX, accelY, accelZ);
             }
         }

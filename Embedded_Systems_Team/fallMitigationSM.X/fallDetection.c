@@ -182,7 +182,7 @@ int fallDetection_detectFalls(float pitch, float roll, float gyroX, float gyroY)
 /* ************************************************************************** */
 /* Section: Test main                                                         */
 /* ************************************************************************** */
-//#define TEST_FALL_DETECTION_MAIN
+#define TEST_FALL_DETECTION_MAIN
 #ifdef TEST_FALL_DETECTION_MAIN
 #include "BOARD.h"
 #include "FRT.h"
@@ -204,8 +204,12 @@ static unsigned int prevDataReadTime; //Used to keep track of data reading times
 int main(void) {
     BOARD_Init();
     FRT_Init();
-    MPU9250_Init();
     begin(100.f);
+    if (MPU9250_Init() == ERROR) {
+        printf("Error with sensor\r\n");
+        while (1);
+    }
+    
     printf("Testing fall detection as state machine\r\n");
     while (1) {
         switch (states) {
