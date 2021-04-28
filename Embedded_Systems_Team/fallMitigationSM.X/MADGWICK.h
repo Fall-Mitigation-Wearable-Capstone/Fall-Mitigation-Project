@@ -40,7 +40,7 @@ typedef struct Madgwick {
  * Return: SUCCESS or ERROR
  * Brief: Initializes the IMU
 */
-static float invSqrt(float x);
+float invSqrt(float x);
 void computeAngles(void);
 
 void begin(float sampleFrequency);

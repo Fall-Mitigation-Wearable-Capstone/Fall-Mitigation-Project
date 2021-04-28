@@ -26,7 +26,7 @@
 #include "BOARD.h"
 #include "I2C.h"
 #include "MPU9250.h"
-
+#include "MADGWICK.h"
 /* ************************************************************************** */
 /* Private Constants and Local Functions                                      */
 /* ************************************************************************** */
@@ -246,6 +246,7 @@ void __ISR(_TIMER_3_VECTOR) Timer3IntHandler(void) {
         //If data registers are full, try to read data
         if (MPU9250_isDataReady()) {
             if(MPU9250_readIMU()){  //If data is read successfully, set read status to SUCCESS
+                update(gyroX, gyroY, gyroZ, accelX, accelY, accelZ); //Convert raw IMU data to Euler angles
                 dataReadStatus = SUCCESS;
             } else{ //Else set read status to indicate an error occurred
                 dataReadStatus = ERROR;

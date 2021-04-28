@@ -50,7 +50,7 @@ Madgwick filter;
  * Return: SUCCESS or ERROR
  * Brief: Initializes the IMU
 */
-static float invSqrt(float x){
+float invSqrt(float x){
 	float halfx = 0.5f * x;
 	float y = x;
 	long i = *(long*)&y;
