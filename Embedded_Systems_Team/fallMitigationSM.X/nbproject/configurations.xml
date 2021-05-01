@@ -49,7 +49,7 @@
     <conf name="default" type="2">
       <toolsSet>
         <developmentServer>localhost</developmentServer>
-        <targetDevice>PIC32MX320F128H</targetDevice>
+        <targetDevice>PIC32MX340F512H</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
@@ -305,6 +305,7 @@
         <property key="AutoSelectMemRanges" value="auto"/>
         <property key="CHANGE NOTICE" value="true"/>
         <property key="COMPARATOR" value="true"/>
+        <property key="DMA" value="true"/>
         <property key="Freeze All Other Peripherals" value="true"/>
         <property key="I2C1" value="true"/>
         <property key="I2C2" value="true"/>
@@ -861,7 +862,7 @@
         <C32Global>
         </C32Global>
       </item>
-      <item path="inflation.c" ex="true" overriding="false">
+      <item path="inflation.c" ex="false" overriding="false">
         <C32>
         </C32>
         <C32-AR>
@@ -877,7 +878,7 @@
         <C32Global>
         </C32Global>
       </item>
-      <item path="projectSM_main.c" ex="true" overriding="false">
+      <item path="projectSM_main.c" ex="false" overriding="false">
         <C32>
         </C32>
         <C32-AR>

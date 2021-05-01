@@ -48,7 +48,7 @@ static volatile float gyroXBuffer[TWO_HUNDRED_MS]; //Previous 31 gyroX values
 static volatile float gyroYBuffer[TWO_HUNDRED_MS]; //Previous 31 gyroY values
 
 //buffer indexing
-static int bufferIndex = TWO_HUNDRED_MS - 1; //On first update, will be set to 0
+static int bufferIndex; //On first update, will be set to 0
 
 //flags for tracking debouncing
 static int forwardFlag;
@@ -88,16 +88,16 @@ void fallDetection_updateData(float pitch, float roll, float gyroX, float gyroY)
         bufferIndex = 0;
     }
 
+    //update differential euler values
+    int tempIndex = bufferIndex;
+    diffRoll = roll - rollBuffer[tempIndex];
+    diffPitch = pitch - pitchBuffer[tempIndex];
+    
     //update the individual data buffers
     rollBuffer[bufferIndex] = roll;
     pitchBuffer[bufferIndex] = pitch;
     gyroXBuffer[bufferIndex] = gyroX;
     gyroYBuffer[bufferIndex] = gyroY;
-
-    //update differential euler values
-    int tempIndex = (bufferIndex % TWO_HUNDRED_MS) + 1;
-    diffRoll = roll - rollBuffer[tempIndex];
-    diffPitch = pitch - pitchBuffer[tempIndex];
 }
 
 /*
@@ -231,7 +231,7 @@ int main(void) {
 
     int time = FRT_GetMilliSeconds(), t, fall;
     while (1) {
-        if (FRT_GetMilliSeconds() - time >= 10) {
+        if (FRT_GetMilliSeconds() - time >= 5) {
             time = FRT_GetMilliSeconds();
             switch (states) {
                 case READ_IMU:
@@ -263,7 +263,8 @@ int main(void) {
                     //                    float roll = getRoll();
                     printf("%.2f %.2f %.2f %.2f\r\n", getPitch(), getRoll(), gyroX, gyroY);
                     //Use the fall detection algorithm to detect falls versus ADLs
-                    if (fall = fallDetection_detectFalls(getPitch(), getRoll(), gyroX, gyroY) != 0) {
+                    fall = fallDetection_detectFalls(getPitch(), getRoll(), gyroX, gyroY);
+                    if (fall != 0) {
                         //                    printf("Fall detected\r\n");
                         //                    printf("Try to inflate now\r\n");
                         if(fall & FORWARD) printf("F");
