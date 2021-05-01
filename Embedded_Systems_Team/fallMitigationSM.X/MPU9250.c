@@ -27,6 +27,7 @@
 #include "I2C.h"
 #include "MPU9250.h"
 #include "MADGWICK.h"
+#include "fallDetection.h"
 /* ************************************************************************** */
 /* Private Constants and Local Functions                                      */
 /* ************************************************************************** */

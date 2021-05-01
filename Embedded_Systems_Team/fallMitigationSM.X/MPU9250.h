@@ -30,6 +30,8 @@ volatile float accelY; //y-axis accelerometer data
 volatile float accelZ; //z-axis accelerometer data
 
 volatile int dataReadStatus; //variable stores whether or not data was read successfully
+
+int fall;
 /* ************************************************************************** */
 /* Section: Library Functions                                                 */
 /* ************************************************************************** */

@@ -28,7 +28,7 @@
 /* Private Constants and Variables                                            */
 /* ************************************************************************** */
 #define TWO_HUNDRED_MS 31  //number of data points in 200ms
-#define DEBOUNCE 16 //number of data points for debouncing
+#define DEBOUNCE 4  //number of data points for debouncing
 #define FORWARD 0b0001  //Forward fall flag value
 #define BACKWARDS 0b0010 //Backwards fall flag value
 #define LEFT 0b0100  //Left fall flag value
@@ -92,7 +92,7 @@ void fallDetection_updateData(float pitch, float roll, float gyroX, float gyroY)
     int tempIndex = bufferIndex;
     diffRoll = roll - rollBuffer[tempIndex];
     diffPitch = pitch - pitchBuffer[tempIndex];
-    
+
     //update the individual data buffers
     rollBuffer[bufferIndex] = roll;
     pitchBuffer[bufferIndex] = pitch;
@@ -108,7 +108,7 @@ void fallDetection_updateData(float pitch, float roll, float gyroX, float gyroY)
  */
 void fallDetection_updateFlags(void) {
     //Check current data with forward fall thresholds
-    if (diffRoll <= FORWARD_THRESHOLD_DIFFROLL && gyroXBuffer[bufferIndex] <= FORWARD_THRESHOLD_GYROX) {
+    if (diffRoll <= FORWARD_THRESHOLD_DIFFROLL) {// && gyroXBuffer[bufferIndex] <= FORWARD_THRESHOLD_GYROX) {
         //increment forward counter in response to detected forward fall
         if (forwardFlag < DEBOUNCE) {
             forwardFlag++;
@@ -134,7 +134,7 @@ void fallDetection_updateFlags(void) {
     }
 
     //Check current data with left fall thresholds
-    if (diffPitch < LEFT_THRESHOLD_DIFFPITCH) {
+    if (diffPitch < LEFT_THRESHOLD_DIFFPITCH && pitchBuffer[bufferIndex] < 0) {
         //increment left counter in response to detected left fall
         if (leftFlag < DEBOUNCE) {
             leftFlag++;
@@ -147,7 +147,7 @@ void fallDetection_updateFlags(void) {
     }
 
     //Check current data with right fall thresholds
-    if (diffPitch > RIGHT_THRESHOLD_DIFFPITCH) {
+    if (diffPitch > RIGHT_THRESHOLD_DIFFPITCH && pitchBuffer[bufferIndex] > 0) {
         //increment right counter in response to detected right fall
         if (rightFlag < DEBOUNCE) {
             rightFlag++;
@@ -174,22 +174,22 @@ int fallDetection_detectFalls(float pitch, float roll, float gyroX, float gyroY)
 
     //return value to be bit-masked if falls are detected
     int out = 0;
-    if (forwardFlag >= DEBOUNCE){
+    if (forwardFlag >= DEBOUNCE) {
         forwardFlag = 0;
         out |= FORWARD; //forward count exceeds debounce => forward fall occurred
-    } 
-    if (backFlag >= DEBOUNCE){
+    }
+    if (backFlag >= DEBOUNCE) {
         backFlag = 0;
         out |= BACKWARDS; //backwards count exceeds debounce => backwards fall occurred
-    } 
-    if (leftFlag >= DEBOUNCE){
+    }
+    if (leftFlag >= DEBOUNCE) {
         leftFlag = 0;
         out |= LEFT; //left count exceeds debounce => left fall occurred
-    } 
-    if (rightFlag >= DEBOUNCE){
+    }
+    if (rightFlag >= DEBOUNCE) {
         rightFlag = 0;
         out |= RIGHT; //right count exceeds debounce => right fall occurred
-    } 
+    }
     return out;
 }
 
@@ -206,12 +206,13 @@ int fallDetection_detectFalls(float pitch, float roll, float gyroX, float gyroY)
 #include <stdlib.h>
 
 enum fallSubstates {
+    CALIBRATE,
     READ_IMU, //Beginning of super state 2
     IMU_ERROR,
     DETECT_FALLS, //End of super state 1
     DONE
 } states;
-enum fallSubstates states = READ_IMU;
+enum fallSubstates states = CALIBRATE;
 
 static unsigned int prevDataReadTime; //Used to keep track of data reading times to detect errors
 
@@ -219,60 +220,61 @@ int main(void) {
     BOARD_Init();
     FRT_Init();
     begin(200.f);
-    
+
     TRISE = 0;
     LATE = 0;
-    
+
     printf("Testing fall detection as state machine\r\n");
     if (MPU9250_Init() == ERROR) {
         printf("Error with sensor\r\n");
         while (1);
     }
 
-    int time = FRT_GetMilliSeconds(), t, fall;
+    int time = FRT_GetMilliSeconds(), t;
+
+//    while (FRT_GetMilliSeconds() - time < 10000) {
+//        printf("Calibrating\r\n");
+//        //update?
+//    }
+//    time = FRT_GetMilliSeconds();
+//    printf("Done Calibrating\r\n");
+
     while (1) {
-        if (FRT_GetMilliSeconds() - time >= 5) {
-            time = FRT_GetMilliSeconds();
-            switch (states) {
-                case READ_IMU:
-                    //printf("detecting Read\r\n");
-                    //Checks if data was read properly
-                    if (dataReadStatus == ERROR) {
-                        /*If data has not been read for 20ms, reading frequency has dropped
-                         * below 100Hz which is too slow for accurate fall detection. */
-                        printf("Error occurred with read\r\n");
-                        if (FRT_GetMilliSeconds() - prevDataReadTime >= 80) {
-                            states = IMU_ERROR; //Failed read
-                        }
-                    } else {
-                        //printf("read occurred successfully\r\n");
-                        prevDataReadTime = FRT_GetMilliSeconds(); //Update time of good data read 
-                        states = DETECT_FALLS; //Data ready
+        //        if (FRT_GetMilliSeconds() - time >= 5) {
+        time = FRT_GetMilliSeconds();
+        switch (states) {
+            case CALIBRATE:
+                while (FRT_GetMilliSeconds() - time < 5000) {
+                    printf("Calibrating\r\n");
+                    //update?
+                }
+                time = FRT_GetMilliSeconds();
+                printf("Done Calibrating\r\n");
+                states = READ_IMU;
+            case READ_IMU:
+                //printf("detecting Read\r\n");
+                //Checks if data was read properly
+                if (dataReadStatus == ERROR) {
+                    /*If data has not been read for 20ms, reading frequency has dropped
+                     * below 100Hz which is too slow for accurate fall detection. */
+                    printf("Error occurred with read\r\n");
+                    if (FRT_GetMilliSeconds() - prevDataReadTime >= 80) {
+                        states = IMU_ERROR; //Failed read
                     }
-                    break;
-
-                case IMU_ERROR:
-                    printf("detecting IMU ERROR\r\n");
-                    printf("STOPPING SYSTEM (Reset ESP to continue testing)\r\n");
-                    break;
-
-                case DETECT_FALLS:
-                    //                printf("detecting Falls\r\n");
-                    //                    update(gyroX, gyroY, gyroZ, accelX, accelY, accelZ); //Convert raw IMU data to Euler angles
-                    //                    float p = getPitch();
-                    //                    float roll = getRoll();
+                } else {
+                    //printf("read occurred successfully\r\n");
+                    prevDataReadTime = FRT_GetMilliSeconds(); //Update time of good data read 
                     printf("%.2f %.2f %.2f %.2f\r\n", getPitch(), getRoll(), gyroX, gyroY);
-                    //Use the fall detection algorithm to detect falls versus ADLs
                     fall = fallDetection_detectFalls(getPitch(), getRoll(), gyroX, gyroY);
                     if (fall != 0) {
                         //                    printf("Fall detected\r\n");
                         //                    printf("Try to inflate now\r\n");
-                        if(fall & FORWARD) printf("F");
-                        if(fall & BACKWARDS) printf("B");
-                        if(fall & LEFT) printf("L");
-                        if(fall & RIGHT) printf("R");
+                        if (fall & FORWARD) printf("F");
+                        if (fall & BACKWARDS) printf("B");
+                        if (fall & LEFT) printf("L");
+                        if (fall & RIGHT) printf("R");
                         printf("\r\n");
-                        
+
                         states = DONE;
                         t = FRT_GetMilliSeconds();
                         LATE = 0xFF;
@@ -281,17 +283,51 @@ int main(void) {
                         //                    printf("ADL detected\r\n");
                         states = READ_IMU; //ADL detected
                     }
-                    break;
-                case DONE:
-                    //printf("Fall has been detected:   ");
-                    printf("%.2f %.2f %.2f %.2f\r\n", getPitch(), getRoll(), gyroX, gyroY);
-                    if (FRT_GetMilliSeconds() - t > 1000) {
-                        LATE = 0;
-                        states = READ_IMU;
-                    }
-                    break;
-            }
+                    //                    states = DETECT_FALLS; //Data ready
+                }
+                break;
+
+            case IMU_ERROR:
+                printf("detecting IMU ERROR\r\n");
+                printf("STOPPING SYSTEM (Reset ESP to continue testing)\r\n");
+                break;
+
+                //            case DETECT_FALLS:
+                //                //                printf("detecting Falls\r\n");
+                //                //                    update(gyroX, gyroY, gyroZ, accelX, accelY, accelZ); //Convert raw IMU data to Euler angles
+                //                //                    float p = getPitch();
+                //                //                    float roll = getRoll();
+                //                printf("%.2f %.2f %.2f %.2f\r\n", getPitch(), getRoll(), gyroX, gyroY);
+                //                //Use the fall detection algorithm to detect falls versus ADLs
+                //
+                //                if (fall != 0) {
+                //                    //                    printf("Fall detected\r\n");
+                //                    //                    printf("Try to inflate now\r\n");
+                //                    if (fall & FORWARD) printf("F");
+                //                    if (fall & BACKWARDS) printf("B");
+                //                    if (fall & LEFT) printf("L");
+                //                    if (fall & RIGHT) printf("R");
+                //                    printf("\r\n");
+                //
+                //                    states = DONE;
+                //                    t = FRT_GetMilliSeconds();
+                //                    LATE = 0xFF;
+                //                    break;
+                //                } else {
+                //                    //                    printf("ADL detected\r\n");
+                //                    states = READ_IMU; //ADL detected
+                //                }
+                //                break;
+            case DONE:
+                //printf("Fall has been detected:   ");
+                printf("%.2f %.2f %.2f %.2f\r\n", getPitch(), getRoll(), gyroX, gyroY);
+                if (FRT_GetMilliSeconds() - t > 1000) {
+                    LATE = 0;
+                    states = CALIBRATE;
+                }
+                break;
         }
+        //        }
     }
 }
 #endif
