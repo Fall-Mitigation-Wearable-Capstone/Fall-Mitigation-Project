@@ -46,5 +46,8 @@ void fallDetection_updateFlags(void);
  Return: A bit-masked integer that indicates which falls may have occurred 
  Brief: Updates data and flags to see if any falls have occurred
  */
-int fallDetection_detectFalls(float pitch, float roll, float gyroX, float gyroY);
+int fallDetection_detectFalls(void);
+
+void fallDetection_resetFlags(void);
+
 #endif

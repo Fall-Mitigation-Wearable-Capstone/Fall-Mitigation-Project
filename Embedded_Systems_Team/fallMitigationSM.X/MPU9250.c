@@ -243,16 +243,17 @@ int MPU9250_readIMU(void) {
 void __ISR(_TIMER_3_VECTOR) Timer3IntHandler(void) {
     if (IFS0bits.T3IF == 1) {
         IFS0bits.T3IF = 0; //Clear interrupt flag
-        
+
         //If data registers are full, try to read data
         if (MPU9250_isDataReady()) {
-            if(MPU9250_readIMU()){  //If data is read successfully, set read status to SUCCESS
+            if (MPU9250_readIMU()) { //If data is read successfully, set read status to SUCCESS
                 update(gyroX, gyroY, gyroZ, accelX, accelY, accelZ); //Convert raw IMU data to Euler angles
+//                fallDetection_updateData(getPitch(), getRoll(), gyroX, gyroY);
                 dataReadStatus = SUCCESS;
-            } else{ //Else set read status to indicate an error occurred
+            } else { //Else set read status to indicate an error occurred
                 dataReadStatus = ERROR;
             }
-        } else {    //If data registers are not full on time, indicate an error occurred
+        } else { //If data registers are not full on time, indicate an error occurred
             dataReadStatus = ERROR;
         }
     }
