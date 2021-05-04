@@ -38,8 +38,11 @@
 #define BACKWARDS_THRESHOLD_ROLL 60 //Roll buffer threshold for backwards fall
 #define BACKWARDS_THRESHOLD_DIFFROLL 8 //Differential roll theshold for backwards fall
 #define BACKWARDS_THRESHOLD_GYROX 60 //GyroX buffer threshold for backwards fall
-#define LEFT_THRESHOLD_DIFFPITCH -6 //Differential pitch threshold for left fall
-#define RIGHT_THRESHOLD_DIFFPITCH 6 //Differential pitch threshold for right fall
+#define LEFT_THRESHOLD_DIFFPITCH -10//-6 //Differential pitch threshold for left fall
+#define LEFT_THRESHOLD_GYROY -40 //GyroY threshold for left fall
+#define RIGHT_THRESHOLD_DIFFPITCH 10//6 //Differential pitch threshold for right fall
+#define RIGHT_THRESHOLD_GYROY 40 //GyroY threshold for right fall
+
 
 //Buffers hold the previous 31 data points to be used to check if a fall can be detected
 static volatile float rollBuffer[TWO_HUNDRED_MS]; //Previous 31 roll angles
@@ -135,7 +138,7 @@ void fallDetection_updateFlags(void) {
     }
     */
     //Check current data with left fall thresholds
-    if (diffPitch < LEFT_THRESHOLD_DIFFPITCH && pitchBuffer[bufferIndex] < 0 && gyroYBuffer[bufferIndex] < -40) {
+    if (diffPitch < LEFT_THRESHOLD_DIFFPITCH && pitchBuffer[bufferIndex] < 0 && gyroYBuffer[bufferIndex] < LEFT_THRESHOLD_GYROY) {
         //increment left counter in response to detected left fall
         if (leftFlag < DEBOUNCE) {
             leftFlag++;
@@ -146,9 +149,9 @@ void fallDetection_updateFlags(void) {
             leftFlag--;
         }
     }
-    /*
+    
     //Check current data with right fall thresholds
-    if (diffPitch > RIGHT_THRESHOLD_DIFFPITCH && pitchBuffer[bufferIndex] > 0 && gyroYBuffer[bufferIndex] > 5) {
+    if (diffPitch > RIGHT_THRESHOLD_DIFFPITCH && pitchBuffer[bufferIndex] > 0 && gyroYBuffer[bufferIndex] > RIGHT_THRESHOLD_GYROY) {
         //increment right counter in response to detected right fall
         if (rightFlag < DEBOUNCE) {
             rightFlag++;
@@ -159,7 +162,7 @@ void fallDetection_updateFlags(void) {
             rightFlag--;
         }
     }
-    */
+    
 }
 
 /*
