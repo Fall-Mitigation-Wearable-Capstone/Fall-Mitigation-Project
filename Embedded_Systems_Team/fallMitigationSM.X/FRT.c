@@ -84,3 +84,27 @@ void __ISR(_TIMER_5_VECTOR, ipl3auto) Timer5IntHandler(void) {
         TMR5 = 0; //clear tmr5 register
     }
 }
+
+/* ************************************************************************** */
+/* Test main                                                                  */
+/* ************************************************************************** */
+#include <stdlib.h>
+#include <stdio.h>
+
+//#define TEST_FRT_MAIN
+#ifdef TEST_FRT_MAIN
+int main(void){
+    BOARD_Init();
+    FRT_Init();
+    TRISE = 0;
+    LATE = 0;
+    int t;
+    t = FRT_GetMilliSeconds();
+    printf("Testing FRT Main\r\n");
+    while(FRT_GetMilliSeconds() - t < 5000){
+        printf("5\r\n");
+    }
+    printf("5 seconds done\r\n");
+    LATE = 1;
+}
+#endif

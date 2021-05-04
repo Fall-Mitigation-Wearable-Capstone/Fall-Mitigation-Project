@@ -37,7 +37,7 @@
 #define FORWARD_THRESHOLD_GYROX -50//-60 //GyroX buffer threshold for forward fall 
 #define BACKWARDS_THRESHOLD_ROLL 60 //Roll buffer threshold for backwards fall
 #define BACKWARDS_THRESHOLD_DIFFROLL 8 //Differential roll theshold for backwards fall
-#define BACKWARDS_THRESHOLD_GYROX 23 //GyroX buffer threshold for backwards fall
+#define BACKWARDS_THRESHOLD_GYROX 60 //GyroX buffer threshold for backwards fall
 #define LEFT_THRESHOLD_DIFFPITCH -6 //Differential pitch threshold for left fall
 #define RIGHT_THRESHOLD_DIFFPITCH 6 //Differential pitch threshold for right fall
 
@@ -108,6 +108,7 @@ void fallDetection_updateData(float pitch, float roll, float gyroX, float gyroY)
  */
 void fallDetection_updateFlags(void) {
     //Check current data with forward fall thresholds
+    /*
     if (diffRoll <= FORWARD_THRESHOLD_DIFFROLL && gyroXBuffer[bufferIndex] <= FORWARD_THRESHOLD_GYROX) {
         //increment forward counter in response to detected forward fall
         if (forwardFlag < DEBOUNCE) {
@@ -119,7 +120,7 @@ void fallDetection_updateFlags(void) {
             forwardFlag--;
         }
     }
-    /*
+    
     //Check current data with backwards fall thresholds
     if (rollBuffer[bufferIndex] > BACKWARDS_THRESHOLD_ROLL && diffRoll > BACKWARDS_THRESHOLD_DIFFROLL && gyroXBuffer[bufferIndex] > BACKWARDS_THRESHOLD_GYROX) {
         //increment backwards counter in response to detected backwards fall
@@ -132,9 +133,9 @@ void fallDetection_updateFlags(void) {
             backFlag--;
         }
     }
-
+    */
     //Check current data with left fall thresholds
-    if (diffPitch < LEFT_THRESHOLD_DIFFPITCH && pitchBuffer[bufferIndex] < 0) {
+    if (diffPitch < LEFT_THRESHOLD_DIFFPITCH && pitchBuffer[bufferIndex] < 0 && gyroYBuffer[bufferIndex] < -40) {
         //increment left counter in response to detected left fall
         if (leftFlag < DEBOUNCE) {
             leftFlag++;
@@ -145,9 +146,9 @@ void fallDetection_updateFlags(void) {
             leftFlag--;
         }
     }
-
+    /*
     //Check current data with right fall thresholds
-    if (diffPitch > RIGHT_THRESHOLD_DIFFPITCH && pitchBuffer[bufferIndex] > 0) {
+    if (diffPitch > RIGHT_THRESHOLD_DIFFPITCH && pitchBuffer[bufferIndex] > 0 && gyroYBuffer[bufferIndex] > 5) {
         //increment right counter in response to detected right fall
         if (rightFlag < DEBOUNCE) {
             rightFlag++;
@@ -157,7 +158,8 @@ void fallDetection_updateFlags(void) {
         if (rightFlag > 0) {
             rightFlag--;
         }
-    }*/
+    }
+    */
 }
 
 /*
@@ -239,7 +241,7 @@ int main(void) {
 
     int time = FRT_GetMilliSeconds(), t;
 
-    while (FRT_GetMilliSeconds() - time < 10000) {
+    while (FRT_GetMilliSeconds() - time < 5000) {
         printf("Calibrating\r\n");
         fallDetection_updateData(getPitch(), getRoll(), gyroX, gyroY);
         //update?
@@ -272,11 +274,12 @@ int main(void) {
                 } else {
                     //printf("read occurred successfully\r\n");
                     prevDataReadTime = FRT_GetMilliSeconds(); //Update time of good data read 
-                    printf("%.2f %.2f %.2f %.2f\r\n", getPitch(), getRoll(), gyroX, gyroY);
+//                    printf("%.2f %.2f %.2f %.2f\r\n", getPitch(), getRoll(), gyroX, gyroY);
                     
                     fallDetection_updateData(getPitch(), getRoll(), gyroX, gyroY);
                     fallDetection_updateFlags();
                     fall = fallDetection_detectFalls();
+                    printf("%.2f %.2f %.2f\r\n", diffPitch, getPitch(), gyroY);
                     if (fall != 0) {
                         //                    printf("Fall detected\r\n");
                         //                    printf("Try to inflate now\r\n");
@@ -331,7 +334,8 @@ int main(void) {
                 //                break;
             case DONE:
                 //printf("Fall has been detected:   ");
-                printf("%.2f %.2f %.2f %.2f\r\n", getPitch(), getRoll(), gyroX, gyroY);
+//                printf("%.2f %.2f %.2f %.2f\r\n", getPitch(), getRoll(), gyroX, gyroY);
+                printf("%.2f %.2f %.2f\r\n", diffRoll, getRoll(), gyroX);
 //                fallDetection_resetFlags();
                 fallDetection_updateData(getPitch(), getRoll(), gyroX, gyroY);
                 if (FRT_GetMilliSeconds() - t > 1000) {

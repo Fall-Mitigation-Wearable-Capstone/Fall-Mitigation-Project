@@ -38,6 +38,7 @@
  * Brief: Initializes the I2C peripheral
  */
 void I2C_Init(void) {
+    I2C1CON = 0;
     I2C1CONbits.ON = 0;
 
     // Setting the frequency of the I2C to 100kHz (lowest SCL clock frequency)
@@ -64,6 +65,7 @@ unsigned char I2C_read(unsigned char deviceAddress) {
     I2C1TRN = MPU_ADDRESS << 1;                 //MPU address shifted to hold 1 bit of R/W = 0
     while(I2C1STATbits.TRSTAT != 0);            //Wait for transmission and another clock cycle for ACK/NACK to occur
     if(I2C1STATbits.ACKSTAT == 1){              //If ACK not received
+        printf("Failed ACK\r\n");
         I2C1CONbits.PEN = 1;                    //Initiate STOP condition on SDA & SCL pins, automatically set to Idle
         while(I2C1CONbits.PEN == 1);            //Wait for STOP to be sent
         return ERROR;                           //Error out
@@ -72,6 +74,7 @@ unsigned char I2C_read(unsigned char deviceAddress) {
     I2C1TRN = deviceAddress;                    //Send 8 bit device address
     while(I2C1STATbits.TRSTAT != 0);            //Wait for transmission and another clock cycle for ACK/NACK to occur
     if(I2C1STATbits.ACKSTAT == 1){              //If ACK not received
+        printf("Failed ACK\r\n");
         I2C1CONbits.PEN = 1;                    //Initiate STOP condition on SDA & SCL pins, automatically set to Idle
         while(I2C1CONbits.PEN == 1);            //Wait for STOP to be sent
         return ERROR;                           //Error out
@@ -79,18 +82,26 @@ unsigned char I2C_read(unsigned char deviceAddress) {
     
     I2C1CONbits.RSEN = 1;                       //Initiate REPEATED START condition on SDA & SCL pins, automatically set to Idle 
     while(I2C1CONbits.RSEN == 1);               //Wait for REPEATED START to be sent
-
+    while(I2C1STATbits.TRSTAT != 0);            //Wait for transmission and another clock cycle for ACK/NACK to occur
+    if(I2C1STATbits.ACKSTAT == 1){              //If ACK not received
+        printf("Failed ACK\r\n");
+        I2C1CONbits.PEN = 1;                    //Initiate STOP condition on SDA & SCL pins, automatically set to Idle
+        while(I2C1CONbits.PEN == 1);            //Wait for STOP to be sent
+        return ERROR;                           //Error out
+    };
+    
     I2C1TRN = (MPU_ADDRESS << 1) + 1;           //EEPROM address shifted to hold 1 bit of R/W = 1
     while(I2C1STATbits.TRSTAT != 0);            //Wait for transmission and another clock cycle for ACK/NACK to occur
     if(I2C1STATbits.ACKSTAT == 1){              //If ACK not received
+        printf("Failed ACK\r\n");
         I2C1CONbits.PEN = 1;                    //Initiate STOP condition on SDA & SCL pins, automatically set to Idle
         while(I2C1CONbits.PEN == 1);            //Wait for STOP to be sent
         return ERROR;                           //Error out
     };
     
     I2C1CONbits.RCEN = 1;                       //Set I2C to receive mode
-    int d = 0;
-    for(d = 0; d < 100; d++) asm("nop");
+//    int d = 0;
+//    for(d = 0; d < 100; d++) asm("nop");
     while(I2C1STATbits.RBF != 1);
     dataRead = I2C1RCV;                         //Read data from buffer
     
@@ -112,24 +123,27 @@ unsigned char I2C_write(unsigned char deviceAddress, char data){
     while(I2C1CONbits.SEN);                 //Wait for START to be sent
 
     I2C1TRN = MPU_ADDRESS << 1;             //EEPROM address shifted to hold 1 bit of R/W = 0
-    while(I2C1STATbits.TRSTAT);             //Wait for transmission and another clock cycle for ACK/NACK to occur
-    if(I2C1STATbits.ACKSTAT){               //If ACK not received
+    while(I2C1STATbits.TRSTAT != 0);             //Wait for transmission and another clock cycle for ACK/NACK to occur
+    if(I2C1STATbits.ACKSTAT == 1){               //If ACK not received
+        printf("Failed ACK\r\n");
         I2C1CONbits.PEN = 1;                //Initiate STOP condition on SDA & SCL pins, automatically set to Idle
         while(I2C1CONbits.PEN);             //Wait for STOP to be sent
         return ERROR;                       //Error out
     };
     
     I2C1TRN = deviceAddress;                //Send 8 bit device address
-    while(I2C1STATbits.TRSTAT);             //Wait for transmission and another clock cycle for ACK/NACK to occur
-    if(I2C1STATbits.ACKSTAT){               //If ACK not received
+    while(I2C1STATbits.TRSTAT != 0);             //Wait for transmission and another clock cycle for ACK/NACK to occur
+    if(I2C1STATbits.ACKSTAT == 1){               //If ACK not received
+        printf("Failed ACK\r\n");
         I2C1CONbits.PEN = 1;                //Initiate STOP condition on SDA & SCL pins, automatically set to Idle
         while(I2C1CONbits.PEN);             //Wait for STOP to be sent
         return ERROR;                       //Error out
     };
     
     I2C1TRN = data;                         //Send upper 8 bits of address
-    while(I2C1STATbits.TRSTAT);             //Wait for transmission and another clock cycle for ACK/NACK to occur
-    if(I2C1STATbits.ACKSTAT){               //If ACK not received
+    while(I2C1STATbits.TRSTAT != 0);             //Wait for transmission and another clock cycle for ACK/NACK to occur
+    if(I2C1STATbits.ACKSTAT == 1){               //If ACK not received
+        printf("Failed ACK\r\n");
         I2C1CONbits.PEN = 1;                //Initiate STOP condition on SDA & SCL pins, automatically set to Idle
         while(I2C1CONbits.PEN);             //Wait for STOP to be sent
         return ERROR;                       //Error out
@@ -155,6 +169,7 @@ int I2C_readInteger(unsigned char deviceAddress){
     I2C1TRN = MPU_ADDRESS << 1;                 //EEPROM address shifted to hold 1 bit of R/W = 0
     while(I2C1STATbits.TRSTAT != 0);            //Wait for transmission and another clock cycle for ACK/NACK to occur
     if(I2C1STATbits.ACKSTAT == 1){              //If ACK not received
+        printf("Failed ACK\r\n");
         I2C1CONbits.PEN = 1;                    //Initiate STOP condition on SDA & SCL pins, automatically set to Idle
         while(I2C1CONbits.PEN == 1);            //Wait for STOP to be sent
         return ERROR;                           //Error out
@@ -163,6 +178,7 @@ int I2C_readInteger(unsigned char deviceAddress){
     I2C1TRN = deviceAddress;                    //Send 8 bit device address
     while(I2C1STATbits.TRSTAT != 0);            //Wait for transmission and another clock cycle for ACK/NACK to occur
     if(I2C1STATbits.ACKSTAT == 1){              //If ACK not received
+        printf("Failed ACK\r\n");
         I2C1CONbits.PEN = 1;                    //Initiate STOP condition on SDA & SCL pins, automatically set to Idle
         while(I2C1CONbits.PEN == 1);            //Wait for STOP to be sent
         return ERROR;                           //Error out
@@ -174,6 +190,7 @@ int I2C_readInteger(unsigned char deviceAddress){
     I2C1TRN = (MPU_ADDRESS << 1) + 1;           //EEPROM address shifted to hold 1 bit of R/W = 1
     while(I2C1STATbits.TRSTAT != 0);            //Wait for transmission and another clock cycle for ACK/NACK to occur
     if(I2C1STATbits.ACKSTAT == 1){              //If ACK not received
+        printf("Failed ACK\r\n");
         I2C1CONbits.PEN = 1;                    //Initiate STOP condition on SDA & SCL pins, automatically set to Idle
         while(I2C1CONbits.PEN == 1);            //Wait for STOP to be sent
         return ERROR;                           //Error out
@@ -205,8 +222,8 @@ int I2C_readInteger(unsigned char deviceAddress){
     while(I2C1CONbits.ACKEN == 1);              //Wait for NACK to be sent
     
     I2C1CONbits.ACKDT = 0;                      //NACK is sent
-    I2C1CONbits.ACKEN = 1;                      //Transmit ACKDT data
-    while(I2C1CONbits.ACKEN == 1);              //Wait for NACK to be sent
+//    I2C1CONbits.ACKEN = 1;                      //Transmit ACKDT data
+//    while(I2C1CONbits.ACKEN == 1);              //Wait for NACK to be sent
     
     I2C1CONbits.PEN = 1;                        //Initiate STOP condition on SDA & SCL pins, automatically set to Idle
     while(I2C1CONbits.PEN == 1);                //Wait for STOP to be sent
