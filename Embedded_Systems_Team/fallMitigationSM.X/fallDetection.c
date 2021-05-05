@@ -38,10 +38,10 @@
 #define BACKWARDS_THRESHOLD_ROLL 60 //Roll buffer threshold for backwards fall
 #define BACKWARDS_THRESHOLD_DIFFROLL 8 //Differential roll theshold for backwards fall
 #define BACKWARDS_THRESHOLD_GYROX 60 //GyroX buffer threshold for backwards fall
-#define LEFT_THRESHOLD_DIFFPITCH -10//-6 //Differential pitch threshold for left fall
-#define LEFT_THRESHOLD_GYROY -40 //GyroY threshold for left fall
-#define RIGHT_THRESHOLD_DIFFPITCH 10//6 //Differential pitch threshold for right fall
-#define RIGHT_THRESHOLD_GYROY 40 //GyroY threshold for right fall
+#define LEFT_THRESHOLD_DIFFPITCH -6//-6 //Differential pitch threshold for left fall
+#define LEFT_THRESHOLD_GYROY -35 //GyroY threshold for left fall
+#define RIGHT_THRESHOLD_DIFFPITCH 6//6 //Differential pitch threshold for right fall
+#define RIGHT_THRESHOLD_GYROY 35 //GyroY threshold for right fall
 
 
 //Buffers hold the previous 31 data points to be used to check if a fall can be detected
@@ -111,7 +111,6 @@ void fallDetection_updateData(float pitch, float roll, float gyroX, float gyroY)
  */
 void fallDetection_updateFlags(void) {
     //Check current data with forward fall thresholds
-    /*
     if (diffRoll <= FORWARD_THRESHOLD_DIFFROLL && gyroXBuffer[bufferIndex] <= FORWARD_THRESHOLD_GYROX) {
         //increment forward counter in response to detected forward fall
         if (forwardFlag < DEBOUNCE) {
@@ -136,7 +135,7 @@ void fallDetection_updateFlags(void) {
             backFlag--;
         }
     }
-    */
+    
     //Check current data with left fall thresholds
     if (diffPitch < LEFT_THRESHOLD_DIFFPITCH && pitchBuffer[bufferIndex] < 0 && gyroYBuffer[bufferIndex] < LEFT_THRESHOLD_GYROY) {
         //increment left counter in response to detected left fall
@@ -243,12 +242,13 @@ int main(void) {
     }
 
     int time = FRT_GetMilliSeconds(), t;
-
+    LATE = 0xFF;
     while (FRT_GetMilliSeconds() - time < 5000) {
-        printf("Calibrating\r\n");
+        //printf("Calibrating\r\n");
         fallDetection_updateData(getPitch(), getRoll(), gyroX, gyroY);
         //update?
     }
+    LATE = 0;
     time = FRT_GetMilliSeconds();
     printf("Done Calibrating\r\n");
 
@@ -282,7 +282,7 @@ int main(void) {
                     fallDetection_updateData(getPitch(), getRoll(), gyroX, gyroY);
                     fallDetection_updateFlags();
                     fall = fallDetection_detectFalls();
-                    printf("%.2f %.2f %.2f\r\n", diffPitch, getPitch(), gyroY);
+                    printf("%.2f %.2f %.2f %.2f\r\n", diffRoll, gyroX, diffPitch, gyroY);
                     if (fall != 0) {
                         //                    printf("Fall detected\r\n");
                         //                    printf("Try to inflate now\r\n");
