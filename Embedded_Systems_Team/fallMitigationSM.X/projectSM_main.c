@@ -62,7 +62,7 @@ enum Substate {
     CHECK_BATTERY_LEVEL,
     LOW_BATTERY, //End of super state 1
     CALIBRATE, //Beginning of super state 2
-    DETECT_FALLS, 
+    DETECT_FALLS,
     IMU_ERROR, //End of super state 2
     INFLATE_TO_100, //Beginning of super state 3
     MAINTAIN_FULL_INFLATION,
@@ -119,7 +119,7 @@ void checkUsability(void) {
             FRT_Init();
             checking_Init();
             inflation_Init();
-            
+
             if (MPU9250_Init() == ERROR) {
                 printf("Error with sensor\r\n"); //Failed IMU Initialization
                 sub = IMU_ERROR;
@@ -172,10 +172,17 @@ void detectMovement(void) {
             time = FRT_GetMilliSeconds();
             printf("Done Calibrating\r\n");
             states = DETECT_FALLS;
+            break;
 
         case DETECT_FALLS:
             //Checks if data was read properly
-            if (dataReadStatus == ERROR) {
+            if (checking_checkForUser() == ERROR) { //Is user still wearing jacket?
+                super = CHECK_USABILITY; //No user
+                sub = START;
+            } else if (batteryLevel < BATTERY_LOW) { //Is battery usable?
+                super = CHECK_USABILITY; //Battery not ready
+                sub = LOW_BATTERY;
+            } else if (dataReadStatus == ERROR) {
                 /*If data has not been read for 20ms, reading frequency has dropped
                  * below 100Hz which is too slow for accurate fall detection. */
                 printf("Error occurred with read\r\n");
@@ -250,7 +257,7 @@ void inflateWearable(void) {
 
         case DEFLATE_FULLY:
             printf("deflating Fully\r\n");
-            
+
             //Deflate the wearable
             inflation_deflate();
 
