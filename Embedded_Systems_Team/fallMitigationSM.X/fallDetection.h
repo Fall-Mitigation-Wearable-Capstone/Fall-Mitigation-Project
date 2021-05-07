@@ -15,15 +15,6 @@
 #ifndef FALL_DETECTION_H    
 #define FALL_DETECTION_H
 
-
-/* 
-Function: fallDetection_Init
-Param: none
-Return: none
-Brief: Initializes sensor buffers and other variables used by the library 
-*/
-void fallDetection_Init(void);
-
 /* 
 Function: fallDetection_updateData
 Param: The most recently updated euler angles and gyroscope rates

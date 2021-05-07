@@ -36,9 +36,9 @@ void inflation_Init(void) {
     TRISDbits.TRISD6 = 0; //Inflation pin
     TRISDbits.TRISD7 = 0; //Deflation pin
 
-    //Make sure inflation and deflation are turned off
-    INFLATION_CONTROL_PIN = 0;
-    DEFLATION_CONTROL_PIN = 0;
+    //Make sure inflation pins are turned off
+    INFLATION_RIGHT_CONTROL_PIN = 0;
+    INFLATION_LEFT_CONTROL_PIN = 0;
 
     //Set pins for pressure sensors as analog inputs
     AD1PCFGbits.PCFG4 = 0; //Configure pin for AD1 as analog input
@@ -54,19 +54,19 @@ Return: none
 Brief: Sends signal to turn on the inflation pumps
  */
 void inflation_inflate(void) {
-    INFLATION_CONTROL_PIN = 1;
-    DEFLATION_CONTROL_PIN = 0;
+    INFLATION_RIGHT_CONTROL_PIN = 1;
+    INFLATION_LEFT_CONTROL_PIN = 1;
 }
 
 /* 
 Function: inflation_deflate
 Param: none
 Return: none
-Brief: Sends signal to turn on the deflation pumps
+Brief: Sends signal to turn off the inflation pumps
  */
 void inflation_deflate(void) {
-    INFLATION_CONTROL_PIN = 0;
-    DEFLATION_CONTROL_PIN = 1;
+    INFLATION_RIGHT_CONTROL_PIN = 0;
+    INFLATION_LEFT_CONTROL_PIN = 0;
 }
 
 /* 
@@ -94,8 +94,8 @@ Return: none
 Brief: Sends signal to turn off all pumps
  */
 void inflation_resetPumps(void) {
-    INFLATION_CONTROL_PIN = 0;
-    DEFLATION_CONTROL_PIN = 0;
+    INFLATION_RIGHT_CONTROL_PIN = 0;
+    INFLATION_LEFT_CONTROL_PIN = 0;
 }
 
 /* ************************************************************************** */
@@ -168,14 +168,7 @@ int main(void) {
 
     //Deflate wearable. Check if deflation pump needed and for how long.
     inflation_deflate();
-    inflationTime = FRT_GetMilliSeconds();
-    pT = FRT_GetMilliSeconds();
-    while (FRT_GetMilliSeconds() - inflationTime <= 1000) {
-        if (FRT_GetMilliSeconds() - pT >= 10) {
-            pT = FRT_GetMilliSeconds();
-            printf("Deflating\r\n");
-        }
-    }
+    printf("Deflating\r\n");
 
     return (1);
 }

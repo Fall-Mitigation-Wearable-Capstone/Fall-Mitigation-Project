@@ -23,8 +23,8 @@
 /* ************************************************************************** */
 /* Constants                                                                  */
 /* ************************************************************************** */
-#define INFLATION_CONTROL_PIN LATDbits.LATD6 //IO pin for inflation control = 36
-#define DEFLATION_CONTROL_PIN LATDbits.LATD7 //IO pin for deflation control = 37
+#define INFLATION_RIGHT_CONTROL_PIN LATDbits.LATD6 //IO pin for inflation control = 36
+#define INFLATION_LEFT_CONTROL_PIN LATDbits.LATD7 //IO pin for deflation control = 37
 #define FRONT_PRESSURE_PIN 1 //Front pressure sensor pin = AD1
 #define BACK_PRESSURE_PIN 2  //Back pressure sensor pin = AD2
 
