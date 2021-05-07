@@ -60,12 +60,12 @@ void checking_Init(void) {
     T2CON = 0x0; //Stop the timer and clear the register
     T2CONbits.TCKPS = 0b011; //Select desired timer input clock prescale to 1:8
     TMR2 = 0x0; //Clear the timer register
-    PR2 = PB_CLOCK_FREQUENCY/(TIMER2_FREQ * PRESCALAR2); //Load period register to rollover at 100Hz
+    PR2 = PB_CLOCK_FREQUENCY / (TIMER2_FREQ * PRESCALAR2); //Load period register to rollover at 100Hz
     IFS0bits.T2IF = 0; //TMR2 flag low
     IPC2bits.T2IP = 6; //TMR2 priority set to 2nd highest in the system
     IPC2bits.T2IS = 1; //TMR2 sub priority high in the priority level
     IEC0bits.T2IE = 1; //TMR2 enabled
-    T2CONbits.ON = 1;  //Turn on TMR2
+    T2CONbits.ON = 1; //Turn on TMR2
 
 }
 
@@ -81,16 +81,12 @@ void checking_getBatteryLevel(void) {
 }
 
 /*
- Function: setBatteryLevel
+ Function: checking_setBatteryLevelLights
  Param: none
  Return: none
  Brief: Set LED lights to indicate the battery level
  */
 void checking_setBatteryLevelLights(void) {
-    //    LATEbits.LATE1 = 1;
-    //Read current battery level
-    checking_getBatteryLevel();
-
     //Set battery level indicators depending on battery level
     if (batteryLevel >= BATTERY_HIGH) { //If battery level is in the high range
         LOW_BATTERY_LED = 0;
@@ -108,21 +104,34 @@ void checking_setBatteryLevelLights(void) {
 }
 
 /*
- Function: checkBatteryCharging
+ Function: checking_flashBatteryLight
  Param: none
  Return: SUCCESS if battery is full, ERROR if not full
- Brief: Reads the level of the battery while it is charging
+ Brief: Flashes battery indicator LEDS to get attention of the user when battery is too low
  */
-int checking_checkBatteryCharging(void) {
-    //Depends on TMR2 interrupt to get the battery level while device is charging
-    if (batteryLevel == BATTERY_FULL) {
-        return SUCCESS;
+void checking_flashBatteryLight(void) {
+    int time = FRT_GetMilliSeconds();
+    int light = 0;
+    int flash_count = 0;
+    //Flash all of the battery indicator LEDs for 10 seconds at 1 second intervals
+    if (flash_count <= 10) {
+        if (FRT_GetMilliSeconds() - time >= 1000) {
+            LOW_BATTERY_LED = light;
+            MID_BATTERY_LED = light;
+            HIGH_BATTERY_LED = light;
+            light ^= 1;
+        }
+    } else {
+        //Set the battery indicator LEDs to show low battery
+        LOW_BATTERY_LED = 1;
+        MID_BATTERY_LED = 0;
+        HIGH_BATTERY_LED = 0;
     }
-    return ERROR;
+
 }
 
 /*
- Function: getTouchSensorReading
+ Function: checking_getTouchSensorReading
  Param: none
  Return: none
  Brief: Read status of touch sensors
@@ -134,7 +143,7 @@ void checking_getTouchSensorReading(void) {
 }
 
 /*
- Function: checkForUser
+ Function: checking_checkForUser
  Param: none
  Return: SUCCESS if both touch sensors have a high signal, ERROR if either are low
  Brief: Checks if the touch sensors signal that a user is wearing a wearable
@@ -152,8 +161,7 @@ int checking_checkForUser(void) {
 void __ISR(_TIMER_2_VECTOR) Timer2IntHandler(void) {
     if (IFS0bits.T2IF == 1) {
         IFS0bits.T2IF = 0; //Clear interrupt flag
-        //        LATEbits.LATE2 = 1;
-        checking_setBatteryLevelLights(); //Update battery level and indicator leds
+        checking_getBatteryLevel(); //Read level of battery
         checking_getTouchSensorReading(); //Update status of both touch sensors
     }
 }

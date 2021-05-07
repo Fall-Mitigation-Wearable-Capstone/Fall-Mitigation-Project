@@ -140,6 +140,7 @@ void checkUsability(void) {
 
         case CHECK_BATTERY_LEVEL:
             printf("checking Battery\r\n");
+            checking_setBatteryLevelLights();
             //Check if battery level is too low
             if (batteryLevel < BATTERY_LOW) {
                 sub = LOW_BATTERY; //Battery not ready
@@ -151,6 +152,7 @@ void checkUsability(void) {
 
         case LOW_BATTERY:
             printf("low battery (User takes off jacket)\r\n");
+            checking_flashBatteryLight();
             //Charge the battery
             if (batteryLevel < BATTERY_LOW) {
                 sub = START; //Battery charged
@@ -169,6 +171,7 @@ void detectMovement(void) {
                 fallDetection_updateData(getPitch(), getRoll(), gyroX, gyroY);
             }
             LATE = 0;
+            checking_setBatteryLevelLights();
             time = FRT_GetMilliSeconds();
             printf("Done Calibrating\r\n");
             states = DETECT_FALLS;
@@ -208,6 +211,7 @@ void detectMovement(void) {
                     printf("\r\n");
 
                     states = INFLATE_TO_100;
+                    
                     t = FRT_GetMilliSeconds();
                     LATE = 0xFF;
                     break;
@@ -215,6 +219,7 @@ void detectMovement(void) {
                     states = DETECT_FALLS; //ADL detected
                 }
             }
+            checking_setBatteryLevelLights();
             break;
 
         case IMU_ERROR:

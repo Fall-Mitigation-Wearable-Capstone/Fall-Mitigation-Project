@@ -73,12 +73,12 @@ void checking_getBatteryLevel(void);
 void checking_setBatteryLevelLights(void);
 
 /*
- Function: checkBatteryCharging
+ Function: checking_flashBatteryLight
  Param: none
  Return: SUCCESS if battery is full, ERROR if not full
- Brief: Reads the level of the battery while it is charging
+ Brief: Flashes battery indicator LEDS to get attention of the user when battery is too low
  */
-int checking_checkBatteryCharging(void);
+void checking_flashBatteryLight(void);
 
 /*
  Function: getTouchSensorReading
