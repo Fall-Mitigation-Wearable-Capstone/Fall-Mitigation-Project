@@ -88,18 +88,30 @@ void checking_getBatteryLevel(void) {
  */
 void checking_setBatteryLevelLights(void) {
     //Set battery level indicators depending on battery level
+
     if (batteryLevel >= BATTERY_HIGH) { //If battery level is in the high range
-        LOW_BATTERY_LED = 0;
-        MID_BATTERY_LED = 0;
-        HIGH_BATTERY_LED = 1;
+        LATEbits.LATE0 = 0;
+        LATEbits.LATE1 = 0;
+        LATEbits.LATE2 = 1;
+        flashFlag = 0;
+        //        LOW_BATTERY_LED = 0;
+        //        MID_BATTERY_LED = 0;
+        //        HIGH_BATTERY_LED = 1;
     } else if (batteryLevel < BATTERY_HIGH && batteryLevel > BATTERY_LOW) { //If battery level is mid range
-        LOW_BATTERY_LED = 0;
-        MID_BATTERY_LED = 1;
-        HIGH_BATTERY_LED = 0;
+        LATEbits.LATE0 = 0;
+        LATEbits.LATE1 = 1;
+        LATEbits.LATE2 = 0;
+        flashFlag = 0;
+        //        LOW_BATTERY_LED = 0;
+        //        MID_BATTERY_LED = 1;
+        //        HIGH_BATTERY_LED = 0;
     } else if (batteryLevel <= BATTERY_LOW) { //If battery level is in the low range
-        LOW_BATTERY_LED = 1;
-        MID_BATTERY_LED = 0;
-        HIGH_BATTERY_LED = 0;
+        LATEbits.LATE0 = 1;
+        LATEbits.LATE1 = 0;
+        LATEbits.LATE2 = 0;
+        //        LOW_BATTERY_LED = 1;
+        //        MID_BATTERY_LED = 0;
+        //        HIGH_BATTERY_LED = 0;
     }
 }
 
@@ -109,25 +121,35 @@ void checking_setBatteryLevelLights(void) {
  Return: SUCCESS if battery is full, ERROR if not full
  Brief: Flashes battery indicator LEDS to get attention of the user when battery is too low
  */
-void checking_flashBatteryLight(void) {
-    int time = FRT_GetMilliSeconds();
-    int light = 0;
-    int flash_count = 0;
+void checking_flashBatteryLight() {
+    //    int time = FRT_GetMilliSeconds();
+    //    int light = 0;
+    //    int flash_count = 0;
     //Flash all of the battery indicator LEDs for 10 seconds at 1 second intervals
+    //    if()
     if (flash_count <= 10) {
-        if (FRT_GetMilliSeconds() - time >= 1000) {
-            LOW_BATTERY_LED = light;
-            MID_BATTERY_LED = light;
-            HIGH_BATTERY_LED = light;
+        if (FRT_GetMilliSeconds() % 1000 == 0) {
+            //            time = FRT_GetMilliSeconds();
+            flash_count++;
+            LATEbits.LATE0 = light;
+            LATEbits.LATE1 = light;
+            LATEbits.LATE2 = light;
+            //            LOW_BATTERY_LED = light;
+            //            MID_BATTERY_LED = light;
+            //            HIGH_BATTERY_LED = light;
             light ^= 1;
         }
-    } else {
-        //Set the battery indicator LEDs to show low battery
-        LOW_BATTERY_LED = 1;
-        MID_BATTERY_LED = 0;
-        HIGH_BATTERY_LED = 0;
+    } else {//Set the battery indicator LEDs to show low battery
+        LATEbits.LATE0 = 1;
+        LATEbits.LATE1 = 0;
+        LATEbits.LATE2 = 0;
+        light = 0;
+        flash_count = 0;
+        flashFlag = 1;
     }
-
+    //        LOW_BATTERY_LED = 1;
+    //        MID_BATTERY_LED = 0;
+    //        HIGH_BATTERY_LED = 0;
 }
 
 /*
@@ -206,5 +228,48 @@ int main(void) {
     }
     return (1);
 }
+#endif
 
+/* ************************************************************************** */
+/* Section: Test battery main                                                         */
+/* ************************************************************************** */
+#define TEST_BATTERY_MAIN
+#ifdef TEST_BATTERY_MAIN
+
+#include "FRT.h"
+#include <stdlib.h>
+#include <stdio.h>
+
+int main(void) {
+    BOARD_Init();
+    checking_Init();
+    ADC_Init();
+    FRT_Init();
+    TRISE = 0;
+    LATE = 0;
+    unsigned int prev = FRT_GetMilliSeconds();
+
+    printf("Testing battery library");
+    while (1) {
+        if (FRT_GetMilliSeconds() - prev >= 100) {
+            prev = FRT_GetMilliSeconds();
+            printf("%d\r\n", batteryLevel);
+            checking_setBatteryLevelLights();
+            if (batteryLevel < BATTERY_LOW && !flashFlag) {
+                checking_flashBatteryLight();
+            }
+
+            //            if (batteryLevel <= BATTERY_LOW) {
+            //                printf("BATTERY LOW\r\n");
+            //            }
+            //            if (batteryLevel < BATTERY_HIGH && batteryLevel > BATTERY_LOW) {
+            //                printf("BATTERY MID\r\n");
+            //            }
+            //            if (batteryLevel >= BATTERY_HIGH) {
+            //                printf("BATTERY HIGH\r\n");
+            //            }
+        }
+    }
+    return (1);
+}
 #endif

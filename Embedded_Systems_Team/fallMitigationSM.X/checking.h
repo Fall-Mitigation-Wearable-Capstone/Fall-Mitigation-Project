@@ -25,7 +25,7 @@
 /* ************************************************************************** */
 /* Section: Constants                                                         */
 /* ************************************************************************** */
-#define BATTERY_PIN 3       //Set this to 0 if testing with potentiometer
+#define BATTERY_PIN 0       //Set this to 0 if testing with potentiometer
 #define TOUCH_RIGHT_PIN PORTDbits.RD1
 #define TOUCH_LEFT_PIN PORTDbits.RD2
 
@@ -33,9 +33,9 @@
 #define MID_BATTERY_LED LATGbits.LATG7
 #define HIGH_BATTERY_LED LATGbits.LATG6
 
-#define BATTERY_LOW 100
-#define BATTERY_MEDIUM 800
-#define BATTERY_HIGH 1000
+#define BATTERY_LOW 859
+//#define BATTERY_MEDIUM 800
+#define BATTERY_HIGH 949
 #define BATTERY_FULL 1023
 
 /* ************************************************************************** */
@@ -44,7 +44,9 @@
 volatile short batteryLevel; //Stores the AD value of the battery level to be called in the SM directly
 volatile int touchRightStatus; //Stores the value of the right touch sensor (0 or 1)
 volatile int touchLeftStatus; //Stores the value of the left touch sensor (0 or 1)
-
+static int flash_count;
+static int light;
+static int flashFlag;
 /* ************************************************************************** */
 /* Section: Library Functions                                                 */
 /* ************************************************************************** */
@@ -78,7 +80,7 @@ void checking_setBatteryLevelLights(void);
  Return: SUCCESS if battery is full, ERROR if not full
  Brief: Flashes battery indicator LEDS to get attention of the user when battery is too low
  */
-void checking_flashBatteryLight(void);
+void checking_flashBatteryLight();
 
 /*
  Function: getTouchSensorReading

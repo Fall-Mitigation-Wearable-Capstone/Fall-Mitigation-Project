@@ -196,7 +196,7 @@ void fallDetection_resetFlags() {
 /* ************************************************************************** */
 /* Section: Test main                                                         */
 /* ************************************************************************** */
-#define TEST_FALL_DETECTION_MAIN
+//#define TEST_FALL_DETECTION_MAIN
 #ifdef TEST_FALL_DETECTION_MAIN
 #include "BOARD.h"
 #include "FRT.h"
@@ -211,7 +211,7 @@ enum fallSubstates {
     IMU_ERROR,
     DONE
 } states;
-enum fallSubstates states = CALIBRATE;
+enum fallSubstates states = DETECT_FALLS;
 
 static unsigned int prevDataReadTime; //Used to keep track of data reading times to detect errors
 
@@ -230,27 +230,27 @@ int main(void) {
     }
 
     int time = FRT_GetMilliSeconds(), t;
-//    LATE = 0xFF;
-//    while (FRT_GetMilliSeconds() - time < 5000) {
-//        //printf("Calibrating\r\n");
-//        fallDetection_updateData(getPitch(), getRoll(), gyroX, gyroY);
-//        //update?
-//    }
-//    LATE = 0;
-//    time = FRT_GetMilliSeconds();
-//    printf("Done Calibrating\r\n");
+    LATE = 0xFF;
+    while (FRT_GetMilliSeconds() - time < 5000) {
+        //printf("Calibrating\r\n");
+        fallDetection_updateData(getPitch(), getRoll(), gyroX, gyroY);
+        //update?
+    }
+    LATE = 0;
+    time = FRT_GetMilliSeconds();
+    printf("Done Calibrating\r\n");
 
     while (1) {
         switch (states) {
-            case CALIBRATE:
-                LATE = 0xFF;
-                while (FRT_GetMilliSeconds() - time < 5000) {
-                    fallDetection_updateData(getPitch(), getRoll(), gyroX, gyroY);
-                }
-                LATE = 0;
-                time = FRT_GetMilliSeconds();
-                printf("Done Calibrating\r\n");
-                states = DETECT_FALLS;
+//            case CALIBRATE:
+//                LATE = 0xFF;
+//                while (FRT_GetMilliSeconds() - time < 5000) {
+//                    fallDetection_updateData(getPitch(), getRoll(), gyroX, gyroY);
+//                }
+//                LATE = 0;
+//                time = FRT_GetMilliSeconds();
+//                printf("Done Calibrating\r\n");
+//                states = DETECT_FALLS;
             case DETECT_FALLS:
                 //Checks if data was read properly
                 if (dataReadStatus == ERROR) {
