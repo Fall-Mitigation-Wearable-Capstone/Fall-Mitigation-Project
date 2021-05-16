@@ -114,23 +114,27 @@ void checkUsability(void) {
     switch (sub) {
         case START:
             printf("checking Start\r\n");
+
             //Initialize all systems here
             BOARD_Init();
             ADC_Init();
             FRT_Init();
             checking_Init();
-            initTestLeds();
+
+            initTestLeds(); //For testing
+
             sub = CHECK_FOR_USER;
             break;
 
         case CHECK_FOR_USER:
             printf("checking User\r\n");
+
             //Check if user has put the jacket on
             if (checking_checkForUser() == SUCCESS) {
                 LATFbits.LATF1 = 1;
                 //Initialize remaining hardware
                 inflation_Init();
-                
+
                 if (MPU9250_Init() == ERROR) {
                     printf("Error with sensor\r\n"); //Failed IMU Initialization
                     sub = IMU_ERROR;
@@ -144,7 +148,9 @@ void checkUsability(void) {
 
         case CHECK_BATTERY_LEVEL:
             printf("checking Battery\r\n");
-            checking_setBatteryLevelLights();
+
+            checking_setBatteryLevelLights(); //Set lights for battery indicators
+
             //Check if battery level is too low
             if (batteryLevel < BATTERY_LOW) {
                 sub = LOW_BATTERY; //Battery not ready
@@ -157,9 +163,11 @@ void checkUsability(void) {
 
         case LOW_BATTERY:
             printf("low battery (User takes off jacket)\r\n");
-            checking_flashBatteryLight();
+
+            checking_flashBatteryLight(); //Indicate the battery is too low for usage
             //Charge the battery
             if (batteryLevel < BATTERY_LOW) {
+                BOARD_End(); //Shut down system
                 sub = START; //Battery charged
             } else {
                 sub = LOW_BATTERY; //Battery charging
@@ -173,14 +181,24 @@ void detectMovement(void) {
         case CALIBRATE:
             printf("Calibrating\r\n");
 
-            //Calibrate IMU for 5 seconds
-            while (FRT_GetMilliSeconds() - prevTime < CALIBRATION_TIME) {
-                fallDetection_updateData(getPitch(), getRoll(), gyroX, gyroY);
-            }
+            if (checking_checkForUser() == ERROR) { //Is user still wearing jacket?
+                LATFbits.LATF1 = 0;
+                BOARD_End(); //Shut down system
+                super = CHECK_USABILITY; //No user
+                sub = START;
+            } else if (batteryLevel < BATTERY_LOW) { //Is battery usable?
+                super = CHECK_USABILITY; //Battery not ready
+                sub = LOW_BATTERY;
+            } else {
+                //Calibrate IMU for 5 seconds
+                while (FRT_GetMilliSeconds() - prevTime < CALIBRATION_TIME) {
+                    fallDetection_updateData(getPitch(), getRoll(), gyroX, gyroY);
+                }
 
-            checking_setBatteryLevelLights();
-            printf("Done Calibrating\r\n");
-            sub = DETECT_FALLS;
+                checking_setBatteryLevelLights();
+                printf("Done Calibrating\r\n");
+                sub = DETECT_FALLS;
+            }
             break;
 
         case DETECT_FALLS:
@@ -189,6 +207,7 @@ void detectMovement(void) {
             //Checks if data was read properly
             if (checking_checkForUser() == ERROR) { //Is user still wearing jacket?
                 LATFbits.LATF1 = 0;
+                BOARD_End(); //Shut down system
                 super = CHECK_USABILITY; //No user
                 sub = START;
             } else if (batteryLevel < BATTERY_LOW) { //Is battery usable?
@@ -221,7 +240,6 @@ void detectMovement(void) {
                     printf("\r\n");
 
                     sub = INFLATE_TO_100;
-
                     prevTime = FRT_GetMilliSeconds();
                     break;
                 } else {
@@ -232,6 +250,7 @@ void detectMovement(void) {
             break;
 
         case IMU_ERROR:
+            BOARD_End(); //Shut down system
             printf("detecting IMU ERROR\r\n");
             printf("STOPPING SYSTEM (Reset ESP to continue testing)\r\n");
             break;
@@ -242,12 +261,13 @@ void inflateWearable(void) {
     switch (sub) {
         case INFLATE_TO_100:
             printf("inflating 100\r\n");
-            
+
             //Inflate the wearable fully. Should take 80ms
             inflation_inflate();
             while (FRT_GetMilliSeconds() - prevTime <= INFLATE_FULLY_TIME) {
                 sub = INFLATE_TO_100; //Time to inflate not done
             }
+            
             LATFbits.LATF2 = 0;
             LATFbits.LATF3 = 1;
             prevTime = FRT_GetMilliSeconds(); //Reset start time to be used to track time for maintaining inflation
@@ -270,6 +290,7 @@ void inflateWearable(void) {
             break;
 
         case INFLATION_ERROR:
+            BOARD_End(); //Shut down system
             printf("inflating INFLATION ERROR\r\n");
             printf("STOPPING SYSTEM (Reset ESP to continue testing)\r\n");
             break;

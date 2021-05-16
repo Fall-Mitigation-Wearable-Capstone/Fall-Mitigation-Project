@@ -102,7 +102,6 @@ void BOARD_Init()
  * @author Max Dunne, 2013.09.20  */
 void BOARD_End()
 {
-
     // kill off all interrupts except serial and clear their flags
     IEC0CLR = ~(_IEC0_U1TXIE_MASK | _IEC0_U1RXIE_MASK);
     IFS0CLR = ~(_IFS0_U1TXIF_MASK | _IFS0_U1RXIF_MASK);
@@ -118,8 +117,6 @@ void BOARD_End()
     TRISE = 0xff;
     TRISF = 0xff;
     TRISG = 0xff;
-
-
 }
 
 /**
