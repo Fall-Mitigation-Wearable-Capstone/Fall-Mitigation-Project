@@ -57,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=checking.c fallDetection.c BOARD.c serial.c I2C.c MPU9250.c ADC.c FRT.c MADGWICK.c
+SOURCEFILES_QUOTED_IF_SPACED=projectSM_main.c checking.c inflation.c fallDetection.c BOARD.c serial.c I2C.c MPU9250.c ADC.c FRT.c MADGWICK.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/checking.o ${OBJECTDIR}/fallDetection.o ${OBJECTDIR}/BOARD.o ${OBJECTDIR}/serial.o ${OBJECTDIR}/I2C.o ${OBJECTDIR}/MPU9250.o ${OBJECTDIR}/ADC.o ${OBJECTDIR}/FRT.o ${OBJECTDIR}/MADGWICK.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/checking.o.d ${OBJECTDIR}/fallDetection.o.d ${OBJECTDIR}/BOARD.o.d ${OBJECTDIR}/serial.o.d ${OBJECTDIR}/I2C.o.d ${OBJECTDIR}/MPU9250.o.d ${OBJECTDIR}/ADC.o.d ${OBJECTDIR}/FRT.o.d ${OBJECTDIR}/MADGWICK.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/projectSM_main.o ${OBJECTDIR}/checking.o ${OBJECTDIR}/inflation.o ${OBJECTDIR}/fallDetection.o ${OBJECTDIR}/BOARD.o ${OBJECTDIR}/serial.o ${OBJECTDIR}/I2C.o ${OBJECTDIR}/MPU9250.o ${OBJECTDIR}/ADC.o ${OBJECTDIR}/FRT.o ${OBJECTDIR}/MADGWICK.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/projectSM_main.o.d ${OBJECTDIR}/checking.o.d ${OBJECTDIR}/inflation.o.d ${OBJECTDIR}/fallDetection.o.d ${OBJECTDIR}/BOARD.o.d ${OBJECTDIR}/serial.o.d ${OBJECTDIR}/I2C.o.d ${OBJECTDIR}/MPU9250.o.d ${OBJECTDIR}/ADC.o.d ${OBJECTDIR}/FRT.o.d ${OBJECTDIR}/MADGWICK.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/checking.o ${OBJECTDIR}/fallDetection.o ${OBJECTDIR}/BOARD.o ${OBJECTDIR}/serial.o ${OBJECTDIR}/I2C.o ${OBJECTDIR}/MPU9250.o ${OBJECTDIR}/ADC.o ${OBJECTDIR}/FRT.o ${OBJECTDIR}/MADGWICK.o
+OBJECTFILES=${OBJECTDIR}/projectSM_main.o ${OBJECTDIR}/checking.o ${OBJECTDIR}/inflation.o ${OBJECTDIR}/fallDetection.o ${OBJECTDIR}/BOARD.o ${OBJECTDIR}/serial.o ${OBJECTDIR}/I2C.o ${OBJECTDIR}/MPU9250.o ${OBJECTDIR}/ADC.o ${OBJECTDIR}/FRT.o ${OBJECTDIR}/MADGWICK.o
 
 # Source Files
-SOURCEFILES=checking.c fallDetection.c BOARD.c serial.c I2C.c MPU9250.c ADC.c FRT.c MADGWICK.c
+SOURCEFILES=projectSM_main.c checking.c inflation.c fallDetection.c BOARD.c serial.c I2C.c MPU9250.c ADC.c FRT.c MADGWICK.c
 
 
 
@@ -107,11 +107,23 @@ endif
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: compile
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
+${OBJECTDIR}/projectSM_main.o: projectSM_main.c  .generated_files/fe8b4aceee061c0ba9f79bce9865d09517df69e2.flag .generated_files/9c38dd73fa47c8727ca672a3ac38932765b77050.flag
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/projectSM_main.o.d 
+	@${RM} ${OBJECTDIR}/projectSM_main.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -Wall -MP -MMD -MF "${OBJECTDIR}/projectSM_main.o.d" -o ${OBJECTDIR}/projectSM_main.o projectSM_main.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
 ${OBJECTDIR}/checking.o: checking.c  .generated_files/939eefd419cc912d69bb0541e70eebadc30dcc0c.flag .generated_files/9c38dd73fa47c8727ca672a3ac38932765b77050.flag
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/checking.o.d 
 	@${RM} ${OBJECTDIR}/checking.o 
 	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -Wall -MP -MMD -MF "${OBJECTDIR}/checking.o.d" -o ${OBJECTDIR}/checking.o checking.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/inflation.o: inflation.c  .generated_files/8a1d97dbbe6fb8801ec1d33f6706e1f468015de1.flag .generated_files/9c38dd73fa47c8727ca672a3ac38932765b77050.flag
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/inflation.o.d 
+	@${RM} ${OBJECTDIR}/inflation.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -Wall -MP -MMD -MF "${OBJECTDIR}/inflation.o.d" -o ${OBJECTDIR}/inflation.o inflation.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
 ${OBJECTDIR}/fallDetection.o: fallDetection.c  .generated_files/fb5fca6b86da1ddcecce1bf23df422d288f51cc9.flag .generated_files/9c38dd73fa47c8727ca672a3ac38932765b77050.flag
 	@${MKDIR} "${OBJECTDIR}" 
@@ -162,11 +174,23 @@ ${OBJECTDIR}/MADGWICK.o: MADGWICK.c  .generated_files/7d72f38076d839938e57f7f1e1
 	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -Wall -MP -MMD -MF "${OBJECTDIR}/MADGWICK.o.d" -o ${OBJECTDIR}/MADGWICK.o MADGWICK.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
 else
+${OBJECTDIR}/projectSM_main.o: projectSM_main.c  .generated_files/6d8ec82ee9724722c142e070bde0719a009f6ff4.flag .generated_files/9c38dd73fa47c8727ca672a3ac38932765b77050.flag
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/projectSM_main.o.d 
+	@${RM} ${OBJECTDIR}/projectSM_main.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -Wall -MP -MMD -MF "${OBJECTDIR}/projectSM_main.o.d" -o ${OBJECTDIR}/projectSM_main.o projectSM_main.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
 ${OBJECTDIR}/checking.o: checking.c  .generated_files/b5800ad1235b3850ee4143c5f968dc54c934f6ee.flag .generated_files/9c38dd73fa47c8727ca672a3ac38932765b77050.flag
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/checking.o.d 
 	@${RM} ${OBJECTDIR}/checking.o 
 	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -Wall -MP -MMD -MF "${OBJECTDIR}/checking.o.d" -o ${OBJECTDIR}/checking.o checking.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/inflation.o: inflation.c  .generated_files/771a5cd4ac8988a08351991cf60d744e5946cb8.flag .generated_files/9c38dd73fa47c8727ca672a3ac38932765b77050.flag
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/inflation.o.d 
+	@${RM} ${OBJECTDIR}/inflation.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -Wall -MP -MMD -MF "${OBJECTDIR}/inflation.o.d" -o ${OBJECTDIR}/inflation.o inflation.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
 ${OBJECTDIR}/fallDetection.o: fallDetection.c  .generated_files/24c0adbe24f80228410495fb57889c56aae68c23.flag .generated_files/9c38dd73fa47c8727ca672a3ac38932765b77050.flag
 	@${MKDIR} "${OBJECTDIR}" 

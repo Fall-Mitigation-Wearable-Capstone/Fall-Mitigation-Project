@@ -15,6 +15,13 @@
 #ifndef FALL_DETECTION_H    
 #define FALL_DETECTION_H
 
+#define FORWARD 0b0001  //Forward fall flag value
+#define BACKWARDS 0b0010 //Backwards fall flag value
+#define LEFT 0b0100  //Left fall flag value
+#define RIGHT 0b1000 //Right fall flag value
+static float diffRoll;
+static float diffPitch;
+
 /* 
 Function: fallDetection_updateData
 Param: The most recently updated euler angles and gyroscope rates

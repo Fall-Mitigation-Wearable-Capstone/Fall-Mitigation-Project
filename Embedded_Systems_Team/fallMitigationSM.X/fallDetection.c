@@ -60,8 +60,8 @@ static int leftFlag;
 static int rightFlag;
 
 //values for change in each euler angle after 0.2s 
-static float diffRoll;
-static float diffPitch;
+//static float diffRoll;
+//static float diffPitch;
 
 /* ************************************************************************** */
 /* Section: Library Functions                                                 */

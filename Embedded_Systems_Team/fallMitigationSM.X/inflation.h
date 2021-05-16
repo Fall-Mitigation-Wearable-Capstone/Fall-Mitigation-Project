@@ -28,8 +28,8 @@
 #define FRONT_PRESSURE_PIN 1 //Front pressure sensor pin = AD1
 #define BACK_PRESSURE_PIN 2  //Back pressure sensor pin = AD2
 
-#define MIN_PRESSURE_FRONT 500 //Minimum required pressure in the front panel. Values are based on pressure sensor readings
-#define MIN_PRESSURE_BACK 800  //Minimum required pressure in the back panel. Values are based on pressure sensor readings
+#define MIN_PRESSURE 762 //Minimum required pressure at full inflation. This value equals 12kPa
+#define DESIRED_PRESSURE 800  //This value equals 15kPa. Used to test what pressure the inflatable actually reaches
 
 /* ************************************************************************** */
 /* Variables                                                                  */

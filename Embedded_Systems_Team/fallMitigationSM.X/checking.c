@@ -233,7 +233,7 @@ int main(void) {
 /* ************************************************************************** */
 /* Section: Test battery main                                                         */
 /* ************************************************************************** */
-#define TEST_BATTERY_MAIN
+//#define TEST_BATTERY_MAIN
 #ifdef TEST_BATTERY_MAIN
 
 #include "FRT.h"
