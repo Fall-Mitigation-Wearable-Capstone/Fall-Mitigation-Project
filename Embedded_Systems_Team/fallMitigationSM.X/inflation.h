@@ -23,8 +23,10 @@
 /* ************************************************************************** */
 /* Constants                                                                  */
 /* ************************************************************************** */
-#define INFLATION_RIGHT_CONTROL_PIN LATDbits.LATD6 //IO pin for inflation control = 36
-#define INFLATION_LEFT_CONTROL_PIN LATDbits.LATD7 //IO pin for deflation control = 37
+#define INFLATION_RIGHT_TOP_CONTROL_PIN LATDbits.LATD5 //IO pin for inflation control = 34
+#define INFLATION_LEFT_TOP_CONTROL_PIN LATDbits.LATD11 //IO pin for inflation control = 35
+#define INFLATION_RIGHT_BOTTOM_CONTROL_PIN LATDbits.LATD6 //IO pin for inflation control = 36
+#define INFLATION_LEFT_BOTTOM_CONTROL_PIN LATDbits.LATD7 //IO pin for deflation control = 37
 #define FRONT_PRESSURE_PIN 1 //Front pressure sensor pin = AD1
 #define BACK_PRESSURE_PIN 2  //Back pressure sensor pin = AD2
 
@@ -73,11 +75,4 @@ Brief: Reads the pressure of the front and back and checks if they are too low
  */
 int inflation_pressureCheck(void);
 
-/* 
-Function: inflation_deflate
-Param: none
-Return: none
-Brief: Sends signal to turn off all pumps
- */
-void inflation_resetPumps(void);
 #endif

@@ -98,4 +98,12 @@ void checking_getTouchSensorReading(void);
  */
 int checking_checkForUser(void);
 
+/*
+ Function: errorLeds
+ Param: none
+ Return: none
+ Brief: All battery indicator lights turn on if an error has occurred within the system
+ */
+int checking_errorLeds(void);
+
 #endif

@@ -45,6 +45,7 @@ void initTestLeds(void); //Initialize LEDs for testing the system
 #define INFLATE_FULLY_TIME 80
 #define MAINTAIN_INFLATION_TIME 30000
 #define DEFLATION_TIME 1000
+#define ERROR_TIME 10000
 
 //Enum holds all super states of the state machine
 
@@ -250,6 +251,9 @@ void detectMovement(void) {
             break;
 
         case IMU_ERROR:
+            checking_errorLeds();
+            prevTime = FRT_GetMilliSeconds();
+            while(FRT_GetMilliSeconds() - prevTime <= ERROR_TIME);
             BOARD_End(); //Shut down system
             printf("detecting IMU ERROR\r\n");
             printf("STOPPING SYSTEM (Reset ESP to continue testing)\r\n");
@@ -290,6 +294,9 @@ void inflateWearable(void) {
             break;
 
         case INFLATION_ERROR:
+            checking_errorLeds();
+            prevTime = FRT_GetMilliSeconds();
+            while(FRT_GetMilliSeconds() - prevTime <= ERROR_TIME);
             BOARD_End(); //Shut down system
             printf("inflating INFLATION ERROR\r\n");
             printf("STOPPING SYSTEM (Reset ESP to continue testing)\r\n");

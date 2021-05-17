@@ -122,34 +122,24 @@ void checking_setBatteryLevelLights(void) {
  Brief: Flashes battery indicator LEDS to get attention of the user when battery is too low
  */
 void checking_flashBatteryLight() {
-    //    int time = FRT_GetMilliSeconds();
-    //    int light = 0;
-    //    int flash_count = 0;
     //Flash all of the battery indicator LEDs for 10 seconds at 1 second intervals
     //    if()
     if (flash_count <= 10) {
         if (FRT_GetMilliSeconds() % 1000 == 0) {
-            //            time = FRT_GetMilliSeconds();
             flash_count++;
-            LATEbits.LATE0 = light;
-            LATEbits.LATE1 = light;
-            LATEbits.LATE2 = light;
-            //            LOW_BATTERY_LED = light;
-            //            MID_BATTERY_LED = light;
-            //            HIGH_BATTERY_LED = light;
+            LOW_BATTERY_LED = light;
+            MID_BATTERY_LED = light;
+            HIGH_BATTERY_LED = light;
             light ^= 1;
         }
     } else {//Set the battery indicator LEDs to show low battery
-        LATEbits.LATE0 = 1;
-        LATEbits.LATE1 = 0;
-        LATEbits.LATE2 = 0;
+        LOW_BATTERY_LED = 1;
+        MID_BATTERY_LED = 0;
+        HIGH_BATTERY_LED = 0;
         light = 0;
         flash_count = 0;
         flashFlag = 1;
     }
-    //        LOW_BATTERY_LED = 1;
-    //        MID_BATTERY_LED = 0;
-    //        HIGH_BATTERY_LED = 0;
 }
 
 /*
@@ -176,6 +166,18 @@ int checking_checkForUser(void) {
         return SUCCESS;
     }
     return ERROR;
+}
+
+/*
+ Function: errorLeds
+ Param: none
+ Return: none
+ Brief: All battery indicator lights turn on if an error has occurred within the system
+ */
+int checking_errorLeds(void) {
+    LOW_BATTERY_LED = 1;
+    MID_BATTERY_LED = 1;
+    HIGH_BATTERY_LED = 1;
 }
 
 //Reads the battery level, sets the battery indicator lights, and reads the touch sensor levels

@@ -33,12 +33,16 @@ Brief: Initializes the inflation/deflation pump pins and the pressure sensor AD 
  */
 void inflation_Init(void) {
     //Set inflation and deflation control pins as output
-    TRISDbits.TRISD6 = 0; //Inflation pin
-    TRISDbits.TRISD7 = 0; //Deflation pin
+    TRISDbits.TRISD5 = 0; //Air pump right top pin
+    TRISDbits.TRISD11 = 0; //Air pimp left top pin
+    TRISDbits.TRISD6 = 0; //Air pump right bottom pin
+    TRISDbits.TRISD7 = 0; //Air pump left bottom pin
 
     //Make sure inflation pins are turned off
-    INFLATION_RIGHT_CONTROL_PIN = 0;
-    INFLATION_LEFT_CONTROL_PIN = 0;
+    INFLATION_RIGHT_TOP_CONTROL_PIN = 0;
+    INFLATION_LEFT_TOP_CONTROL_PIN = 0;
+    INFLATION_RIGHT_BOTTOM_CONTROL_PIN = 0;
+    INFLATION_LEFT_BOTTOM_CONTROL_PIN = 0;
 
     //Set pins for pressure sensors as analog inputs
     AD1PCFGbits.PCFG4 = 0; //Configure pin for AD1 as analog input
@@ -54,8 +58,10 @@ Return: none
 Brief: Sends signal to turn on the inflation pumps
  */
 void inflation_inflate(void) {
-    INFLATION_RIGHT_CONTROL_PIN = 1;
-    INFLATION_LEFT_CONTROL_PIN = 1;
+    INFLATION_RIGHT_TOP_CONTROL_PIN = 1;
+    INFLATION_LEFT_TOP_CONTROL_PIN = 1;
+    INFLATION_RIGHT_BOTTOM_CONTROL_PIN = 1;
+    INFLATION_LEFT_BOTTOM_CONTROL_PIN = 1;
 }
 
 /* 
@@ -65,8 +71,10 @@ Return: none
 Brief: Sends signal to turn off the inflation pumps
  */
 void inflation_deflate(void) {
-    INFLATION_RIGHT_CONTROL_PIN = 0;
-    INFLATION_LEFT_CONTROL_PIN = 0;
+    INFLATION_RIGHT_TOP_CONTROL_PIN = 0;
+    INFLATION_LEFT_TOP_CONTROL_PIN = 0;
+    INFLATION_RIGHT_BOTTOM_CONTROL_PIN = 0;
+    INFLATION_LEFT_BOTTOM_CONTROL_PIN = 0;
 }
 
 /* 
@@ -87,16 +95,6 @@ int inflation_pressureCheck(void) {
     return SUCCESS;
 }
 
-/* 
-Function: inflation_deflate
-Param: none
-Return: none
-Brief: Sends signal to turn off all pumps
- */
-void inflation_resetPumps(void) {
-    INFLATION_RIGHT_CONTROL_PIN = 0;
-    INFLATION_LEFT_CONTROL_PIN = 0;
-}
 
 /* ************************************************************************** */
 /* Section: Test main for pressure sensors                                    */
