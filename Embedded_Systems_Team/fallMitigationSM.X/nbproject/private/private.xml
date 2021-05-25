@@ -3,14 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/C:/Fall-Mitigation-Project/Embedded_Systems_Team/fallMitigationSM.X/inflation.h</file>
             <file>file:/C:/Fall-Mitigation-Project/Embedded_Systems_Team/fallMitigationSM.X/MPU9250.c</file>
+            <file>file:/C:/Fall-Mitigation-Project/Embedded_Systems_Team/fallMitigationSM.X/checking.h</file>
             <file>file:/C:/Fall-Mitigation-Project/Embedded_Systems_Team/fallMitigationSM.X/inflation.c</file>
-            <file>file:/C:/Fall-Mitigation-Project/Embedded_Systems_Team/fallMitigationSM.X/BOARD.c</file>
-            <file>file:/C:/Fall-Mitigation-Project/Embedded_Systems_Team/fallMitigationSM.X/MADGWICK.c</file>
-            <file>file:/C:/Fall-Mitigation-Project/Embedded_Systems_Team/fallMitigationSM.X/fallDetection.h</file>
             <file>file:/C:/Fall-Mitigation-Project/Embedded_Systems_Team/fallMitigationSM.X/checking.c</file>
             <file>file:/C:/Fall-Mitigation-Project/Embedded_Systems_Team/fallMitigationSM.X/fallDetection.c</file>
-            <file>file:/C:/Fall-Mitigation-Project/Embedded_Systems_Team/fallMitigationSM.X/ADC.c</file>
             <file>file:/C:/Fall-Mitigation-Project/Embedded_Systems_Team/fallMitigationSM.X/projectSM_main.c</file>
         </group>
     </open-files>

@@ -11,7 +11,7 @@
  * Author: Archisha Sinha
  */
 /* ************************************************************************** */
-#define MAIN
+//#define MAIN/
 #ifdef MAIN
 /* ************************************************************************** */
 /* Section: Included Files                                                    */
@@ -43,7 +43,7 @@ void initTestLeds(void); //Initialize LEDs for testing the system
 #define CALIBRATION_TIME 5000
 #define DATA_READ_ERROR_TIME 20
 #define INFLATE_FULLY_TIME 80
-#define MAINTAIN_INFLATION_TIME 30000
+#define MAINTAIN_INFLATION_TIME 10000
 #define DEFLATION_TIME 1000
 #define ERROR_TIME 10000
 
@@ -85,17 +85,14 @@ int main(void) {
     while (1) {
         switch (super) {
             case CHECK_USABILITY:
-                printf("CHECK USABILITY\r\n");
                 checkUsability();
                 break;
 
             case DETECT_MOVEMENT:
-                printf("DETECT MOVEMENT\r\n");
                 detectMovement();
                 break;
 
             case INFLATE_WEARABLE:
-                printf("INFLATE WEARABLE\r\n");
                 inflateWearable();
                 break;
         }
@@ -114,8 +111,6 @@ int main(void) {
 void checkUsability(void) {
     switch (sub) {
         case START:
-            printf("checking Start\r\n");
-
             //Initialize all systems here
             BOARD_Init();
             ADC_Init();
@@ -128,8 +123,6 @@ void checkUsability(void) {
             break;
 
         case CHECK_FOR_USER:
-            printf("checking User\r\n");
-
             //Check if user has put the jacket on
             if (checking_checkForUser() == SUCCESS) {
                 LATFbits.LATF1 = 1;
@@ -148,8 +141,6 @@ void checkUsability(void) {
             break;
 
         case CHECK_BATTERY_LEVEL:
-            printf("checking Battery\r\n");
-
             checking_setBatteryLevelLights(); //Set lights for battery indicators
 
             //Check if battery level is too low
@@ -163,7 +154,7 @@ void checkUsability(void) {
             break;
 
         case LOW_BATTERY:
-            printf("low battery (User takes off jacket)\r\n");
+//            printf("low battery (User takes off jacket)\r\n");
 
             checking_flashBatteryLight(); //Indicate the battery is too low for usage
             //Charge the battery
@@ -180,7 +171,7 @@ void checkUsability(void) {
 void detectMovement(void) {
     switch (sub) {
         case CALIBRATE:
-            printf("Calibrating\r\n");
+//            printf("Calibrating\r\n");
 
             if (checking_checkForUser() == ERROR) { //Is user still wearing jacket?
                 LATFbits.LATF1 = 0;

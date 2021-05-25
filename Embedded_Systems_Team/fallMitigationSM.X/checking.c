@@ -90,28 +90,19 @@ void checking_setBatteryLevelLights(void) {
     //Set battery level indicators depending on battery level
 
     if (batteryLevel >= BATTERY_HIGH) { //If battery level is in the high range
-        LATEbits.LATE0 = 0;
-        LATEbits.LATE1 = 0;
-        LATEbits.LATE2 = 1;
         flashFlag = 0;
-        //        LOW_BATTERY_LED = 0;
-        //        MID_BATTERY_LED = 0;
-        //        HIGH_BATTERY_LED = 1;
+        LOW_BATTERY_LED = 0;
+        MID_BATTERY_LED = 0;
+        HIGH_BATTERY_LED = 1;
     } else if (batteryLevel < BATTERY_HIGH && batteryLevel > BATTERY_LOW) { //If battery level is mid range
-        LATEbits.LATE0 = 0;
-        LATEbits.LATE1 = 1;
-        LATEbits.LATE2 = 0;
         flashFlag = 0;
-        //        LOW_BATTERY_LED = 0;
-        //        MID_BATTERY_LED = 1;
-        //        HIGH_BATTERY_LED = 0;
+        LOW_BATTERY_LED = 0;
+        MID_BATTERY_LED = 1;
+        HIGH_BATTERY_LED = 0;
     } else if (batteryLevel <= BATTERY_LOW) { //If battery level is in the low range
-        LATEbits.LATE0 = 1;
-        LATEbits.LATE1 = 0;
-        LATEbits.LATE2 = 0;
-        //        LOW_BATTERY_LED = 1;
-        //        MID_BATTERY_LED = 0;
-        //        HIGH_BATTERY_LED = 0;
+        LOW_BATTERY_LED = 1;
+        MID_BATTERY_LED = 0;
+        HIGH_BATTERY_LED = 0;
     }
 }
 
@@ -233,7 +224,7 @@ int main(void) {
 #endif
 
 /* ************************************************************************** */
-/* Section: Test battery main                                                         */
+/* Section: Test battery main                                                 */
 /* ************************************************************************** */
 //#define TEST_BATTERY_MAIN
 #ifdef TEST_BATTERY_MAIN

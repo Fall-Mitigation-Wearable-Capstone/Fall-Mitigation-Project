@@ -102,6 +102,21 @@ int inflation_pressureCheck(void) {
 //#define TEST_PRESSURE_MAIN
 #ifdef TEST_PRESSURE_MAIN
 #include "FRT.h"
+#include <stdlib.h>
+#include <stdio.h>
+float voltageFront, voltageBack, pressureFront, pressureBack;
+
+//Function converts the AD value read from the pin to voltage
+
+float calculateVoltage(short adVal) {
+    return (adVal * 3.3) / 1023;
+}
+
+//Function converts the voltage to pressure
+
+float calculatePressure(float voltage) {
+    return ((voltage - 1.65) * 50000) / (255 * 0.0132);
+}
 
 int main(void) {
     BOARD_Init();
@@ -113,10 +128,16 @@ int main(void) {
     int pressure = 0;
     unsigned int pT = FRT_GetMilliSeconds();
     while (1) {
-        if (FRT_GetMilliSeconds() - pT >= 10) {
+        if (FRT_GetMilliSeconds() - pT >= 1000) {
+            pT = FRT_GetMilliSeconds();
             pressure = inflation_pressureCheck();
-            printf("Front pressure: %d  Back pressure: %d\r\n", frontPressure, backPressure);
-            printf("Is pressure too low(1 = no, 0 = yes): %d\r\n", pressure);
+            //            voltageFront = calculateVoltage(frontPressure);
+            voltageBack = calculateVoltage(backPressure);
+            //            pressureFront = calculatePressure(voltageFront);
+            pressureBack = calculatePressure(voltageBack);
+            printf("Back reading: %d\r\n", backPressure);
+            printf("Back pressure: %0.2f\r\n", pressureBack);
+            //            printf("Is pressure too low(1 = no, 0 = yes): %d\r\n", pressure);
         }
     }
     return (1);
@@ -140,11 +161,13 @@ int main(void) {
 
     printf("Testing inflation library\r\n");
     int pressure = 0;
-
+    inflation_deflate();
+    unsigned int inflationTime = FRT_GetMilliSeconds();
+    while (FRT_GetMilliSeconds() - inflationTime <= 5000);
     //Inflate fully. Check if full inflation occurs in 80ms
     inflation_inflate();
     unsigned int pT = FRT_GetMilliSeconds();
-    unsigned int inflationTime = FRT_GetMilliSeconds();
+    inflationTime = FRT_GetMilliSeconds();
     while (FRT_GetMilliSeconds() - inflationTime <= 80) {
         if (FRT_GetMilliSeconds() - pT >= 10) {
             pT = FRT_GetMilliSeconds();
@@ -155,15 +178,15 @@ int main(void) {
     //Maintain full inflation. Check if 30s is needed here
     inflationTime = FRT_GetMilliSeconds();
     pT = FRT_GetMilliSeconds();
-    while (FRT_GetMilliSeconds() - inflationTime <= 30000) {
+    while (FRT_GetMilliSeconds() - inflationTime <= 10000) {
         if (FRT_GetMilliSeconds() - pT >= 10) {
             pT = FRT_GetMilliSeconds();
             printf("Maintaining inflation\r\n");
         }
         pressure = inflation_pressureCheck();
-//        if (pressure == ERROR) {
-//            printf("Pressure Low\r\n");
-//        }
+        //        if (pressure == ERROR) {
+        //            printf("Pressure Low\r\n");
+        //        }
     }
 
     //Deflate wearable. Check if deflation pump needed and for how long.
@@ -181,16 +204,20 @@ int main(void) {
 #ifdef TEST_INFLATION_PRESSURE_MAIN
 
 #include "FRT.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 #define DESIRED_PRESSURE 825  //This value equals 15kPa. Used to test what pressure the inflatable actually reaches
 
 //Function converts the AD value read from the pin to voltage
-float calculateVoltage(short adVal){
+
+float calculateVoltage(short adVal) {
     return (adVal * 3.3) / 1023;
 }
 
 //Function converts the voltage to pressure
-float calculatePressure(float voltage){
+
+float calculatePressure(float voltage) {
     return ((voltage - 1.65) * 50000) / (255 * 0.0132);
 }
 
@@ -205,34 +232,37 @@ int main(void) {
     int iT = FRT_GetMilliSeconds();
     printf("Testing inflation pressure main\r\n");
 
-    while (1) {
-        while (FRT_GetMilliSeconds() - iT < 80){
-            inflation_inflate();
-        };
-        iT = FRT_GetMilliSeconds();
-        
-        while(FRT_GetMilliSeconds() - iT < 30000){
-            inflation_inflate();
-            
-            inflation_pressureCheck();
-            voltageFront = calculateVoltage(frontPressure);
-            voltageBack = calculateVoltage(backPressure);
-            pressureFront = calculatePressure(voltageFront);
-            pressureBack = calculatePressure(voltageBack);
-            
-            if (FRT_GetMilliSeconds() - pT >= 10) {
-                pT = FRT_GetMilliSeconds();
-                printf("Front = %0.4f Back = %0.4f\r\n", pressureFront, pressureBack);
-                if(frontPressure >= DESIRED_PRESSURE){
-                    printf("FRONT PRESSURE GOOD\r\n");
-                }
-                if(backPressure >= DESIRED_PRESSURE){
-                    printf("BACK PRESSURE GOOD\r\n");
-                }
-            }
-        }
-        inflation_deflate();
+    while (FRT_GetMilliSeconds() - iT <= 80) {
+        inflation_inflate();
     }
+    printf("FULL\r\n");
+    iT = FRT_GetMilliSeconds();
+
+    while (FRT_GetMilliSeconds() - iT < 10000) {
+        //            inflation_inflate();
+
+        inflation_pressureCheck();
+        voltageFront = calculateVoltage(frontPressure);
+        voltageBack = calculateVoltage(backPressure);
+        pressureFront = calculatePressure(voltageFront);
+        pressureBack = calculatePressure(voltageBack);
+
+        if (FRT_GetMilliSeconds() - pT >= 10) {
+            pT = FRT_GetMilliSeconds();
+            //            printf("%0.2f, %0.2f, \r\n", pressureFront, voltageFront);
+
+            printf("%0.2f, %0.2f, %0.2f, %0.2f, \r\n", pressureFront, voltageFront, pressureBack, voltageBack);
+            //                if (frontPressure >= DESIRED_PRESSURE) {
+            //                    printf("FRONT PRESSURE GOOD\r\n");
+            //                }
+            //                if (backPressure >= DESIRED_PRESSURE) {
+            //                    printf("BACK PRESSURE GOOD\r\n");
+            //                }
+        }
+    }
+    inflation_deflate();
+    printf("DONE\r\n");
+
     return (1);
 }
 #endif
