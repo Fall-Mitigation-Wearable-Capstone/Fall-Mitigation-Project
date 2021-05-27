@@ -11,7 +11,7 @@
  * Author: Archisha Sinha
  */
 /* ************************************************************************** */
-//#define MAIN
+#define MAIN
 #ifdef MAIN
 /* ************************************************************************** */
 /* Section: Included Files                                                    */
@@ -124,6 +124,10 @@ void checkUsability(void) {
             FRT_Init();
             checking_Init();
 
+            LOW_BATTERY_LED = 0;
+            MID_BATTERY_LED = 0;
+            HIGH_BATTERY_LED = 0;
+
             initTestLeds(); //For testing
             USER_LIGHT = 0;
             FALL_LIGHT = 0;
@@ -187,6 +191,9 @@ void detectMovement(void) {
 
             if (checking_checkForUser() == ERROR) { //Is user still wearing jacket?
                 USER_LIGHT = 0;
+                LOW_BATTERY_LED = 0;
+                MID_BATTERY_LED = 0;
+                HIGH_BATTERY_LED = 0;
                 BOARD_End(); //Shut down system
                 super = CHECK_USABILITY; //No user
                 sub = START;
@@ -216,6 +223,9 @@ void detectMovement(void) {
             //Checks if data was read properly
             if (checking_checkForUser() == ERROR) { //Is user still wearing jacket?
                 USER_LIGHT = 0;
+                LOW_BATTERY_LED = 0;
+                MID_BATTERY_LED = 0;
+                HIGH_BATTERY_LED = 0;
                 BOARD_End(); //Shut down system
                 super = CHECK_USABILITY; //No user
                 sub = START;
@@ -237,7 +247,7 @@ void detectMovement(void) {
                 fallDetection_updateFlags(); //Compare new data with fall thresholds
                 fallStatus = fallDetection_detectFalls(); //Determine if a fall was detected
                 //                INFLATION_LIGHT = 1;
-                printf("%.2f %.2f %.2f %.2f\r\n", diffRoll, gyroX, diffPitch, gyroY);
+//                printf("%.2f %.2f %.2f %.2f\r\n", diffRoll, gyroX, diffPitch, gyroY);
 
                 //If a fall is detected
                 if (fallStatus != 0) {
@@ -263,6 +273,9 @@ void detectMovement(void) {
             checking_errorLeds();
             prevTime = FRT_GetMilliSeconds();
             while (FRT_GetMilliSeconds() - prevTime <= ERROR_TIME);
+            LOW_BATTERY_LED = 0;
+            MID_BATTERY_LED = 0;
+            HIGH_BATTERY_LED = 0;
             BOARD_End(); //Shut down system
             //            printf("detecting IMU ERROR\r\n");
             //            printf("STOPPING SYSTEM (Reset ESP to continue testing)\r\n");
@@ -308,6 +321,9 @@ void inflateWearable(void) {
             inflation_deflate();
             prevTime = FRT_GetMilliSeconds();
             while (FRT_GetMilliSeconds() - prevTime <= ERROR_TIME);
+            LOW_BATTERY_LED = 0;
+            MID_BATTERY_LED = 0;
+            HIGH_BATTERY_LED = 0;
             BOARD_End(); //Shut down system
             //            printf("inflating INFLATION ERROR\r\n");
             //            printf("STOPPING SYSTEM (Reset ESP to continue testing)\r\n");

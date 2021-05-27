@@ -200,7 +200,7 @@ int main(void) {
 /* ************************************************************************** */
 /* Section: Test pressure of inflatable                                       */
 /* ************************************************************************** */
-#define TEST_INFLATION_PRESSURE_MAIN
+//#define TEST_INFLATION_PRESSURE_MAIN
 #ifdef TEST_INFLATION_PRESSURE_MAIN
 
 #include "FRT.h"

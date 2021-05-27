@@ -109,7 +109,7 @@ void BOARD_End()
     // kill off all interrupts except A/D and clear their flags
     IEC1CLR = ~(_IEC1_AD1IE_MASK);
     IFS0CLR = ~(_IFS1_AD1IF_MASK);
-
+//    LATG = 0;
     // set all ports to be digital inputs
     TRISB = 0xff;
     TRISC = 0xff;
