@@ -8,7 +8,7 @@
  * functions allow the program to keep track of time which aids in data logging
  * and ensuring correctly timed intervals.
  
- * Author: David Prager
+ * Author: David Prager & Archisha Sinha
  */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ void FRT_Init(void) {
 
     IFS0bits.T5IF = 0; //tmr5 isr flag set low
     IPC5bits.T5IP = 2; //tmr5 priority set to 2
+//    IPC5bits.T5IS = 2;
     IEC0bits.T5IE = 1; //tmr5 enabled
 
     T5CONbits.ON = 1; //tmr5 enabled

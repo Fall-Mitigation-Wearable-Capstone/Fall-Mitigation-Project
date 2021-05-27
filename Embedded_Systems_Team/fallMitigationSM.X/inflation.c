@@ -200,7 +200,7 @@ int main(void) {
 /* ************************************************************************** */
 /* Section: Test pressure of inflatable                                       */
 /* ************************************************************************** */
-//#define TEST_INFLATION_PRESSURE_MAIN
+#define TEST_INFLATION_PRESSURE_MAIN
 #ifdef TEST_INFLATION_PRESSURE_MAIN
 
 #include "FRT.h"
@@ -230,12 +230,18 @@ int main(void) {
     float voltageFront, voltageBack, pressureFront, pressureBack;
     int pT = FRT_GetMilliSeconds();
     int iT = FRT_GetMilliSeconds();
-    printf("Testing inflation pressure main\r\n");
+    //    printf("Testing inflation pressure main\r\n");
 
     while (FRT_GetMilliSeconds() - iT <= 80) {
         inflation_inflate();
+        inflation_pressureCheck();
+        voltageFront = calculateVoltage(frontPressure);
+        voltageBack = calculateVoltage(backPressure);
+        pressureFront = calculatePressure(voltageFront);
+        pressureBack = calculatePressure(voltageBack);
+        printf("%d, %0.2f, %0.2f, %0.2f, %0.2f, \r\n", FRT_GetMilliSeconds(), pressureFront, voltageFront, pressureBack, voltageBack);
     }
-    printf("FULL\r\n");
+    //    printf("FULL\r\n");
     iT = FRT_GetMilliSeconds();
 
     while (FRT_GetMilliSeconds() - iT < 10000) {
@@ -251,7 +257,7 @@ int main(void) {
             pT = FRT_GetMilliSeconds();
             //            printf("%0.2f, %0.2f, \r\n", pressureFront, voltageFront);
 
-            printf("%0.2f, %0.2f, %0.2f, %0.2f, \r\n", pressureFront, voltageFront, pressureBack, voltageBack);
+            printf("%d, %0.2f, %0.2f, %0.2f, %0.2f, \r\n", FRT_GetMilliSeconds(), pressureFront, voltageFront, pressureBack, voltageBack);
             //                if (frontPressure >= DESIRED_PRESSURE) {
             //                    printf("FRONT PRESSURE GOOD\r\n");
             //                }
@@ -261,7 +267,7 @@ int main(void) {
         }
     }
     inflation_deflate();
-    printf("DONE\r\n");
+    //    printf("DONE\r\n");
 
     return (1);
 }

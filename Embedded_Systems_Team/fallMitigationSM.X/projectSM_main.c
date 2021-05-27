@@ -11,7 +11,7 @@
  * Author: Archisha Sinha
  */
 /* ************************************************************************** */
-//#define MAIN/
+//#define MAIN
 #ifdef MAIN
 /* ************************************************************************** */
 /* Section: Included Files                                                    */
@@ -40,13 +40,16 @@ void initTestLeds(void); //Initialize LEDs for testing the system
 /* Local Variables                                                            */
 /* ************************************************************************** */
 //Time in milliseconds for all situations
-#define CALIBRATION_TIME 5000
+#define CALIBRATION_TIME 1000
 #define DATA_READ_ERROR_TIME 20
 #define INFLATE_FULLY_TIME 80
-#define MAINTAIN_INFLATION_TIME 10000
+#define MAINTAIN_INFLATION_TIME 2000
 #define DEFLATION_TIME 1000
 #define ERROR_TIME 10000
 
+#define FALL_LIGHT LATDbits.LATD8
+#define USER_LIGHT LATFbits.LATF1
+#define INFLATION_LIGHT LATDbits.LATD0
 //Enum holds all super states of the state machine
 
 enum Superstate {
@@ -75,7 +78,7 @@ enum Substate sub = START;
 
 static unsigned int prevDataReadTime; //Used to keep track of data reading times to detect errors
 static unsigned int prevTime; //Variable to track time intervals
-
+static unsigned int fallStatus;
 /* ************************************************************************** */
 /* Section: Main Loop                                                         */
 
@@ -85,14 +88,17 @@ int main(void) {
     while (1) {
         switch (super) {
             case CHECK_USABILITY:
+                //                printf("checking\r\n");
                 checkUsability();
                 break;
 
             case DETECT_MOVEMENT:
+                //                printf("detection\r\n");
                 detectMovement();
                 break;
 
             case INFLATE_WEARABLE:
+                //                printf("inflation\r\n");
                 inflateWearable();
                 break;
         }
@@ -111,6 +117,7 @@ int main(void) {
 void checkUsability(void) {
     switch (sub) {
         case START:
+            //            printf("init\r\n");
             //Initialize all systems here
             BOARD_Init();
             ADC_Init();
@@ -118,6 +125,9 @@ void checkUsability(void) {
             checking_Init();
 
             initTestLeds(); //For testing
+            USER_LIGHT = 0;
+            FALL_LIGHT = 0;
+            INFLATION_LIGHT = 0;
 
             sub = CHECK_FOR_USER;
             break;
@@ -125,16 +135,18 @@ void checkUsability(void) {
         case CHECK_FOR_USER:
             //Check if user has put the jacket on
             if (checking_checkForUser() == SUCCESS) {
-                LATFbits.LATF1 = 1;
                 //Initialize remaining hardware
                 inflation_Init();
-
+                begin(200.f);
+                USER_LIGHT = 1;
+                //                printf("User detected\r\n");
                 if (MPU9250_Init() == ERROR) {
                     printf("Error with sensor\r\n"); //Failed IMU Initialization
                     sub = IMU_ERROR;
                 } else {
                     sub = CHECK_BATTERY_LEVEL; //User ready    
                 }
+
             } else {
                 sub = CHECK_FOR_USER; //No user
             }
@@ -142,7 +154,7 @@ void checkUsability(void) {
 
         case CHECK_BATTERY_LEVEL:
             checking_setBatteryLevelLights(); //Set lights for battery indicators
-
+            //            printf("battery check\r\n");
             //Check if battery level is too low
             if (batteryLevel < BATTERY_LOW) {
                 sub = LOW_BATTERY; //Battery not ready
@@ -154,7 +166,7 @@ void checkUsability(void) {
             break;
 
         case LOW_BATTERY:
-//            printf("low battery (User takes off jacket)\r\n");
+            //            printf("low battery (User takes off jacket)\r\n");
 
             checking_flashBatteryLight(); //Indicate the battery is too low for usage
             //Charge the battery
@@ -171,10 +183,10 @@ void checkUsability(void) {
 void detectMovement(void) {
     switch (sub) {
         case CALIBRATE:
-//            printf("Calibrating\r\n");
+            //            printf("Calibrating\r\n");
 
             if (checking_checkForUser() == ERROR) { //Is user still wearing jacket?
-                LATFbits.LATF1 = 0;
+                USER_LIGHT = 0;
                 BOARD_End(); //Shut down system
                 super = CHECK_USABILITY; //No user
                 sub = START;
@@ -185,20 +197,25 @@ void detectMovement(void) {
                 //Calibrate IMU for 5 seconds
                 while (FRT_GetMilliSeconds() - prevTime < CALIBRATION_TIME) {
                     fallDetection_updateData(getPitch(), getRoll(), gyroX, gyroY);
+                    FALL_LIGHT = 1;
+                    INFLATION_LIGHT = 1;
+                    USER_LIGHT = 0;
                 }
-
+                FALL_LIGHT = 0;
+                INFLATION_LIGHT = 0;
+                USER_LIGHT = 1;
                 checking_setBatteryLevelLights();
-                printf("Done Calibrating\r\n");
+                //                printf("Done Calibrating\r\n");
                 sub = DETECT_FALLS;
             }
             break;
 
         case DETECT_FALLS:
-            printf("Detecting falls\r\n");
+            //            printf("Detecting falls\r\n");
 
             //Checks if data was read properly
             if (checking_checkForUser() == ERROR) { //Is user still wearing jacket?
-                LATFbits.LATF1 = 0;
+                USER_LIGHT = 0;
                 BOARD_End(); //Shut down system
                 super = CHECK_USABILITY; //No user
                 sub = START;
@@ -208,30 +225,31 @@ void detectMovement(void) {
             } else if (dataReadStatus == ERROR) {
                 /*If data has not been read for 20ms, reading frequency has dropped
                  * below 100Hz which is too slow for accurate fall detection. */
-                printf("Error occurred with read\r\n");
+                //                printf("Error occurred with read\r\n");
                 if (FRT_GetMilliSeconds() - prevDataReadTime >= DATA_READ_ERROR_TIME) {
                     sub = IMU_ERROR; //Failed read
                 }
             } else {
                 prevDataReadTime = FRT_GetMilliSeconds(); //Update time of good data read 
-
                 //Go through fall detection algorithm process
+
                 fallDetection_updateData(getPitch(), getRoll(), gyroX, gyroY); //Update data buffers and euler angle slopes
                 fallDetection_updateFlags(); //Compare new data with fall thresholds
-                fall = fallDetection_detectFalls(); //Determine if a fall was detected
-
+                fallStatus = fallDetection_detectFalls(); //Determine if a fall was detected
+                //                INFLATION_LIGHT = 1;
                 printf("%.2f %.2f %.2f %.2f\r\n", diffRoll, gyroX, diffPitch, gyroY);
 
                 //If a fall is detected
-                if (fall != 0) {
-                    LATFbits.LATF2 = 1;
-                    if (fall & FORWARD) printf("F");
-                    if (fall & BACKWARDS) printf("B");
-                    if (fall & LEFT) printf("L");
-                    if (fall & RIGHT) printf("R");
-                    printf("\r\n");
+                if (fallStatus != 0) {
+                    FALL_LIGHT = 1;
+                    //                    if (fall & FORWARD) printf("F");
+                    //                    if (fall & BACKWARDS) printf("B");
+                    //                    if (fall & LEFT) printf("L");
+                    //                    if (fall & RIGHT) printf("R");
+                    //                    printf("\r\n");
 
                     sub = INFLATE_TO_100;
+                    super = INFLATE_WEARABLE;
                     prevTime = FRT_GetMilliSeconds();
                     break;
                 } else {
@@ -244,10 +262,10 @@ void detectMovement(void) {
         case IMU_ERROR:
             checking_errorLeds();
             prevTime = FRT_GetMilliSeconds();
-            while(FRT_GetMilliSeconds() - prevTime <= ERROR_TIME);
+            while (FRT_GetMilliSeconds() - prevTime <= ERROR_TIME);
             BOARD_End(); //Shut down system
-            printf("detecting IMU ERROR\r\n");
-            printf("STOPPING SYSTEM (Reset ESP to continue testing)\r\n");
+            //            printf("detecting IMU ERROR\r\n");
+            //            printf("STOPPING SYSTEM (Reset ESP to continue testing)\r\n");
             break;
     }
 }
@@ -255,28 +273,29 @@ void detectMovement(void) {
 void inflateWearable(void) {
     switch (sub) {
         case INFLATE_TO_100:
-            printf("inflating 100\r\n");
+            //            printf("inflating 100\r\n");
 
             //Inflate the wearable fully. Should take 80ms
             inflation_inflate();
-            while (FRT_GetMilliSeconds() - prevTime <= INFLATE_FULLY_TIME) {
+            if (FRT_GetMilliSeconds() - prevTime <= INFLATE_FULLY_TIME) {
                 sub = INFLATE_TO_100; //Time to inflate not done
+            } else {
+                FALL_LIGHT = 0;
+                INFLATION_LIGHT = 1;
+                prevTime = FRT_GetMilliSeconds(); //Reset start time to be used to track time for maintaining inflation
+                sub = MAINTAIN_FULL_INFLATION; //Time to inflate done    
             }
-            
-            LATFbits.LATF2 = 0;
-            LATFbits.LATF3 = 1;
-            prevTime = FRT_GetMilliSeconds(); //Reset start time to be used to track time for maintaining inflation
-            sub = MAINTAIN_FULL_INFLATION; //Time to inflate done
+
             break;
 
         case MAINTAIN_FULL_INFLATION:
-            printf("inflating Full\r\n");
+            //            printf("inflating Full\r\n");
 
             //Hold the inflation at full until hold time completes and pressure is in a good range
             if (inflation_pressureCheck() == ERROR) {
                 sub = INFLATION_ERROR; //Low pressure
             } else if (FRT_GetMilliSeconds() - prevTime >= MAINTAIN_INFLATION_TIME) { //Inflation must be maintained for 30 seconds
-                LATFbits.LATF3 = 0;
+                INFLATION_LIGHT = 0;
                 prevTime = FRT_GetMilliSeconds();
                 sub = DEFLATE_FULLY; //Hold time done
             } else {
@@ -286,15 +305,16 @@ void inflateWearable(void) {
 
         case INFLATION_ERROR:
             checking_errorLeds();
+            inflation_deflate();
             prevTime = FRT_GetMilliSeconds();
-            while(FRT_GetMilliSeconds() - prevTime <= ERROR_TIME);
+            while (FRT_GetMilliSeconds() - prevTime <= ERROR_TIME);
             BOARD_End(); //Shut down system
-            printf("inflating INFLATION ERROR\r\n");
-            printf("STOPPING SYSTEM (Reset ESP to continue testing)\r\n");
+            //            printf("inflating INFLATION ERROR\r\n");
+            //            printf("STOPPING SYSTEM (Reset ESP to continue testing)\r\n");
             break;
 
         case DEFLATE_FULLY:
-            printf("deflating Fully\r\n");
+            //            printf("deflating Fully\r\n");
 
             //Deflate the wearable
             inflation_deflate();
@@ -306,9 +326,9 @@ void inflateWearable(void) {
 }
 
 void initTestLeds(void) {
+    TRISDbits.TRISD0 = 0;
+    TRISDbits.TRISD8 = 0;
     TRISFbits.TRISF1 = 0;
-    TRISFbits.TRISF2 = 0;
-    TRISFbits.TRISF3 = 0;
 }
 
 #endif

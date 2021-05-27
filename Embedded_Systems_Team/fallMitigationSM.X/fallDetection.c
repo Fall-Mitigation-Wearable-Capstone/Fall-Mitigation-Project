@@ -196,7 +196,7 @@ void fallDetection_resetFlags() {
 /* ************************************************************************** */
 /* Section: Test main                                                         */
 /* ************************************************************************** */
-#define TEST_FALL_DETECTION_MAIN
+//#define TEST_FALL_DETECTION_MAIN
 #ifdef TEST_FALL_DETECTION_MAIN
 #include "BOARD.h"
 #include "FRT.h"
@@ -219,17 +219,17 @@ int main(void) {
     BOARD_Init();
     FRT_Init();
     begin(200.f);
-    TRISGbits.TRISG8 = 0; //Pin for "battery level los" led set as output 
-    TRISGbits.TRISG7 = 0; //Pin for "battery level mid" led set as output
-    TRISGbits.TRISG6 = 0;
+    TRISDbits.TRISD8 = 0; //Pin for "battery level los" led set as output 
+    TRISFbits.TRISF1 = 0; //Pin for "battery level mid" led set as output
+    TRISDbits.TRISD0 = 0;
     
     printf("Testing fall detection as state machine\r\n");
     if (MPU9250_Init() == ERROR) {
-        LATGbits.LATG8 = 1;
+        LATFbits.LATF1 = 1;
         printf("Error with sensor\r\n");
         while (1);
     }
-    LATGbits.LATG7 = 1;
+    LATDbits.LATD0 = 1;
     int time = FRT_GetMilliSeconds(), t;
     while (FRT_GetMilliSeconds() - time < 5000) {
         
@@ -238,7 +238,7 @@ int main(void) {
         //update?
     }
     time = FRT_GetMilliSeconds();
-    LATGbits.LATG7 = 0;
+    LATDbits.LATD0 = 0;
 //    printf("Done Calibrating\r\n");
 
     while (1) {
@@ -273,7 +273,7 @@ int main(void) {
                     
                     //If a fall is detected
                     if (fall != 0) {
-                        LATGbits.LATG6 = 1;
+                        LATDbits.LATD8 = 1;
                         if (fall & FORWARD) printf("F");
                         if (fall & BACKWARDS) printf("B");
                         if (fall & LEFT) printf("L");
@@ -290,7 +290,7 @@ int main(void) {
                 break;
 
             case IMU_ERROR:
-                LATGbits.LATG8 = 1;
+                LATFbits.LATF1 = 1;
                 printf("detecting IMU ERROR\r\n");
                 printf("STOPPING SYSTEM (Reset ESP to continue testing)\r\n");
                 break;
@@ -300,7 +300,7 @@ int main(void) {
                 fallDetection_updateData(getPitch(), getRoll(), gyroX, gyroY);
                 if (FRT_GetMilliSeconds() - t > 1000) {
                     states = DETECT_FALLS;
-                    LATGbits.LATG6 = 0;
+                    LATDbits.LATD8 = 0;
                 }
                 break;
         }

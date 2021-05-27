@@ -19,8 +19,8 @@
 #define BACKWARDS 0b0010 //Backwards fall flag value
 #define LEFT 0b0100  //Left fall flag value
 #define RIGHT 0b1000 //Right fall flag value
-static float diffRoll;
-static float diffPitch;
+float diffRoll;
+float diffPitch;
 
 /* 
 Function: fallDetection_updateData
