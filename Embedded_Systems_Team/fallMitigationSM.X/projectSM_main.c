@@ -247,7 +247,7 @@ void detectMovement(void) {
                 fallDetection_updateFlags(); //Compare new data with fall thresholds
                 fallStatus = fallDetection_detectFalls(); //Determine if a fall was detected
                 //                INFLATION_LIGHT = 1;
-//                printf("%.2f %.2f %.2f %.2f\r\n", diffRoll, gyroX, diffPitch, gyroY);
+                //                printf("%.2f %.2f %.2f %.2f\r\n", diffRoll, gyroX, diffPitch, gyroY);
 
                 //If a fall is detected
                 if (fallStatus != 0) {
@@ -307,24 +307,35 @@ void inflateWearable(void) {
             //Hold the inflation at full until hold time completes and pressure is in a good range
             if (inflation_pressureCheck() == ERROR) {
                 sub = INFLATION_ERROR; //Low pressure
-            } else if (FRT_GetMilliSeconds() - prevTime >= MAINTAIN_INFLATION_TIME) { //Inflation must be maintained for 30 seconds
+            } else if (FRT_GetMilliSeconds() - prevTime <= MAINTAIN_INFLATION_TIME) {
+                sub = MAINTAIN_FULL_INFLATION;
+            } else {
                 INFLATION_LIGHT = 0;
                 prevTime = FRT_GetMilliSeconds();
                 sub = DEFLATE_FULLY; //Hold time done
-            } else {
-                sub = MAINTAIN_FULL_INFLATION; //Hold time not done and correct pressure range
             }
+
+            //            else if (FRT_GetMilliSeconds() - prevTime >= MAINTAIN_INFLATION_TIME) { //Inflation must be maintained for 30 seconds
+            //                INFLATION_LIGHT = 0;
+            //                prevTime = FRT_GetMilliSeconds();
+            //                sub = DEFLATE_FULLY; //Hold time done
+            //            } else {
+            //                sub = MAINTAIN_FULL_INFLATION; //Hold time not done and correct pressure range
+            //            }
             break;
 
         case INFLATION_ERROR:
-            checking_errorLeds();
-            inflation_deflate();
-            prevTime = FRT_GetMilliSeconds();
-            while (FRT_GetMilliSeconds() - prevTime <= ERROR_TIME);
-            LOW_BATTERY_LED = 0;
-            MID_BATTERY_LED = 0;
-            HIGH_BATTERY_LED = 0;
-            BOARD_End(); //Shut down system
+            //            prevTime = FRT_GetMilliSeconds();
+            if (FRT_GetMilliSeconds() - prevTime <= ERROR_TIME){
+                checking_errorLeds();
+                inflation_deflate();
+            }
+            else {
+//                LOW_BATTERY_LED = 0;
+//                MID_BATTERY_LED = 0;
+//                HIGH_BATTERY_LED = 0;
+                BOARD_End(); //Shut down system
+            }
             //            printf("inflating INFLATION ERROR\r\n");
             //            printf("STOPPING SYSTEM (Reset ESP to continue testing)\r\n");
             break;
